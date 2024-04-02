@@ -27,11 +27,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Racha Aí
-        uses: ./.github/actions/racha-ai-setup
+      - name: Setup Regex Match
+        uses: ./.github/actions/regex-match-setup
 
       - name: Check formatting style
-        uses: ./.github/actions/racha-ai-style-check
+        uses: ./.github/actions/regex-match-style-check
 
       - name: Lint code and check types
         run: |
