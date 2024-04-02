@@ -1,5 +1,18 @@
-out
-dist
-node_modules
+# Dependencies
+/node_modules
+
+# Testing
 .vscode-test/
+
+# Build
+/build
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ESlint
+.eslintcache
+
+# VSCode
 *.vsix
