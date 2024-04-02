@@ -1,0 +1,27 @@
+name: Cache
+
+on:
+  push:
+    branches:
+      - canary
+  workflow_dispatch:
+
+concurrency:
+  group: cache
+  cancel-in-progress: true
+
+jobs:
+  cache-canary:
+    name: Cache canary
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Racha Aí
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Check formatting style and save prettier cache
+        uses: ./.github/actions/regex-match-style-check
