@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  pull_request:
+    types:
+      - opened
+      - synchronize
+      - reopened
+    branches-ignore:
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.ref_name }}
+  cancel-in-progress: true
+
+env:
+  CI: true
+
+jobs:
+  ci:
+    name: CI
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Regex Match
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Check formatting style
+        uses: ./.github/actions/regex-match-style-check
+
+      - name: Lint code and check types
+        run: |
+          pnpm concurrently --names lint,types \
+            'pnpm lint .' \
+            'pnpm types:check'

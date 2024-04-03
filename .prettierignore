@@ -13,5 +13,10 @@
 .eslintcache
 tsconfig.tsbuildinfo
 
+# Cache
+.cache
+.eslintcache
+tsconfig.tsbuildinfo
+
 # Miscellaneous
 .vscode-test

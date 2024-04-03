@@ -1,0 +1,40 @@
+name: Regex Match Setup
+description: Set up Regex Match
+
+runs:
+  using: composite
+  steps:
+    - name: Install Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: 20.11.1
+
+    - name: Install pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: 8.15.3
+
+    - name: Get pnpm store directory
+      id: pnpm-store
+      shell: bash
+      run: echo "path=$(pnpm store path)" >> $GITHUB_OUTPUT
+
+    - name: Restore pnpm cache
+      id: pnpm-cache
+      uses: actions/cache@v4
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+        restore-keys: |
+          ${{ runner.os }}-pnpm-store-
+
+    - name: Install dependencies
+      shell: bash
+      run: pnpm install --prefer-offline --frozen-lockfile
+
+    - name: Save dependency cache
+      uses: actions/cache/save@v4
+      if: ${{ steps.pnpm-cache.outputs.cache-hit != 'true' }}
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}

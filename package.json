@@ -32,7 +32,8 @@
     "style:format": "pnpm style --write",
     "types:check": "tsc --noEmit",
     "pre:commit": "lint-staged",
-    "pre:push": "concurrently --names style,lint,types 'pnpm style:check .' 'pnpm lint .' 'pnpm types:check'"
+    "pre:push": "concurrently --names style,lint,types 'pnpm style:check .' 'pnpm lint .' 'pnpm types:check'",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.2.1",
@@ -44,6 +45,7 @@
     "@typescript-eslint/parser": "^6.19.1",
     "@vscode/test-cli": "^0.0.4",
     "@vscode/test-electron": "^2.3.9",
+    "concurrently": "^8.2.2",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-import-resolver-typescript": "^3.6.1",
