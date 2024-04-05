@@ -5,7 +5,7 @@
 .vscode-test/
 
 # Build
-/build
+/out
 
 # TypeScript
 *.tsbuildinfo

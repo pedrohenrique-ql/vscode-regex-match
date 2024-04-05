@@ -11,20 +11,20 @@
     "Other"
   ],
   "activationEvents": [],
-  "main": "./build/extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "commands": [
       {
-        "command": "regex-match.helloWorld",
-        "title": "Hello World"
+        "command": "regex-match.openRegexTestWindow",
+        "title": "Test Regex"
       }
     ]
   },
   "scripts": {
-    "vscode:prepublish": "pnpm run build",
-    "build": "tsc -p ./",
+    "vscode:prepublish": "pnpm run compile",
+    "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pre:test": "pnpm run build && pnpm run lint",
+    "pre:test": "pnpm run compile && pnpm run lint",
     "test": "pnpm run pre:test && vscode-test",
     "lint": "eslint --ext 'ts' --cache --no-error-on-unmatched-pattern --max-warnings 0 --fix",
     "style": "prettier --log-level warn --ignore-unknown --no-error-on-unmatched-pattern --cache",
