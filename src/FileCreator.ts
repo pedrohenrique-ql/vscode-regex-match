@@ -1,13 +1,10 @@
 import { TextEncoder } from 'util';
 import { Uri, ViewColumn, window, workspace } from 'vscode';
 
-const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 const DEFAULT_FILE_CONTENT = `/[0-9]+a+/g\n---\n123aaa\n---`;
 
 class FileCreator {
-  static async openRegexTestFile(extensionPath: string) {
-    const fileUri = Uri.file(`${extensionPath}/${REGEX_TEST_FILE_PATH}`);
-
+  static async openRegexTestFile(fileUri: Uri) {
     try {
       await workspace.fs.stat(fileUri);
     } catch (_error) {

@@ -1,10 +1,19 @@
-import { commands, window, ExtensionContext, workspace } from 'vscode';
+import { commands, window, ExtensionContext, workspace, Uri, ConfigurationTarget } from 'vscode';
 
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
 import RegexTester from './RegexTester';
 
-export function activate(context: ExtensionContext) {
+const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
+
+export async function activate(context: ExtensionContext) {
+  const regexTestFileUri = Uri.file(`${context.extensionPath}/${REGEX_TEST_FILE_PATH}`);
+  await workspace
+    .getConfiguration('', regexTestFileUri)
+    .update('files.autoSave', 'afterDelay', ConfigurationTarget.Global);
+
+  let testDebounce: NodeJS.Timeout | undefined;
+
   async function parseAndTextRegex(fileContent: string) {
     try {
       const parsedRegexTest = FileParser.parseRegexAndTextLines(fileContent);
@@ -23,19 +32,26 @@ export function activate(context: ExtensionContext) {
   }
 
   const openRegexTestWindowDisposable = commands.registerCommand('regex-match.openRegexTestWindow', async () => {
-    const document = await FileCreator.openRegexTestFile(context.extensionPath);
+    const document = await FileCreator.openRegexTestFile(regexTestFileUri);
     await parseAndTextRegex(document.getText());
   });
 
-  const onChangeTextDocumentDisposable = workspace.onDidChangeTextDocument(async (event) => {
+  const onChangeTextDocumentDisposable = workspace.onDidChangeTextDocument((event) => {
     const activeEditor = window.activeTextEditor;
     if (!activeEditor) {
       return;
     }
 
     const document = event.document;
-    if (document === activeEditor.document) {
-      await parseAndTextRegex(document.getText());
+
+    if (document === activeEditor.document && event.contentChanges.length !== 0) {
+      if (testDebounce) {
+        clearTimeout(testDebounce);
+      }
+
+      testDebounce = setTimeout(async () => {
+        await parseAndTextRegex(document.getText());
+      }, 500);
     }
   });
 
