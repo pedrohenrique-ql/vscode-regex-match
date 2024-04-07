@@ -20,19 +20,15 @@ class FileParser {
     }
   }
 
-  static transformStringToRegExp(patternString: string): RegExp | null {
+  static transformStringToRegExp(patternString: string): RegExp | undefined {
     const matchGroups = patternString.match(/\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
     if (matchGroups) {
       const [, pattern] = matchGroups;
       const flags = matchGroups.groups?.flags;
 
-      console.log(flags);
-
       return new RegExp(pattern, flags?.replace('/', '') ?? DEFAULT_FLAG);
     }
-
-    return null;
   }
 
   static getTestLines(fileContent: string[]): string[] {

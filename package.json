@@ -16,7 +16,7 @@
     "commands": [
       {
         "command": "regex-match.openRegexTestWindow",
-        "title": "Test Regex"
+        "title": "Open Regex Test Window"
       }
     ]
   },
