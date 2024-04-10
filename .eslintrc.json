@@ -94,14 +94,14 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["**/tests/**/*.ts*", "**/__tests__/**/*.ts*", "**/*.test.ts*", "*.config.ts", "*.d.ts"]
+        "devDependencies": ["**/test/**/*.ts*", "**/__test__/**/*.ts*", "**/*.test.ts*", "*.config.ts", "*.d.ts"]
       }
     ],
     "import-helpers/order-imports": [
       "warn",
       {
         "newlinesBetween": "always",
-        "groups": ["module", ["/^@//", "/^@tests/", "/^@@//"], ["parent", "sibling", "index"]],
+        "groups": ["module", ["/^@//", "/^@test/", "/^@@//"], ["parent", "sibling", "index"]],
         "alphabetize": { "order": "asc", "ignoreCase": true }
       }
     ],
@@ -234,7 +234,7 @@
   },
   "overrides": [
     {
-      "files": ["**/*.test.ts*", "**/tests/**/utils/*.ts"],
+      "files": ["**/*.test.ts*", "**/test/**/utils/*.ts"],
       "rules": {
         "@typescript-eslint/no-non-null-assertion": "off"
       }

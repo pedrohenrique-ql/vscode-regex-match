@@ -3,7 +3,7 @@
 /pnpm-lock.yaml
 
 # Build
-/build
+/out
 
 # Configuration
 .husky
