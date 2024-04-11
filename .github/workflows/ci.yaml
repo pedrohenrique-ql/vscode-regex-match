@@ -20,7 +20,12 @@ env:
 jobs:
   ci:
     name: CI
-    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        os: [macos-latest, ubuntu-latest, windows-latest]
+
+    runs-on: ${{ matrix.os }}
     timeout-minutes: 5
 
     steps:
@@ -38,3 +43,17 @@ jobs:
           pnpm concurrently --names lint,types \
             'pnpm lint .' \
             'pnpm types:check'
+
+      - name: Prepare test environment
+        run: pnpm run pre:test
+
+      - name: Run unit tests
+        run: pnpm test:vi run
+
+      - name: Run integration tests
+        run: |
+          if [ "$RUNNER_OS" = "Linux" ]; then
+            xvfb-run -a pnpm test
+          else
+            pnpm test:vsc
+          fi

@@ -24,7 +24,7 @@
     "vscode:prepublish": "pnpm run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "pre:test": "pnpm run compile && pnpm run lint",
+    "pre:test": "pnpm run compile",
     "test:vsc": "pnpm pre:test && vscode-test",
     "test:vi": "vitest",
     "lint": "eslint --ext 'ts' --cache --no-error-on-unmatched-pattern --max-warnings 0 --fix",
