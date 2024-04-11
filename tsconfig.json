@@ -1,7 +1,6 @@
 {
   "compilerOptions": {
     "target": "esnext",
-    // "lib": ["esnext"],
     "outDir": "out",
     "sourceMap": true,
     "strict": true,
@@ -13,7 +12,7 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "paths": {
-      "@/*": ["./"],
+      "@/*": ["./src/*"],
       "@tests/*": ["./tests/*"],
       "@@/*": ["./*"]
     }
