@@ -11,7 +11,7 @@
     "Other"
   ],
   "activationEvents": [],
-  "main": "./out/extension.js",
+  "main": "./out/src/extension.js",
   "contributes": {
     "commands": [
       {
@@ -62,7 +62,6 @@
     "mocha": "^10.4.0",
     "prettier": "^3.2.5",
     "prettier-plugin-sh": "^0.14.0",
-    "tmp": "^0.2.3",
-    "typescript": "^5.3.3"
+    "tmp": "^0.2.3"
   }
 }

@@ -2,7 +2,7 @@ import { defineConfig } from '@vscode/test-cli';
 
 export default defineConfig({
   label: 'unitTests',
-  files: 'out/test/**/*.test.js',
+  files: 'out/src/tests/integration/**/*.test.js',
   version: 'insiders',
   mocha: {
     ui: 'tdd',
