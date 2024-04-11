@@ -1,5 +1,11 @@
 import { defineConfig } from '@vscode/test-cli';
 
 export default defineConfig({
-  files: 'build/tests/**/*.test.js',
+  label: 'unitTests',
+  files: 'out/test/**/*.test.js',
+  version: 'insiders',
+  mocha: {
+    ui: 'tdd',
+    timeout: 20000,
+  },
 });
