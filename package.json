@@ -25,7 +25,8 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "pre:test": "pnpm run compile && pnpm run lint",
-    "test": "pnpm pre:test && vscode-test",
+    "test:vsc": "pnpm pre:test && vscode-test",
+    "test:vi": "vitest",
     "lint": "eslint --ext 'ts' --cache --no-error-on-unmatched-pattern --max-warnings 0 --fix",
     "style": "prettier --log-level warn --ignore-unknown --no-error-on-unmatched-pattern --cache",
     "style:check": "pnpm style --check",
@@ -62,6 +63,8 @@
     "mocha": "^10.4.0",
     "prettier": "^3.2.5",
     "prettier-plugin-sh": "^0.14.0",
-    "tmp": "^0.2.3"
+    "tmp": "^0.2.3",
+    "typescript": "^5.3.3",
+    "vitest": "^1.4.0"
   }
 }
