@@ -53,7 +53,7 @@ jobs:
       - name: Run integration tests
         run: |
           if [ "$RUNNER_OS" = "Linux" ]; then
-            xvfb-run -a pnpm test
+            xvfb-run -a pnpm test:vsc
           else
             pnpm test:vsc
           fi
