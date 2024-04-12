@@ -35,15 +35,9 @@ jobs:
 
       - name: Lint code and check types
         run: |
-          if [ "$RUNNER_OS" = "Windows" ]; then \
-            pnpm concurrently --names lint,types `
-              'pnpm lint .' `
-              'pnpm types:check'; \
-          else \
-            pnpm concurrently --names lint,types \
-              'pnpm lint .' \
-              'pnpm types:check'; \
-          fi
+          pnpm concurrently --names lint,types \
+            'pnpm lint .' \
+            'pnpm types:check'; \
 
   ci-ubuntu-latest:
     name: CI (ubuntu-latest)
@@ -89,8 +83,8 @@ jobs:
       - name: Lint code and check types
         run: |
           pnpm concurrently --names lint,types ^
-            'pnpm lint .' ^
-            'pnpm types:check';
+            "pnpm lint ." ^
+            "pnpm types:check"
 
       - name: Prepare test environment
         run: pnpm run pre:test
