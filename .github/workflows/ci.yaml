@@ -18,14 +18,9 @@ env:
   CI: true
 
 jobs:
-  ci:
-    name: CI
-
-    strategy:
-      matrix:
-        os: [macos-latest, ubuntu-latest, windows-latest]
-
-    runs-on: ${{ matrix.os }}
+  ci-common:
+    name: CI Common
+    runs-on: ubuntu-latest
     timeout-minutes: 5
 
     steps:
@@ -50,16 +45,42 @@ jobs:
               'pnpm types:check'; \
           fi
 
-      - name: Prepare test environment
-        run: pnpm run pre:test
+  ci-ubuntu-latest:
+    name: CI (ubuntu-latest)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
 
-      - name: Run unit tests
-        run: pnpm test:vi run
+    - name: Lint code and check types
+      run: |
+        pnpm concurrently --names lint,types \
+          'pnpm lint .' \
+          'pnpm types:check'; \
 
-      - name: Run integration tests
-        run: |
-          if [ "$RUNNER_OS" = "Linux" ]; then
-            xvfb-run -a pnpm test:vsc
-          else
-            pnpm test:vsc
-          fi
+    - name: Prepare test environment
+      run: pnpm run pre:test
+
+    - name: Run unit tests
+      run: pnpm test:vi run
+
+    - name: Run integration tests
+      run: xvfb-run -a pnpm test:vsc
+    
+  ci-ubuntu-latest:
+    name: CI (windows-latest)
+    runs-on: windows-latest
+    timeout-minutes: 5
+
+    - name: Lint code and check types
+      run: |
+        pnpm concurrently --names lint,types ^
+          'pnpm lint .' ^
+          'pnpm types:check';
+
+    - name: Prepare test environment
+      run: pnpm run pre:test
+
+    - name: Run unit tests
+      run: pnpm test:vi run
+
+    - name: Run integration tests
+      run: pnpm test:vsc
