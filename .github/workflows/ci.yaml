@@ -40,9 +40,15 @@ jobs:
 
       - name: Lint code and check types
         run: |
-          pnpm concurrently --names lint,types \
-            'pnpm lint .' \
-            'pnpm types:check'
+          if [ "$RUNNER_OS" = "Windows" ]; then \
+            pnpm concurrently --names lint,types `
+              'pnpm lint .' `
+              'pnpm types:check'; \
+          else \
+            pnpm concurrently --names lint,types \
+              'pnpm lint .' \
+              'pnpm types:check'; \
+          fi
 
       - name: Prepare test environment
         run: pnpm run pre:test
