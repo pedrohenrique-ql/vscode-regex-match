@@ -81,10 +81,7 @@ jobs:
         uses: ./.github/actions/regex-match-setup
 
       - name: Lint code and check types
-        run: |
-          pnpm concurrently --names lint,types ^
-            "pnpm lint ." ^
-            "pnpm types:check"
+        run: pnpm concurrently --names lint,types "pnpm lint ." "pnpm types:check"
 
       - name: Prepare test environment
         run: pnpm run pre:test
