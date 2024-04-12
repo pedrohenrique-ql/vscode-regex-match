@@ -18,8 +18,8 @@ env:
   CI: true
 
 jobs:
-  ci:
-    name: CI
+  ci-common:
+    name: CI Common
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -37,4 +37,82 @@ jobs:
         run: |
           pnpm concurrently --names lint,types \
             'pnpm lint .' \
-            'pnpm types:check'
+            'pnpm types:check'; \
+
+  ci-ubuntu-latest:
+    name: CI (ubuntu-latest)
+    runs-on: ubuntu-latest
+    needs: [ci-common]
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Regex Match
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Lint code and check types
+        run: |
+          pnpm concurrently --names lint,types \
+            'pnpm lint .' \
+            'pnpm types:check'; \
+
+      - name: Prepare test environment
+        run: pnpm run pre:test
+
+      - name: Run unit tests
+        run: pnpm test:vi run
+
+      - name: Run integration tests
+        run: xvfb-run -a pnpm test:vsc
+
+  ci-windows-latest:
+    name: CI (windows-latest)
+    runs-on: windows-latest
+    needs: [ci-common]
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Regex Match
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Lint code and check types
+        run: pnpm concurrently --names lint,types "pnpm lint ." "pnpm types:check"
+
+      - name: Prepare test environment
+        run: pnpm run pre:test
+
+      - name: Run unit tests
+        run: pnpm test:vi run
+
+      - name: Run integration tests
+        run: pnpm test:vsc
+
+  ci-macos-latest:
+    name: CI (macos-latest)
+    runs-on: macos-latest
+    needs: [ci-common]
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Regex Match
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Lint code and check types
+        run: pnpm concurrently --names lint,types "pnpm lint ." "pnpm types:check"
+
+      - name: Prepare test environment
+        run: pnpm run pre:test
+
+      - name: Run unit tests
+        run: pnpm test:vi run
+
+      - name: Run integration tests
+        run: pnpm test:vsc

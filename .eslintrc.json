@@ -94,7 +94,7 @@
     "import/no-extraneous-dependencies": [
       "error",
       {
-        "devDependencies": ["**/tests/**/*.ts*", "**/__tests__/**/*.ts*", "**/*.test.ts*", "*.config.ts", "*.d.ts"]
+        "devDependencies": ["**/tests/**/*.ts*", "**/__test__/**/*.ts*", "**/*.test.ts*", "*.config.ts", "*.d.ts"]
       }
     ],
     "import-helpers/order-imports": [

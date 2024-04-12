@@ -1,18 +1,21 @@
 {
   "compilerOptions": {
-    "module": "Node16",
-    "target": "ES2022",
-    "outDir": "build",
-    "lib": ["ES2022"],
+    "target": "esnext",
+    "outDir": "out",
     "sourceMap": true,
-    "baseUrl": ".",
     "strict": true,
-    "allowJs": true,
-    "noEmit": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "module": "CommonJS",
+    "moduleResolution": "node",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "incremental": true
+    "paths": {
+      "@/*": ["./src/*"],
+      "@tests/*": ["./tests/*"],
+      "@@/*": ["./*"]
+    }
   },
   "exclude": ["node_modules"]
 }
