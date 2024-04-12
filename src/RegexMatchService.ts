@@ -13,7 +13,7 @@ import FileCreator from './FileCreator';
 import FileParser from './FileParser';
 import RegexTester from './RegexTester';
 
-const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
+export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
