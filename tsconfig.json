@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "types": ["@types/vscode"],
     "target": "esnext",
     "outDir": "out",
     "sourceMap": true,
@@ -13,9 +14,10 @@
     "isolatedModules": true,
     "paths": {
       "@/*": ["./src/*"],
-      "@tests/*": ["./tests/*"],
+      "@tests/*": ["./src/tests/*"],
       "@@/*": ["./*"]
     }
   },
+  "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }
