@@ -1,4 +1,5 @@
-const DEFAULT_FLAGS = ['g', 'd', 'm'];
+const DEFAULT_FLAGS = ['g', 'm'];
+const REQUIRED_FLAG = 'd';
 const TEST_AREA_DIVIDER = '---';
 
 export interface ParsedRegexTest {
@@ -7,7 +8,7 @@ export interface ParsedRegexTest {
 }
 
 class FileParser {
-  static parseRegexAndTextLines(fileContent: string): ParsedRegexTest | undefined {
+  static parseFileContent(fileContent: string): ParsedRegexTest | undefined {
     const fileLines = fileContent.split('\n');
 
     if (fileLines.length > 0) {
@@ -26,7 +27,7 @@ class FileParser {
   }
 
   static transformStringToRegExp(patternString: string): RegExp | undefined {
-    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuyd]*)?$/i);
 
     if (matchGroups) {
       const [, pattern] = matchGroups;
@@ -36,6 +37,10 @@ class FileParser {
 
       if (!flags) {
         flags = DEFAULT_FLAGS.join('');
+      }
+
+      if (!flags.includes(REQUIRED_FLAG)) {
+        flags += REQUIRED_FLAG;
       }
 
       return new RegExp(pattern, flags);

@@ -45,7 +45,7 @@ class RegexMatchService {
 
   private async parseAndTestRegex(fileContent: string) {
     try {
-      const parsedRegexTest = FileParser.parseRegexAndTextLines(fileContent);
+      const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
       if (!parsedRegexTest) {
         await window.showErrorMessage('Regex not found. Please format the file according to the established standard.');
