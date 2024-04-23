@@ -43,7 +43,6 @@ class RegexTester {
       }
     }
 
-    console.log(matchResults);
     return matchResults;
   }
 }
