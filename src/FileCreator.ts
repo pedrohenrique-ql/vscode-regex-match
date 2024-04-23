@@ -1,7 +1,7 @@
 import { TextEncoder } from 'util';
 import { Uri, ViewColumn, window, workspace } from 'vscode';
 
-export const DEFAULT_FILE_CONTENT = `/[0-9]+a+/g\n---\n123aaa\n---`;
+export const DEFAULT_FILE_CONTENT = `/[0-9]+a+/gm\n---\n123aaa\nb2507ab\n2024aa---`;
 
 class FileCreator {
   static async openRegexTestFile(fileUri: Uri) {

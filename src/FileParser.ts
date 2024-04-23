@@ -1,4 +1,4 @@
-const DEFAULT_FLAG = 'g';
+const DEFAULT_FLAGS = ['g', 'd', 'm'];
 const TEST_AREA_DIVIDER = '---';
 
 export interface ParsedRegexTest {
@@ -15,19 +15,30 @@ class FileParser {
 
       if (matchingRegex) {
         const testLines = this.getTestLines(fileLines.slice(1));
+
+        if (matchingRegex.flags.includes('m')) {
+          return { matchingRegex, testLines: [testLines.join('\n')] };
+        }
+
         return { matchingRegex, testLines };
       }
     }
   }
 
   static transformStringToRegExp(patternString: string): RegExp | undefined {
-    const matchGroups = patternString.match(/\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
     if (matchGroups) {
       const [, pattern] = matchGroups;
-      const flags = matchGroups.groups?.flags;
+      const flagsGroup = matchGroups.groups?.flags;
 
-      return new RegExp(pattern, flags?.replace('/', '') ?? DEFAULT_FLAG);
+      let flags = flagsGroup?.replace('/', '');
+
+      if (!flags) {
+        flags = DEFAULT_FLAGS.join('');
+      }
+
+      return new RegExp(pattern, flags);
     }
   }
 

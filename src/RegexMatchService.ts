@@ -52,7 +52,7 @@ class RegexMatchService {
         return;
       }
 
-      await RegexTester.testRegex(parsedRegexTest);
+      RegexTester.testRegex(parsedRegexTest);
     } catch (error) {
       if (error instanceof Error) {
         await window.showErrorMessage(error.message);
