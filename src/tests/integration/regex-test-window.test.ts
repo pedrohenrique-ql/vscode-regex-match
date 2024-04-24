@@ -13,7 +13,9 @@ describe('Regex Test Window', () => {
     assert.notStrictEqual(activeTextEditor, undefined);
 
     assert.equal(activeTextEditor!.viewColumn, ViewColumn.Two);
-    assert.ok(activeTextEditor!.document.fileName.endsWith(REGEX_TEST_FILE_PATH.split('/').pop()!));
+    const realEndPath = activeTextEditor!.document.fileName.replace(/[/\\]/g, '');
+    const expectedEndPath = REGEX_TEST_FILE_PATH.replace(/\//g, '');
+    assert.ok(realEndPath.endsWith(expectedEndPath));
     assert.equal(activeTextEditor!.document.getText(), DEFAULT_FILE_CONTENT);
   });
 });
