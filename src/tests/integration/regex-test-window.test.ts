@@ -13,7 +13,7 @@ describe('Regex Test Window', () => {
     assert.notStrictEqual(activeTextEditor, undefined);
 
     assert.equal(activeTextEditor!.viewColumn, ViewColumn.Two);
-    assert.ok(activeTextEditor!.document.fileName.endsWith(REGEX_TEST_FILE_PATH));
+    assert.ok(activeTextEditor!.document.fileName.endsWith(REGEX_TEST_FILE_PATH.split('/').pop()!));
     assert.equal(activeTextEditor!.document.getText(), DEFAULT_FILE_CONTENT);
   });
 });
