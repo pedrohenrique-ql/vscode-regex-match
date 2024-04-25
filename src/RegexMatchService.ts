@@ -1,13 +1,4 @@
-import {
-  ConfigurationTarget,
-  Disposable,
-  ExtensionContext,
-  TextDocumentChangeEvent,
-  Uri,
-  commands,
-  window,
-  workspace,
-} from 'vscode';
+import { Disposable, ExtensionContext, TextDocumentChangeEvent, Uri, commands, window, workspace } from 'vscode';
 
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
@@ -35,12 +26,6 @@ class RegexMatchService {
     const onChangeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
 
     return [onChangeTextDocumentDisposable];
-  }
-
-  async setupFileAutoSave() {
-    await workspace
-      .getConfiguration('', this.regexTestFileUri)
-      .update('files.autoSave', 'afterDelay', ConfigurationTarget.Global);
   }
 
   private async parseAndTestRegex(fileContent: string) {
