@@ -1,10 +1,12 @@
+export const TEST_AREA_DIVIDER = '---';
+
 const DEFAULT_FLAGS = ['g', 'm'];
 const REQUIRED_FLAG = 'd';
-const TEST_AREA_DIVIDER = '---';
 
 export interface ParsedRegexTest {
   matchingRegex: RegExp;
   testLines: string[];
+  startTestIndex: number;
 }
 
 class FileParser {
@@ -16,12 +18,9 @@ class FileParser {
 
       if (matchingRegex) {
         const testLines = this.getTestLines(fileLines.slice(1));
+        const startTestIndex = fileContent.indexOf(TEST_AREA_DIVIDER) + TEST_AREA_DIVIDER.length + 1;
 
-        if (matchingRegex.flags.includes('m')) {
-          return { matchingRegex, testLines: [testLines.join('\n')] };
-        }
-
-        return { matchingRegex, testLines };
+        return { matchingRegex, testLines, startTestIndex };
       }
     }
   }
