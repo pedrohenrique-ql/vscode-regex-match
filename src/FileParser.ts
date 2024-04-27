@@ -1,7 +1,6 @@
-export const TEST_AREA_DIVIDER = '---';
+export const TEST_AREA_DELIMITER = '---';
 
 const DEFAULT_FLAGS = ['g', 'm'];
-const REQUIRED_FLAG = 'd';
 
 export interface ParsedRegexTest {
   matchingRegex: RegExp;
@@ -18,7 +17,7 @@ class FileParser {
 
       if (matchingRegex) {
         const testLines = this.getTestLines(fileLines.slice(1));
-        const startTestIndex = fileContent.indexOf(TEST_AREA_DIVIDER) + TEST_AREA_DIVIDER.length + 1;
+        const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
 
         return { matchingRegex, testLines, startTestIndex };
       }
@@ -26,7 +25,7 @@ class FileParser {
   }
 
   static transformStringToRegExp(patternString: string): RegExp | undefined {
-    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuyd]*)?$/i);
+    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
     if (matchGroups) {
       const [, pattern] = matchGroups;
@@ -38,16 +37,12 @@ class FileParser {
         flags = DEFAULT_FLAGS.join('');
       }
 
-      if (!flags.includes(REQUIRED_FLAG)) {
-        flags += REQUIRED_FLAG;
-      }
-
       return new RegExp(pattern, flags);
     }
   }
 
   static getTestLines(fileContent: string[]): string[] {
-    return fileContent.filter((line) => line !== TEST_AREA_DIVIDER);
+    return fileContent.filter((line) => line !== TEST_AREA_DELIMITER);
   }
 }
 
