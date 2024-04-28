@@ -16,7 +16,8 @@ class FileParser {
       const matchingRegex = this.transformStringToRegExp(fileLines[0]);
 
       if (matchingRegex) {
-        const testLines = this.getTestLines(fileLines.slice(1));
+        const testLines = this.getTestLines(fileLines.slice(1), matchingRegex.multiline);
+
         const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
 
         return { matchingRegex, testLines, startTestIndex };
@@ -41,8 +42,14 @@ class FileParser {
     }
   }
 
-  static getTestLines(fileContent: string[]): string[] {
-    return fileContent.filter((line) => line !== TEST_AREA_DELIMITER);
+  static getTestLines(fileContent: string[], multineFlag: boolean): string[] {
+    const testLines = fileContent.filter((line) => line !== TEST_AREA_DELIMITER);
+
+    if (multineFlag) {
+      return testLines;
+    }
+
+    return [testLines.join('\n')];
   }
 }
 
