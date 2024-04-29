@@ -95,4 +95,26 @@ describe('Regex Tester', () => {
     expect(matchResult[0].substring).toBe('9a');
     expect(matchResult[0].range).toEqual([0, 2]);
   });
+
+  it('should test regex correctly, if the start test index is greater than zero', () => {
+    const regex = new RegExp('[0-9]a', 'gm');
+
+    const parsedRegexTest: ParsedRegexTest = {
+      matchingRegex: regex,
+      testLines: ['9abbb', 'bb8ab', '7abb'],
+      startTestIndex: 15,
+    };
+
+    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    expect(matchResult.length).toBe(3);
+
+    expect(matchResult[0].substring).toBe('9a');
+    expect(matchResult[0].range).toEqual([15, 17]);
+
+    expect(matchResult[1].substring).toBe('8a');
+    expect(matchResult[1].range).toEqual([23, 25]);
+
+    expect(matchResult[2].substring).toBe('7a');
+    expect(matchResult[2].range).toEqual([27, 29]);
+  });
 });
