@@ -4,6 +4,7 @@ import {
   Range,
   TextDocument,
   TextDocumentChangeEvent,
+  TextEditor,
   Uri,
   commands,
   window,
@@ -11,12 +12,16 @@ import {
 } from 'vscode';
 
 import FileCreator from './FileCreator';
-import FileParser from './FileParser';
+import FileParser, { TEST_AREA_DELIMITER } from './FileParser';
 import RegexTester, { MatchResult } from './RegexTester';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
-const matchDecoration = window.createTextEditorDecorationType({ backgroundColor: 'rgba(255,165,0,0.5)' });
+const matchDecorationType = window.createTextEditorDecorationType({ backgroundColor: 'rgba(255,165,0,0.5)' });
+const delimiterDecorationType = window.createTextEditorDecorationType({
+  color: 'rgba(189,147,249)',
+  fontWeight: 'bold',
+});
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
@@ -41,7 +46,18 @@ class RegexMatchService {
 
   private async openRegexTestWindow() {
     const document = await FileCreator.openRegexTestFile(this.regexTestFileUri);
-    this.parseAndTestRegex(document);
+
+    const activeEditor = window.activeTextEditor;
+    if (!(activeEditor && document === activeEditor.document)) {
+      return;
+    }
+
+    this.updateRegexTest(document);
+  }
+
+  private updateRegexTest(document: TextDocument) {
+    const matchResults = this.parseAndTestRegex(document);
+    this.updateDecorations(document, matchResults ?? []);
   }
 
   private parseAndTestRegex(document: TextDocument) {
@@ -55,7 +71,7 @@ class RegexMatchService {
       }
 
       const matchResults = RegexTester.testRegex(parsedRegexTest);
-      this.applyMatchDecorations(matchResults, document);
+      return matchResults;
     } catch (error) {
       if (error instanceof Error) {
         void window.showErrorMessage(error.message);
@@ -63,11 +79,18 @@ class RegexMatchService {
     }
   }
 
-  private applyMatchDecorations(matchResults: MatchResult[], document: TextDocument) {
+  private updateDecorations(document: TextDocument, matchResults: MatchResult[]) {
     const activeEditor = window.activeTextEditor;
     if (!(activeEditor && document === activeEditor.document)) {
       return;
     }
+
+    this.applyMatchDecorations(activeEditor, matchResults);
+    this.applyDelimiterDecorations(activeEditor);
+  }
+
+  private applyMatchDecorations(activeEditor: TextEditor, matchResults: MatchResult[]) {
+    const document = activeEditor.document;
 
     const ranges = matchResults.map(({ range }) => {
       const start = document.positionAt(range[0]);
@@ -76,7 +99,26 @@ class RegexMatchService {
       return new Range(start, end);
     });
 
-    activeEditor.setDecorations(matchDecoration, ranges);
+    activeEditor.setDecorations(matchDecorationType, ranges);
+  }
+
+  private applyDelimiterDecorations(activeEditor: TextEditor) {
+    const document = activeEditor.document;
+    const fileContent = document.getText();
+
+    const delimiterRegex = new RegExp(TEST_AREA_DELIMITER, 'g');
+    let match: RegExpExecArray | null;
+
+    const ranges: Range[] = [];
+
+    while ((match = delimiterRegex.exec(fileContent))) {
+      const start = document.positionAt(match.index);
+      const end = document.positionAt(match.index + TEST_AREA_DELIMITER.length);
+
+      ranges.push(new Range(start, end));
+    }
+
+    activeEditor.setDecorations(delimiterDecorationType, ranges);
   }
 
   private setupTextDocumentChangeHandling() {
@@ -92,7 +134,7 @@ class RegexMatchService {
     const document = event.document;
 
     if (document === activeEditor.document && event.contentChanges.length !== 0) {
-      this.parseAndTestRegex(document);
+      this.updateRegexTest(document);
     }
   }
 }
