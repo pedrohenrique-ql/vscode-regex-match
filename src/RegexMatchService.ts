@@ -1,10 +1,8 @@
 import {
   Disposable,
   ExtensionContext,
-  Range,
   TextDocument,
   TextDocumentChangeEvent,
-  TextEditor,
   Uri,
   commands,
   window,
@@ -12,16 +10,11 @@ import {
 } from 'vscode';
 
 import FileCreator from './FileCreator';
-import FileParser, { TEST_AREA_DELIMITER } from './FileParser';
-import RegexTester, { MatchResult } from './RegexTester';
+import FileParser from './FileParser';
+import RegexTester from './RegexTester';
+import TextDecorationApplier from './TextDecorationApplier';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
-
-const matchDecorationType = window.createTextEditorDecorationType({ backgroundColor: 'rgba(255,165,0,0.5)' });
-const delimiterDecorationType = window.createTextEditorDecorationType({
-  color: 'rgba(189,147,249)',
-  fontWeight: 'bold',
-});
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
@@ -57,7 +50,7 @@ class RegexMatchService {
 
   private updateRegexTest(document: TextDocument) {
     const matchResults = this.parseAndTestRegex(document);
-    this.updateDecorations(document, matchResults ?? []);
+    TextDecorationApplier.updateDecorations(document, matchResults ?? []);
   }
 
   private parseAndTestRegex(document: TextDocument) {
@@ -77,48 +70,6 @@ class RegexMatchService {
         void window.showErrorMessage(error.message);
       }
     }
-  }
-
-  private updateDecorations(document: TextDocument, matchResults: MatchResult[]) {
-    const activeEditor = window.activeTextEditor;
-    if (!(activeEditor && document === activeEditor.document)) {
-      return;
-    }
-
-    this.applyMatchDecorations(activeEditor, matchResults);
-    this.applyDelimiterDecorations(activeEditor);
-  }
-
-  private applyMatchDecorations(activeEditor: TextEditor, matchResults: MatchResult[]) {
-    const document = activeEditor.document;
-
-    const ranges = matchResults.map(({ range }) => {
-      const start = document.positionAt(range[0]);
-      const end = document.positionAt(range[1]);
-
-      return new Range(start, end);
-    });
-
-    activeEditor.setDecorations(matchDecorationType, ranges);
-  }
-
-  private applyDelimiterDecorations(activeEditor: TextEditor) {
-    const document = activeEditor.document;
-    const fileContent = document.getText();
-
-    const delimiterRegex = new RegExp(TEST_AREA_DELIMITER, 'g');
-    let match: RegExpExecArray | null;
-
-    const ranges: Range[] = [];
-
-    while ((match = delimiterRegex.exec(fileContent))) {
-      const start = document.positionAt(match.index);
-      const end = document.positionAt(match.index + TEST_AREA_DELIMITER.length);
-
-      ranges.push(new Range(start, end));
-    }
-
-    activeEditor.setDecorations(delimiterDecorationType, ranges);
   }
 
   private setupTextDocumentChangeHandling() {
