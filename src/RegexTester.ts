@@ -1,46 +1,30 @@
-import { window } from 'vscode';
-
 import { ParsedRegexTest } from './FileParser';
 
-interface MatchResult {
-  line: string;
-  matched: boolean;
-  indexes: number[][];
+export interface MatchResult {
+  substring: string;
+  range: number[];
 }
 
 class RegexTester {
-  static testRegex({ matchingRegex, testLines }: ParsedRegexTest): MatchResult[] {
+  static testRegex({ matchingRegex, testLines, startTestIndex }: ParsedRegexTest): MatchResult[] {
     const matchResults: MatchResult[] = [];
 
+    let lineStartIndex = startTestIndex;
+
     for (const line of testLines) {
-      const trimmedLine = line.trim();
-      const lineMatch = [...trimmedLine.matchAll(matchingRegex)];
+      let match: RegExpExecArray | null;
 
-      if (lineMatch.length > 0) {
-        if (matchingRegex.flags.includes('m')) {
-          for (const line of trimmedLine.split('\n')) {
-            void window.showInformationMessage(`Matched! ${line}`);
-          }
-        } else {
-          void window.showInformationMessage(`Matched! ${trimmedLine}`);
+      while ((match = matchingRegex.exec(line)) !== null) {
+        const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
+
+        matchResults.push({ substring: match[0], range });
+
+        if (!matchingRegex.global) {
+          break;
         }
-
-        const indexes = lineMatch.map((match) => (match.indices ? match.indices[0] : [])) as number[][];
-
-        matchResults.push({
-          line,
-          matched: true,
-          indexes,
-        });
-      } else {
-        void window.showInformationMessage(`Not matched :( ${trimmedLine}`);
-
-        matchResults.push({
-          line,
-          matched: false,
-          indexes: [],
-        });
       }
+
+      lineStartIndex += line.length + 1;
     }
 
     return matchResults;

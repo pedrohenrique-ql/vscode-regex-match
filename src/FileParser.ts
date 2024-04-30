@@ -1,10 +1,11 @@
+export const TEST_AREA_DELIMITER = '---';
+
 const DEFAULT_FLAGS = ['g', 'm'];
-const REQUIRED_FLAG = 'd';
-const TEST_AREA_DIVIDER = '---';
 
 export interface ParsedRegexTest {
   matchingRegex: RegExp;
   testLines: string[];
+  startTestIndex: number;
 }
 
 class FileParser {
@@ -15,19 +16,17 @@ class FileParser {
       const matchingRegex = this.transformStringToRegExp(fileLines[0]);
 
       if (matchingRegex) {
-        const testLines = this.getTestLines(fileLines.slice(1));
+        const testLines = this.getTestLines(fileLines.slice(1), matchingRegex.multiline);
 
-        if (matchingRegex.flags.includes('m')) {
-          return { matchingRegex, testLines: [testLines.join('\n')] };
-        }
+        const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
 
-        return { matchingRegex, testLines };
+        return { matchingRegex, testLines, startTestIndex };
       }
     }
   }
 
   static transformStringToRegExp(patternString: string): RegExp | undefined {
-    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuyd]*)?$/i);
+    const matchGroups = patternString.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
     if (matchGroups) {
       const [, pattern] = matchGroups;
@@ -39,16 +38,18 @@ class FileParser {
         flags = DEFAULT_FLAGS.join('');
       }
 
-      if (!flags.includes(REQUIRED_FLAG)) {
-        flags += REQUIRED_FLAG;
-      }
-
       return new RegExp(pattern, flags);
     }
   }
 
-  static getTestLines(fileContent: string[]): string[] {
-    return fileContent.filter((line) => line !== TEST_AREA_DIVIDER);
+  static getTestLines(fileContent: string[], multineFlag: boolean): string[] {
+    const testLines = fileContent.filter((line) => line !== TEST_AREA_DELIMITER);
+
+    if (multineFlag) {
+      return testLines;
+    }
+
+    return [testLines.join('\n')];
   }
 }
 

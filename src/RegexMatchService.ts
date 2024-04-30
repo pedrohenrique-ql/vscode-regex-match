@@ -1,14 +1,23 @@
-import { Disposable, ExtensionContext, TextDocumentChangeEvent, Uri, commands, window, workspace } from 'vscode';
+import {
+  Disposable,
+  ExtensionContext,
+  TextDocument,
+  TextDocumentChangeEvent,
+  Uri,
+  commands,
+  window,
+  workspace,
+} from 'vscode';
 
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
 import RegexTester from './RegexTester';
+import TextDecorationApplier from './TextDecorationApplier';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
-  private regexTestDebounce: NodeJS.Timeout | undefined;
 
   constructor(context: ExtensionContext) {
     this.regexTestFileUri = Uri.file(`${context.extensionPath}/${REGEX_TEST_FILE_PATH}`);
@@ -28,26 +37,39 @@ class RegexMatchService {
     return [onChangeTextDocumentDisposable];
   }
 
-  private async parseAndTestRegex(fileContent: string) {
+  private async openRegexTestWindow() {
+    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri);
+
+    const activeEditor = window.activeTextEditor;
+    if (!(activeEditor && document === activeEditor.document)) {
+      return;
+    }
+
+    this.updateRegexTest(document);
+  }
+
+  private updateRegexTest(document: TextDocument) {
+    const matchResults = this.parseAndTestRegex(document);
+    TextDecorationApplier.updateDecorations(document, matchResults ?? []);
+  }
+
+  private parseAndTestRegex(document: TextDocument) {
     try {
+      const fileContent = document.getText();
       const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
       if (!parsedRegexTest) {
-        await window.showErrorMessage('Regex not found. Please format the file according to the established standard.');
+        void window.showErrorMessage('Regex not found. Please format the file according to the established standard.');
         return;
       }
 
-      RegexTester.testRegex(parsedRegexTest);
+      const matchResults = RegexTester.testRegex(parsedRegexTest);
+      return matchResults;
     } catch (error) {
       if (error instanceof Error) {
-        await window.showErrorMessage(error.message);
+        void window.showErrorMessage(error.message);
       }
     }
-  }
-
-  private async openRegexTestWindow() {
-    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri);
-    await this.parseAndTestRegex(document.getText());
   }
 
   private setupTextDocumentChangeHandling() {
@@ -63,13 +85,7 @@ class RegexMatchService {
     const document = event.document;
 
     if (document === activeEditor.document && event.contentChanges.length !== 0) {
-      if (this.regexTestDebounce) {
-        clearTimeout(this.regexTestDebounce);
-      }
-
-      this.regexTestDebounce = setTimeout(async () => {
-        await this.parseAndTestRegex(document.getText());
-      }, 300);
+      this.updateRegexTest(document);
     }
   }
 }

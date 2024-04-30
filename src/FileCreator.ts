@@ -1,14 +1,14 @@
 import { TextEncoder } from 'util';
 import { Uri, ViewColumn, window, workspace } from 'vscode';
 
-export const DEFAULT_FILE_CONTENT = `/[0-9]+a+/gm\n---\n123aaa\nb2507ab\n2024aa\n---`;
+export const DEFAULT_FILE_CONTENT = '/[0-9]+a+/gm\n---\n123aaa\nb2507ab\n2024aa\n---';
 
 class FileCreator {
   static async openRegexTestFile(fileUri: Uri) {
     try {
       await workspace.fs.stat(fileUri);
     } catch (_error) {
-      console.log('File not found, creating default test file.');
+      console.error('File not found, creating default test file.');
       await this.writeDefaultTestFile(fileUri);
     } finally {
       const document = await workspace.openTextDocument(fileUri);
