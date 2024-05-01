@@ -7,7 +7,7 @@ import { REGEX_TEST_FILE_PATH } from '@/RegexMatchService';
 
 describe('Regex Test Window', () => {
   it('should open the regex test window by command with correct content', async () => {
-    await commands.executeCommand('regex-match.openRegexTestWindow');
+    await commands.executeCommand('regex-match.openRegexMatchWindow');
     const activeTextEditor = window.activeTextEditor;
 
     assert.notStrictEqual(activeTextEditor, undefined);

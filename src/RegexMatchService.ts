@@ -24,7 +24,7 @@ class RegexMatchService {
   }
 
   registerCommands(): Disposable[] {
-    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexTestWindow', () =>
+    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', () =>
       this.openRegexTestWindow(),
     );
 

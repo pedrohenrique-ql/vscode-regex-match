@@ -15,12 +15,12 @@
   "contributes": {
     "commands": [
       {
-        "command": "regex-match.openRegexTestWindow",
-        "title": "Regex Match: Open Regex Test Window"
+        "command": "regex-match.openRegexMatchWindow",
+        "title": "Regex Match: Open Regex Match Window"
       }
     ],
     "keybindings": {
-      "command": "regex-match.openRegexTestWindow",
+      "command": "regex-match.openRegexMatchWindow",
       "key": "ctrl+alt+x",
       "mac": "cmd+alt+x"
     }
