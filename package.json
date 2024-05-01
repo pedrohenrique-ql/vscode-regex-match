@@ -18,7 +18,12 @@
         "command": "regex-match.openRegexTestWindow",
         "title": "Regex Match: Open Regex Test Window"
       }
-    ]
+    ],
+    "keybindings": {
+      "command": "regex-match.openRegexTestWindow",
+      "key": "ctrl+alt+x",
+      "mac": "cmd+alt+x"
+    }
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
