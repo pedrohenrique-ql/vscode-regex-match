@@ -12,7 +12,7 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex test window, where you can plac
 - [Release Notes](#release-notes)
 - [Development](#development)
   - [Requirements](#requirements)
-  - [Installation](#installation)
+  - [Usage](#installation)
   - [Testing](#testing)
 
 ## Features
