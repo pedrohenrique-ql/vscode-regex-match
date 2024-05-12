@@ -36,16 +36,21 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex test window, where you can plac
 - [Visual Studio Code v1.87.0](https://code.visualstudio.com/)
 - [pnpm v8.15.3](https://pnpm.io/)
 
-### Installation
+### Usage
 
 1. Install the dependencies:
 
    ```bash
    pnpm install
    ```
+2. Build the extension:
 
-2. Press `F5` to open a new window with the extension loaded.
-3. Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
+   ```bash
+   pnpm compile
+   ```
+
+3. Press `F5` to open a new window with the extension loaded.
+4. Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
 
 ### Testing
 
