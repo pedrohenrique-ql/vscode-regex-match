@@ -44,14 +44,8 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex test window, where you can plac
    pnpm install
    ```
 
-2. Open the project in Visual Studio Code:
-
-   ```bash
-   code .
-   ```
-
-3. Press `F5` to open a new window with the extension loaded.
-4. Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
+2. Press `F5` to open a new window with the extension loaded.
+3. Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
 
 ### Testing
 
