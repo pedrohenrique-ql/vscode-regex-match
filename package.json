@@ -1,14 +1,28 @@
 {
   "name": "regex-match",
   "displayName": "Regex Match",
-  "description": "",
-  "version": "0.0.0",
+  "description": "Create, test and debug regular expressions in Visual Studio Code",
+  "version": "0.1.0",
+  "author": {
+    "name": "Pedro Henrique Queiroz Lúcio",
+    "email": "pedrohenriqueql.dev@gmail.com"
+  },
+  "publisher": "pedrohenrique-ql",
   "engines": {
     "node": ">= 20.11.0 <21",
     "vscode": "^1.87.0"
   },
+  "license": "MIT",
   "categories": [
-    "Other"
+    "Other",
+    "Programming Languages",
+    "Testing"
+  ],
+  "keywords": [
+    "regex",
+    "regular expression",
+    "regexp",
+    "test"
   ],
   "activationEvents": [],
   "main": "./out/extension.js",
