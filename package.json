@@ -7,6 +7,10 @@
     "name": "Pedro Henrique Queiroz Lúcio",
     "email": "pedrohenriqueql.dev@gmail.com"
   },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/pedrohenrique-ql/vscode-regex-match"
+  },
   "publisher": "pedrohenrique-ql",
   "engines": {
     "node": ">= 20.11.0 <21",
@@ -24,6 +28,7 @@
     "regexp",
     "test"
   ],
+  "icon": "./resources/green.png",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
