@@ -28,7 +28,7 @@
     "regexp",
     "test"
   ],
-  "icon": "./resources/green.png",
+  "icon": "./resources/icon.png",
   "activationEvents": [],
   "main": "./out/extension.js",
   "contributes": {
