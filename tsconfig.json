@@ -1,0 +1,23 @@
+{
+  "compilerOptions": {
+    "types": ["@types/vscode"],
+    "target": "esnext",
+    "outDir": "out",
+    "sourceMap": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "module": "CommonJS",
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "paths": {
+      "@/*": ["./src/*"],
+      "@tests/*": ["./src/tests/*"],
+      "@@/*": ["./*"]
+    }
+  },
+  "include": ["**/*.ts"],
+  "exclude": ["node_modules"]
+}

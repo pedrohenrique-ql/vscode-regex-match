@@ -1,0 +1,18 @@
+# Dependencies
+/node_modules
+
+# Testing
+.vscode-test/
+
+# Build
+/out
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# ESlint
+.eslintcache
+
+# VSCode
+*.vsix

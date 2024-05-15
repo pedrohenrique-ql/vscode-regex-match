@@ -1,0 +1,22 @@
+# Dependencies
+/node_modules
+/pnpm-lock.yaml
+
+# Build
+/out
+
+# Configuration
+.husky
+
+# Cache
+.cache
+.eslintcache
+tsconfig.tsbuildinfo
+
+# Cache
+.cache
+.eslintcache
+tsconfig.tsbuildinfo
+
+# Miscellaneous
+.vscode-test

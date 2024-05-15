@@ -1,0 +1,11 @@
+# Dependencies
+/node_modules
+
+# Build
+/out
+
+# Configuration
+/.lintstagedrc.js
+
+# Miscellaneous
+.vscode-test
