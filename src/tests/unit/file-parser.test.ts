@@ -9,7 +9,7 @@ describe('File Parser', () => {
     const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
     expect(parsedRegexTest).toBeDefined();
-    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/g);
+    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/dg);
     expect(parsedRegexTest!.testLines).toHaveLength(1);
     expect(parsedRegexTest!.testLines[0]).toBe('bb9abb');
     expect(parsedRegexTest!.startTestIndex).toBe(14);
@@ -21,7 +21,7 @@ describe('File Parser', () => {
     const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
     expect(parsedRegexTest).toBeDefined();
-    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/gm);
+    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/dgm);
     expect(parsedRegexTest!.testLines).toHaveLength(2);
     expect(parsedRegexTest!.testLines[0]).toBe('bb9abb');
     expect(parsedRegexTest!.testLines[1]).toBe('2a');
@@ -34,7 +34,7 @@ describe('File Parser', () => {
     const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
     expect(parsedRegexTest).toBeDefined();
-    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/g);
+    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/dg);
     expect(parsedRegexTest!.testLines).toHaveLength(1);
     expect(parsedRegexTest!.testLines[0]).toBe('bb9abb\n2a');
     expect(parsedRegexTest!.startTestIndex).toBe(14);
@@ -46,7 +46,7 @@ describe('File Parser', () => {
     const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
     expect(parsedRegexTest).toBeDefined();
-    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/gm);
+    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/dgm);
     expect(parsedRegexTest!.testLines).toHaveLength(1);
     expect(parsedRegexTest!.testLines[0]).toBe('bb9abb');
     expect(parsedRegexTest!.startTestIndex).toBe(13);
