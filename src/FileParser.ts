@@ -1,5 +1,6 @@
 export const TEST_AREA_DELIMITER = '---';
 
+const REQUIRED_FLAG = 'd';
 const DEFAULT_FLAGS = ['g', 'm'];
 
 export interface ParsedRegexTest {
@@ -36,6 +37,10 @@ class FileParser {
 
       if (!flags) {
         flags = DEFAULT_FLAGS.join('');
+      }
+
+      if (!flags.includes(REQUIRED_FLAG)) {
+        flags += REQUIRED_FLAG;
       }
 
       return new RegExp(pattern, flags);

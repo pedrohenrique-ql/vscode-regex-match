@@ -3,6 +3,7 @@ import { ParsedRegexTest } from './FileParser';
 export interface MatchResult {
   substring: string;
   range: number[];
+  groupRanges?: number[][];
 }
 
 class RegexTester {
@@ -17,7 +18,13 @@ class RegexTester {
       while ((match = matchingRegex.exec(line)) !== null) {
         const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
 
-        matchResults.push({ substring: match[0], range });
+        let groupRanges: number[][] | undefined;
+        if (match.indices && match.indices.length > 1) {
+          const matchGroupIndexes = match.indices.slice(1);
+          groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
+        }
+
+        matchResults.push({ substring: match[0], range, groupRanges });
 
         if (!matchingRegex.global) {
           break;
@@ -28,6 +35,16 @@ class RegexTester {
     }
 
     return matchResults;
+  }
+
+  static getGroupRanges(matchIndexes: number[][], startIndex: number): number[][] {
+    const ranges: number[][] = [];
+
+    for (const [start, end] of matchIndexes) {
+      ranges.push([startIndex + start, startIndex + end]);
+    }
+
+    return ranges;
   }
 }
 
