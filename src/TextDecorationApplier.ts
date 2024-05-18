@@ -4,6 +4,8 @@ import { TEST_AREA_DELIMITER } from './FileParser';
 import { MatchResult } from './RegexTester';
 
 const matchDecorationType = window.createTextEditorDecorationType({ backgroundColor: 'rgba(255,165,0,0.5)' });
+const groupDecorationType = window.createTextEditorDecorationType({ backgroundColor: 'rgba(4,194,120,0.5)' });
+
 const delimiterDecorationType = window.createTextEditorDecorationType({
   color: 'rgba(189,147,249)',
   fontWeight: 'bold',
@@ -23,14 +25,27 @@ class TextDecorationApplier {
   private static applyMatchDecorations(activeEditor: TextEditor, matchResults: MatchResult[]) {
     const document = activeEditor.document;
 
-    const ranges = matchResults.map(({ range }) => {
+    const ranges = matchResults.map(({ range, groupRanges: groupIndexes }) => {
       const start = document.positionAt(range[0]);
       const end = document.positionAt(range[1]);
 
-      return new Range(start, end);
+      const groupRanges = this.getGroupRanges(document, groupIndexes);
+
+      const lineRange = new Range(start, end);
+      return { lineRange, groupRanges };
     });
 
-    activeEditor.setDecorations(matchDecorationType, ranges);
+    const lineRanges = ranges.map(({ lineRange }) => lineRange);
+    activeEditor.setDecorations(matchDecorationType, lineRanges);
+
+    const groupRanges = ranges.flatMap(({ groupRanges }) => groupRanges ?? []);
+    activeEditor.setDecorations(groupDecorationType, groupRanges);
+  }
+
+  private static getGroupRanges(document: TextDocument, groupIndexes?: number[][]): Range[] | undefined {
+    if (groupIndexes) {
+      return groupIndexes.map(([start, end]) => new Range(document.positionAt(start), document.positionAt(end)));
+    }
   }
 
   private static applyDelimiterDecorations(activeEditor: TextEditor) {
