@@ -1,14 +1,24 @@
 import { ParsedRegexTest } from './FileParser';
 
 export interface MatchResult {
+  lineMatchResults: LineMatchResult[];
+  numberOfCapturingGroups: number;
+}
+
+export interface LineMatchResult {
   substring: string;
   range: number[];
   groupRanges?: number[][];
 }
 
 class RegexTester {
-  static testRegex({ matchingRegex, testLines, startTestIndex }: ParsedRegexTest): MatchResult[] {
-    const matchResults: MatchResult[] = [];
+  static testRegex({
+    matchingRegex,
+    testLines,
+    startTestIndex,
+    numberOfCapturingGroups,
+  }: ParsedRegexTest): MatchResult {
+    const lineMatchResults: LineMatchResult[] = [];
 
     let lineStartIndex = startTestIndex;
 
@@ -24,7 +34,7 @@ class RegexTester {
           groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
         }
 
-        matchResults.push({ substring: match[0], range, groupRanges });
+        lineMatchResults.push({ substring: match[0], range, groupRanges });
 
         if (!matchingRegex.global) {
           break;
@@ -34,7 +44,7 @@ class RegexTester {
       lineStartIndex += line.length + 1;
     }
 
-    return matchResults;
+    return { lineMatchResults, numberOfCapturingGroups };
   }
 
   static getGroupRanges(matchIndexes: number[][], startIndex: number): number[][] {

@@ -9,10 +9,10 @@ import {
   workspace,
 } from 'vscode';
 
+import TextDecorationApplier from './decorations/TextDecorationApplier';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
 import RegexTester from './RegexTester';
-import TextDecorationApplier from './TextDecorationApplier';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
@@ -50,7 +50,7 @@ class RegexMatchService {
 
   private updateRegexTest(document: TextDocument) {
     const matchResults = this.parseAndTestRegex(document);
-    TextDecorationApplier.updateDecorations(document, matchResults ?? []);
+    TextDecorationApplier.updateDecorations(document, matchResults);
   }
 
   private parseAndTestRegex(document: TextDocument) {
