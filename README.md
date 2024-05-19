@@ -4,7 +4,7 @@ Regex Match is a Visual Studio Code extension that enables dynamically creating,
 
 Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex test window, where you can place the regular expression on the first line and the texts to match between delimiters (`---`). The extension will highlight the matches in the text, making it easy to see the results.
 
-![Regex Match](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/regex-match.gif)
+![Regex Match](https://github.com/pedrohenrique-ql/vscode-regex-match/blob/main/resources/regex-match.gif)
 
 ## Table of Contents
 
