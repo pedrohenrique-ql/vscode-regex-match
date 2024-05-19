@@ -30,7 +30,7 @@ class TextDecorationApplier {
       const matchRange = new Range(start, end);
       activeEditor.setDecorations(MATCH_DECORATION, [matchRange]);
 
-      const groupRanges = this.getCapturingGroupRanges(document, groupIndexes);
+      const groupRanges = this.getGroupRanges(document, groupIndexes);
 
       return { matchRange, groupRanges };
     });
@@ -38,27 +38,22 @@ class TextDecorationApplier {
     const matchRanges = ranges.map(({ matchRange }) => matchRange);
     activeEditor.setDecorations(MATCH_DECORATION, matchRanges);
 
-    const groupRanges = this.organizeGroupRangesByDecoration(ranges);
-    this.applyCapturingGroupDecorations(activeEditor, groupRanges);
-  }
-
-  private static getCapturingGroupRanges(document: TextDocument, groupIndexes?: number[][]): Range[] | undefined {
-    if (groupIndexes) {
-      return groupIndexes.map(([start, end]) => new Range(document.positionAt(start), document.positionAt(end)));
-    }
-  }
-
-  private static organizeGroupRangesByDecoration(ranges: { matchRange: Range; groupRanges: Range[] | undefined }[]) {
-    const organizedGroupRanges: Range[][] = Array.from({ length: GROUP_DECORATIONS.length }, () => []);
+    const g: Range[][] = Array.from({ length: GROUP_DECORATIONS.length }, () => []);
 
     ranges.forEach(({ groupRanges }) => {
       groupRanges?.forEach((groupRange, index) => {
         const targetIndex = index % GROUP_DECORATIONS.length;
-        organizedGroupRanges[targetIndex].push(groupRange);
+        g[targetIndex].push(groupRange);
       });
     });
 
-    return organizedGroupRanges;
+    this.applyCapturingGroupDecorations(activeEditor, g);
+  }
+
+  private static getGroupRanges(document: TextDocument, groupIndexes?: number[][]): Range[] | undefined {
+    if (groupIndexes) {
+      return groupIndexes.map(([start, end]) => new Range(document.positionAt(start), document.positionAt(end)));
+    }
   }
 
   private static applyCapturingGroupDecorations(activeEditor: TextEditor, groupRanges: Range[][]) {

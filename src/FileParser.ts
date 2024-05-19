@@ -5,7 +5,6 @@ const DEFAULT_FLAGS = ['g', 'm'];
 
 export interface ParsedRegexTest {
   matchingRegex: RegExp;
-  numberOfCapturingGroups: number;
   testLines: string[];
   startTestIndex: number;
 }
@@ -22,9 +21,7 @@ class FileParser {
 
         const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
 
-        const numberOfCapturingGroups = this.getNumberOfCapturingGroups(matchingRegex);
-
-        return { matchingRegex, numberOfCapturingGroups, testLines, startTestIndex };
+        return { matchingRegex, testLines, startTestIndex };
       }
     }
   }
@@ -58,10 +55,6 @@ class FileParser {
     }
 
     return [testLines.join('\n')];
-  }
-
-  static getNumberOfCapturingGroups(matchingRegex: RegExp): number {
-    return (matchingRegex.toString().match(/\((?!\?)/g) ?? []).length;
   }
 }
 

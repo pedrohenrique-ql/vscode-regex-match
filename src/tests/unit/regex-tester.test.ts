@@ -128,54 +128,98 @@ describe('Regex Tester', () => {
     expect(matchResult[2].groupRanges).toBeUndefined();
   });
 
-  it('should capture group ranges', () => {
-    const regex = new RegExp('[0-9]ax(abc)', 'gmd');
+  describe('Capturing Groups', () => {
+    it('should extract capturing group ranges', () => {
+      const regex = new RegExp('[0-9]ax(abc)', 'gmd');
 
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
-      testLines: ['bb8axabcx'],
-      startTestIndex: 0,
-    };
+      const parsedRegexTest: ParsedRegexTest = {
+        matchingRegex: regex,
+        testLines: ['bb8axabcx'],
+        startTestIndex: 0,
+      };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
-    expect(matchResult.length).toBe(1);
+      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      expect(matchResult.length).toBe(1);
 
-    expect(matchResult[0].substring).toBe('8axabc');
-    expect(matchResult[0].range).toEqual([2, 8]);
+      expect(matchResult[0].substring).toBe('8axabc');
+      expect(matchResult[0].range).toEqual([2, 8]);
 
-    expect(matchResult[0].groupRanges).toBeDefined();
-    expect(matchResult[0].groupRanges!.length).toBe(1);
-    expect(matchResult[0].groupRanges).toEqual([[5, 8]]);
-  });
+      expect(matchResult[0].groupRanges).toBeDefined();
+      expect(matchResult[0].groupRanges!.length).toBe(1);
+      expect(matchResult[0].groupRanges).toEqual([[5, 8]]);
+    });
 
-  it('should capture group ranges of each line, if there are many test lines', () => {
-    const regex = new RegExp('[0-9]ax(abc)', 'gmd');
+    it('should extract ranges of many capturing groups', () => {
+      const regex = new RegExp('[0-9]ax(abc)x(cba)', 'gmd');
 
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
-      testLines: ['bb8axabcx', '9axabc123', '1234axabc'],
-      startTestIndex: 0,
-    };
+      const parsedRegexTest: ParsedRegexTest = {
+        matchingRegex: regex,
+        testLines: ['bb8axabcxcba'],
+        startTestIndex: 0,
+      };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
-    expect(matchResult.length).toBe(3);
+      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      expect(matchResult.length).toBe(1);
 
-    expect(matchResult[0].substring).toBe('8axabc');
-    expect(matchResult[0].range).toEqual([2, 8]);
-    expect(matchResult[0].groupRanges).toBeDefined();
-    expect(matchResult[0].groupRanges!.length).toBe(1);
-    expect(matchResult[0].groupRanges).toEqual([[5, 8]]);
+      expect(matchResult[0].substring).toBe('8axabcxcba');
+      expect(matchResult[0].range).toEqual([2, 12]);
 
-    expect(matchResult[1].substring).toBe('9axabc');
-    expect(matchResult[1].range).toEqual([10, 16]);
-    expect(matchResult[1].groupRanges).toBeDefined();
-    expect(matchResult[1].groupRanges!.length).toBe(1);
-    expect(matchResult[1].groupRanges).toEqual([[13, 16]]);
+      expect(matchResult[0].groupRanges).toBeDefined();
+      expect(matchResult[0].groupRanges!.length).toBe(2);
+      expect(matchResult[0].groupRanges![0]).toEqual([5, 8]);
+      expect(matchResult[0].groupRanges![1]).toEqual([9, 12]);
+    });
 
-    expect(matchResult[2].substring).toBe('4axabc');
-    expect(matchResult[2].range).toEqual([23, 29]);
-    expect(matchResult[2].groupRanges).toBeDefined();
-    expect(matchResult[2].groupRanges!.length).toBe(1);
-    expect(matchResult[2].groupRanges).toEqual([[26, 29]]);
+    it('should extract the capture group ranges from each line, if there are many test lines', () => {
+      const regex = new RegExp('[0-9]ax(abc)', 'gmd');
+
+      const parsedRegexTest: ParsedRegexTest = {
+        matchingRegex: regex,
+        testLines: ['bb8axabcx', '9axabc123', '1234axabc'],
+        startTestIndex: 0,
+      };
+
+      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      expect(matchResult.length).toBe(3);
+
+      expect(matchResult[0].substring).toBe('8axabc');
+      expect(matchResult[0].range).toEqual([2, 8]);
+      expect(matchResult[0].groupRanges).toBeDefined();
+      expect(matchResult[0].groupRanges!.length).toBe(1);
+      expect(matchResult[0].groupRanges).toEqual([[5, 8]]);
+
+      expect(matchResult[1].substring).toBe('9axabc');
+      expect(matchResult[1].range).toEqual([10, 16]);
+      expect(matchResult[1].groupRanges).toBeDefined();
+      expect(matchResult[1].groupRanges!.length).toBe(1);
+      expect(matchResult[1].groupRanges).toEqual([[13, 16]]);
+
+      expect(matchResult[2].substring).toBe('4axabc');
+      expect(matchResult[2].range).toEqual([23, 29]);
+      expect(matchResult[2].groupRanges).toBeDefined();
+      expect(matchResult[2].groupRanges!.length).toBe(1);
+      expect(matchResult[2].groupRanges).toEqual([[26, 29]]);
+    });
+
+    it('should extract named capturing group ranges', () => {
+      const regex = new RegExp('[0-9]ax(?<group>abc)(x)', 'gmd');
+
+      const parsedRegexTest: ParsedRegexTest = {
+        matchingRegex: regex,
+        testLines: ['bb8axabcx'],
+        startTestIndex: 0,
+      };
+
+      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      expect(matchResult.length).toBe(1);
+
+      expect(matchResult[0].substring).toBe('8axabcx');
+      expect(matchResult[0].range).toEqual([2, 9]);
+
+      expect(matchResult[0].groupRanges).toBeDefined();
+      expect(matchResult[0].groupRanges!.length).toBe(2);
+      expect(matchResult[0].groupRanges![0]).toEqual([5, 8]);
+      expect(matchResult[0].groupRanges![1]).toEqual([8, 9]);
+    });
   });
 });
