@@ -1,9 +1,7 @@
 # Change Log
 
-All notable changes to the "regex-match" extension will be documented in this file.
+## 0.1.0
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
-
-## [Unreleased]
-
-- Initial release
+- Create, test and debug regular expressions within a text file.
+- Highlight matches in the text.
+- Use `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
