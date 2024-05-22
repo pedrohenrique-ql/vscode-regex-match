@@ -37,11 +37,14 @@ class RegexTester {
     return matchResults;
   }
 
-  static getGroupRanges(matchIndexes: number[][], startIndex: number): number[][] {
+  static getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): number[][] {
     const ranges: number[][] = [];
 
-    for (const [start, end] of matchIndexes) {
-      ranges.push([startIndex + start, startIndex + end]);
+    for (const range of matchIndexes) {
+      if (range) {
+        const [start, end] = range;
+        ranges.push([startIndex + start, startIndex + end]);
+      }
     }
 
     return ranges;
