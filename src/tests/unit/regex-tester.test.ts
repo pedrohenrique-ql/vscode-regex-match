@@ -249,5 +249,25 @@ describe('Regex Tester', () => {
       expect(matchResult[1].groupRanges!.length).toBe(1);
       expect(matchResult[1].groupRanges![0]).toEqual([11, 14]);
     });
+
+    it('should test regex correctly, if there is a non-capturing group', () => {
+      const regex = new RegExp('[0-9]x(?<group>abc)(?:cba)', 'gmd');
+
+      const parsedRegexTest: ParsedRegexTest = {
+        matchingRegex: regex,
+        testLines: ['8xabccba'],
+        startTestIndex: 0,
+      };
+
+      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      expect(matchResult.length).toBe(1);
+
+      expect(matchResult[0].substring).toBe('8xabccba');
+      expect(matchResult[0].range).toEqual([0, 8]);
+
+      expect(matchResult[0].groupRanges).toBeDefined();
+      expect(matchResult[0].groupRanges!.length).toBe(1);
+      expect(matchResult[0].groupRanges![0]).toEqual([2, 5]);
+    });
   });
 });
