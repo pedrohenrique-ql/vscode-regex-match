@@ -51,4 +51,22 @@ describe('File Parser', () => {
     expect(parsedRegexTest!.testLines[0]).toBe('bb9abb');
     expect(parsedRegexTest!.startTestIndex).toBe(13);
   });
+
+  it("should set the required 'd' flag in matching regex", () => {
+    const fileContent = '/[0-9]a/gm\n---\nbb9abb\n---';
+
+    const parsedRegexTest = FileParser.parseFileContent(fileContent);
+
+    expect(parsedRegexTest).toBeDefined();
+    expect(parsedRegexTest!.matchingRegex).toStrictEqual(/[0-9]a/dgm);
+    expect(parsedRegexTest!.testLines).toHaveLength(1);
+    expect(parsedRegexTest!.testLines[0]).toBe('bb9abb');
+    expect(parsedRegexTest!.startTestIndex).toBe(15);
+  });
+
+  it('should throw an error if the matching regex is invalid', () => {
+    const fileContent = '/(?/gm\n---\nbb9abb\n---';
+
+    expect(() => FileParser.parseFileContent(fileContent)).toThrowError();
+  });
 });
