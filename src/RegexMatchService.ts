@@ -1,10 +1,15 @@
 import {
+  Diagnostic,
+  DiagnosticCollection,
+  DiagnosticSeverity,
   Disposable,
   ExtensionContext,
+  Range,
   TextDocument,
   TextDocumentChangeEvent,
   Uri,
   commands,
+  languages,
   window,
   workspace,
 } from 'vscode';
@@ -18,9 +23,11 @@ export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
+  private diagnosticCollection: DiagnosticCollection;
 
   constructor(context: ExtensionContext) {
     this.regexTestFileUri = Uri.file(`${context.extensionPath}/${REGEX_TEST_FILE_PATH}`);
+    this.diagnosticCollection = this.createDiagnosticCollection();
   }
 
   registerCommands(): Disposable[] {
@@ -35,6 +42,10 @@ class RegexMatchService {
     const onChangeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
 
     return [onChangeTextDocumentDisposable];
+  }
+
+  createDiagnosticCollection() {
+    return languages.createDiagnosticCollection('regex-match');
   }
 
   private async openRegexTestWindow() {
@@ -54,8 +65,10 @@ class RegexMatchService {
   }
 
   private parseAndTestRegex(document: TextDocument) {
+    const fileContent = document.getText();
+    const diagnostics: Diagnostic[] = [];
+
     try {
-      const fileContent = document.getText();
       const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
       if (!parsedRegexTest) {
@@ -67,8 +80,18 @@ class RegexMatchService {
       return matchResults;
     } catch (error) {
       if (error instanceof Error) {
-        void window.showErrorMessage(error.message);
+        const firstLine = document.lineAt(0).text;
+        const errorRange = new Range(0, 0, 0, firstLine.length);
+        const regexSyntaxErrorDiagnostic = new Diagnostic(
+          errorRange,
+          `Regex syntax error: ${error.message}`,
+          DiagnosticSeverity.Error,
+        );
+
+        diagnostics.push(regexSyntaxErrorDiagnostic);
       }
+    } finally {
+      this.diagnosticCollection.set(this.regexTestFileUri, diagnostics);
     }
   }
 
