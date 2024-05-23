@@ -153,6 +153,19 @@ describe('Regex Tester', () => {
     expect(matchResult[2].groupRanges).toBeUndefined();
   });
 
+  it('should test regex correctly, if the regex is empty', () => {
+    const regex = new RegExp('', 'gm');
+
+    const parsedRegexTest: ParsedRegexTest = {
+      matchingRegex: regex,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    expect(matchResult.length).toBe(0);
+  });
+
   describe('Capturing Groups', () => {
     it('should extract capturing group ranges', () => {
       const regex = new RegExp('[0-9]ax(abc)', 'gmd');
