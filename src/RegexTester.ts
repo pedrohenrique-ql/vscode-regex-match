@@ -16,15 +16,12 @@ class RegexTester {
       let match: RegExpExecArray | null;
 
       while ((match = matchingRegex.exec(line)) !== null) {
-        const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
-
-        let groupRanges: number[][] | undefined;
-        if (match.indices && match.indices.length > 1) {
-          const matchGroupIndexes = match.indices.slice(1);
-          groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
+        if (match[0].trim() === '') {
+          break;
         }
 
-        matchResults.push({ substring: match[0], range, groupRanges });
+        const processedMatch = this.processMatch(match, lineStartIndex);
+        matchResults.push(processedMatch);
 
         if (!matchingRegex.global) {
           break;
@@ -35,6 +32,18 @@ class RegexTester {
     }
 
     return matchResults;
+  }
+
+  static processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
+    const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
+
+    let groupRanges: number[][] | undefined;
+    if (match.indices && match.indices.length > 1) {
+      const matchGroupIndexes = match.indices.slice(1);
+      groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
+    }
+
+    return { substring: match[0], range, groupRanges };
   }
 
   static getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): number[][] {
