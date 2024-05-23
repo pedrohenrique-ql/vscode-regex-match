@@ -128,6 +128,31 @@ describe('Regex Tester', () => {
     expect(matchResult[2].groupRanges).toBeUndefined();
   });
 
+  it('should test regex correctly, if there is a flag other than defaults', () => {
+    const regex = new RegExp('[0-9]a', 'i');
+
+    const parsedRegexTest: ParsedRegexTest = {
+      matchingRegex: regex,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    expect(matchResult.length).toBe(3);
+
+    expect(matchResult[0].substring).toBe('9a');
+    expect(matchResult[0].range).toEqual([0, 2]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+
+    expect(matchResult[1].substring).toBe('8a');
+    expect(matchResult[1].range).toEqual([4, 6]);
+    expect(matchResult[1].groupRanges).toBeUndefined();
+
+    expect(matchResult[2].substring).toBe('7A');
+    expect(matchResult[2].range).toEqual([7, 9]);
+    expect(matchResult[2].groupRanges).toBeUndefined();
+  });
+
   describe('Capturing Groups', () => {
     it('should extract capturing group ranges', () => {
       const regex = new RegExp('[0-9]ax(abc)', 'gmd');
