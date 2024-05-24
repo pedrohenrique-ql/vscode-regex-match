@@ -1,5 +1,7 @@
 import { ParsedRegexTest } from './FileParser';
 
+const NEW_LINE_LENGTH = 1;
+
 export interface MatchResult {
   substring: string;
   range: number[];
@@ -28,7 +30,7 @@ class RegexTester {
         }
       }
 
-      lineStartIndex += line.length + 1;
+      lineStartIndex += line.length + NEW_LINE_LENGTH;
     }
 
     return matchResults;
