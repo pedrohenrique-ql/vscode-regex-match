@@ -1,7 +1,5 @@
 import {
   Diagnostic,
-  DiagnosticCollection,
-  DiagnosticSeverity,
   Disposable,
   ExtensionContext,
   Range,
@@ -9,25 +7,27 @@ import {
   TextDocumentChangeEvent,
   Uri,
   commands,
-  languages,
   window,
   workspace,
 } from 'vscode';
 
 import TextDecorationApplier from './decorations/TextDecorationApplier';
+import DiagnosticProvider from './DiagnosticProvider';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
 import RegexTester from './RegexTester';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
+const REGEX_TEST_PATTERN_ERROR_MESSAGE = `Parsing error: The format of the regex test is incorrect. Please ensure your test follows the required pattern.\n\nExpected format:\n\n1 /regex/[flags]\n2 ---\n3 test string\n4 ---`;
+
 class RegexMatchService {
   private regexTestFileUri: Uri;
-  private diagnosticCollection: DiagnosticCollection;
+  private diagnosticProvider: DiagnosticProvider;
 
   constructor(context: ExtensionContext) {
     this.regexTestFileUri = Uri.file(`${context.extensionPath}/${REGEX_TEST_FILE_PATH}`);
-    this.diagnosticCollection = this.createDiagnosticCollection();
+    this.diagnosticProvider = new DiagnosticProvider('regex-match');
   }
 
   registerCommands(): Disposable[] {
@@ -44,8 +44,8 @@ class RegexMatchService {
     return [onChangeTextDocumentDisposable];
   }
 
-  createDiagnosticCollection() {
-    return languages.createDiagnosticCollection('regex-match');
+  getDiagnosticCollection() {
+    return this.diagnosticProvider.getDiagnosticCollection();
   }
 
   private async openRegexTestWindow() {
@@ -72,7 +72,14 @@ class RegexMatchService {
       const parsedRegexTest = FileParser.parseFileContent(fileContent);
 
       if (!parsedRegexTest) {
-        void window.showErrorMessage('Regex not found. Please format the file according to the established standard.');
+        const firstLine = document.lineAt(0).text;
+        const errorRange = new Range(0, 0, 0, firstLine.length);
+        const parsingDiagnosticError = this.diagnosticProvider.createErrorDiagnostic(
+          errorRange,
+          REGEX_TEST_PATTERN_ERROR_MESSAGE,
+        );
+
+        diagnostics.push(parsingDiagnosticError);
         return;
       }
 
@@ -82,16 +89,12 @@ class RegexMatchService {
       if (error instanceof Error) {
         const firstLine = document.lineAt(0).text;
         const errorRange = new Range(0, 0, 0, firstLine.length);
-        const regexSyntaxErrorDiagnostic = new Diagnostic(
-          errorRange,
-          `Regex syntax error: ${error.message}`,
-          DiagnosticSeverity.Error,
-        );
+        const regexSyntaxDiagnosticError = this.diagnosticProvider.createErrorDiagnostic(errorRange, error.message);
 
-        diagnostics.push(regexSyntaxErrorDiagnostic);
+        diagnostics.push(regexSyntaxDiagnosticError);
       }
     } finally {
-      this.diagnosticCollection.set(this.regexTestFileUri, diagnostics);
+      this.diagnosticProvider.updateDiagnostics(this.regexTestFileUri, diagnostics);
     }
   }
 
