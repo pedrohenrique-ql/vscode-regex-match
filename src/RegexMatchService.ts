@@ -19,14 +19,14 @@ import RegexTester from './RegexTester';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
-const REGEX_TEST_PATTERN_ERROR_MESSAGE = `Parsing error: The format of the regex test is incorrect. Please ensure your test follows the required pattern.\n\nExpected format:\n\n1 /regex/[flags]\n2 ---\n3 test string\n4 ---`;
+const REGEX_TEST_PATTERN_ERROR_MESSAGE = `Parsing error: The format of the regex test is incorrect. Please ensure your test follows the required pattern.\n\nExpected format:\n\n/regex/[flags]\n---\ntest string\n---`;
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
   private diagnosticProvider: DiagnosticProvider;
 
   constructor(context: ExtensionContext) {
-    this.regexTestFileUri = Uri.file(`${context.extensionPath}/${REGEX_TEST_FILE_PATH}`);
+    this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
     this.diagnosticProvider = new DiagnosticProvider('regex-match');
   }
 
@@ -104,14 +104,15 @@ class RegexMatchService {
 
   private onChangeTextDocument(event: TextDocumentChangeEvent) {
     const activeEditor = window.activeTextEditor;
-    if (!activeEditor) {
-      return;
-    }
+    const eventDocument = event.document;
 
-    const document = event.document;
-
-    if (document === activeEditor.document && event.contentChanges.length !== 0) {
-      this.updateRegexTest(document);
+    if (
+      activeEditor &&
+      eventDocument.uri.path === this.regexTestFileUri.path &&
+      eventDocument === activeEditor.document &&
+      event.contentChanges.length > 0
+    ) {
+      this.updateRegexTest(eventDocument);
     }
   }
 }
