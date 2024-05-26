@@ -13,15 +13,33 @@ class FileParser {
   static parseFileContent(fileContent: string): ParsedRegexTest | undefined {
     const fileLines = fileContent.split('\n');
 
-    if (fileLines.length > 0) {
-      const matchingRegex = this.transformStringToRegExp(fileLines[0]);
+    const firstDelimiterLineIndex = this.findFirstDelimiterLineIndex(fileLines);
+    if (
+      firstDelimiterLineIndex === undefined ||
+      firstDelimiterLineIndex === fileLines.length - 1 ||
+      firstDelimiterLineIndex === 0
+    ) {
+      return undefined;
+    }
 
-      if (matchingRegex) {
-        const testLines = this.getTestLines(fileLines.slice(1), matchingRegex.multiline);
+    const regexLine = fileLines[firstDelimiterLineIndex - 1];
+    const matchingRegex = this.transformStringToRegExp(regexLine);
 
-        const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
+    if (!matchingRegex) {
+      return undefined;
+    }
 
-        return { matchingRegex, testLines, startTestIndex };
+    const testLines = this.getTestLines(fileLines.slice(firstDelimiterLineIndex), matchingRegex.multiline);
+
+    const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
+
+    return { matchingRegex, testLines, startTestIndex };
+  }
+
+  static findFirstDelimiterLineIndex(fileLines: string[]): number | undefined {
+    for (let i = 0; i < fileLines.length; i++) {
+      if (this.isTestAreaDelimiter(fileLines[i])) {
+        return i;
       }
     }
   }
@@ -55,6 +73,10 @@ class FileParser {
     }
 
     return [testLines.join('\n')];
+  }
+
+  private static isTestAreaDelimiter(line: string): boolean {
+    return line === TEST_AREA_DELIMITER;
   }
 }
 

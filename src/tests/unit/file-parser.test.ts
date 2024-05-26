@@ -69,4 +69,28 @@ describe('File Parser', () => {
 
     expect(() => FileParser.parseFileContent(fileContent)).toThrowError();
   });
+
+  it('should return undefined if the file content does not contain the test area delimiter', () => {
+    const fileContent = '/[0-9]a/g\nbb9abb\n---';
+
+    const parsedRegexTest = FileParser.parseFileContent(fileContent);
+
+    expect(parsedRegexTest).toBeUndefined();
+  });
+
+  it('should return undefined if the file content does not contain the matching regex', () => {
+    const fileContent = '---\nbb9abb\n---';
+
+    const parsedRegexTest = FileParser.parseFileContent(fileContent);
+
+    expect(parsedRegexTest).toBeUndefined();
+  });
+
+  it('should return undefined if the file content does not contain the test area', () => {
+    const fileContent = '/[0-9]a/g\n---';
+
+    const parsedRegexTest = FileParser.parseFileContent(fileContent);
+
+    expect(parsedRegexTest).toBeUndefined();
+  });
 });

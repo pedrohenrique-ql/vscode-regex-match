@@ -7,6 +7,7 @@ export function activate(context: ExtensionContext) {
 
   const regexMatchCommands = regexMatchService.registerCommands();
   const regexMatchDisposables = regexMatchService.registerDisposables();
+  const diagnosticCollection = regexMatchService.getDiagnosticCollection();
 
-  context.subscriptions.push(...regexMatchCommands, ...regexMatchDisposables);
+  context.subscriptions.push(...regexMatchCommands, ...regexMatchDisposables, diagnosticCollection);
 }
