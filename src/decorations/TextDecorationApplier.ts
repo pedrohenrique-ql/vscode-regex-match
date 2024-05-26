@@ -13,10 +13,10 @@ class TextDecorationApplier {
     }
 
     this.resetDecorations(activeEditor);
+    this.applyDelimiterDecorations(activeEditor);
 
     if (matchResults) {
       this.applyMatchDecorations(activeEditor, matchResults);
-      this.applyDelimiterDecorations(activeEditor);
     }
   }
 
