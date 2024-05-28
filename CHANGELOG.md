@@ -3,6 +3,8 @@
 ## 0.2.0
 
 - Highlight capturing groups in the test string.
+- Use diagnostics to show errors in the regex match window.
+- Prevents the extension from acting on non-extension files.
 
 ## 0.1.0
 
