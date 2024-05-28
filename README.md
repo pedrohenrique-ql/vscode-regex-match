@@ -1,26 +1,47 @@
 # Regex Match
 
-Regex Match is a Visual Studio Code extension that enables dynamically creating, testing and debugging regular expressions within a text file. It provides a simple and user-friendly interface, making the process of working with regular expressions effortless and efficient.
+[Regex Match](https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match) is a Visual Studio Code extension that enables dynamically creating, testing and debugging regular expressions within a text file. It provides a simple and user-friendly interface, making the process of working with regular expressions effortless and efficient.
 
-Press `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex test window, where you can place the regular expression on the first line and the texts to match between delimiters (`---`). The extension will highlight the matches in the text, making it easy to see the results.
+Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights.
 
-![Regex Match](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/regex-match.gif)
+![Regex Match Demo](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/regex-match.gif)
 
 ## Table of Contents
 
-- [Features](#features)
-- [Release Notes](#release-notes)
-- [Development](#development)
-  - [Requirements](#requirements)
-  - [Usage](#installation)
-  - [Testing](#testing)
+- [Regex Match](#regex-match)
+  - [Table of Contents](#table-of-contents)
+  - [Features](#features)
+    - [Test Regular Expressions](#test-regular-expressions)
+    - [Highlight of Capturing Groups](#highlight-of-capturing-groups)
+  - [Release Notes](#release-notes)
+    - [0.2.0](#020)
+    - [0.1.0](#010)
+  - [Development](#development)
+    - [Requirements](#requirements)
+    - [Usage](#usage)
+    - [Testing](#testing)
 
 ## Features
 
-- Create, test and debug regular expressions within a text file.
-- Highlight matches in the text.
+### Test Regular Expressions
+
+Create, test and debug your regex in a text window. To do this, use the standard format with the regex on the first line of the file with the flags required for your case, plus the test string between the text area delimiters (`---`).
+
+![Testing Regular Expressions](./resources/test-regex-feature.gif)
+
+### Highlight of Capturing Groups
+
+Each group in a regular expression is highlighted in a different color, making it easy to distinguish and identify them. Color-coded regex capture groups enhance readability and simplify debugging.
+
+![Highlight of Capturing Groups](./resources/capturing-groups-feature.gif)
 
 ## Release Notes
+
+### 0.2.0
+
+- Highlight capturing groups in the test string.
+- Use diagnostics to show errors in the regex match window.
+- Prevents the extension's actions from being performed while modifying files that are not part of the extension.
 
 ### 0.1.0
 
