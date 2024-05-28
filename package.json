@@ -2,7 +2,7 @@
   "name": "regex-match",
   "displayName": "Regex Match",
   "description": "Create, test and debug regular expressions in Visual Studio Code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": {
     "name": "Pedro Henrique Queiroz Lúcio",
     "email": "pedrohenriqueql.dev@gmail.com"
@@ -30,6 +30,7 @@
   ],
   "icon": "./resources/icon.png",
   "activationEvents": [],
+  "packageManager": "pnpm@8.15.5",
   "main": "./out/extension.js",
   "contributes": {
     "commands": [
