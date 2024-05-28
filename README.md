@@ -8,18 +8,12 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match
 
 ## Table of Contents
 
-- [Regex Match](#regex-match)
-  - [Table of Contents](#table-of-contents)
-  - [Features](#features)
-    - [Test Regular Expressions](#test-regular-expressions)
-    - [Highlight of Capturing Groups](#highlight-of-capturing-groups)
-  - [Release Notes](#release-notes)
-    - [0.2.0](#020)
-    - [0.1.0](#010)
-  - [Development](#development)
-    - [Requirements](#requirements)
-    - [Usage](#usage)
-    - [Testing](#testing)
+- [Features](#features)
+- [Release Notes](#release-notes)
+- [Development](#development)
+  - [Requirements](#requirements)
+  - [Usage](#usage)
+  - [Testing](#testing)
 
 ## Features
 
@@ -41,7 +35,7 @@ Each group in a regular expression is highlighted in a different color, making i
 
 - Highlight capturing groups in the test string.
 - Use diagnostics to show errors in the regex match window.
-- Prevents the extension's actions from being performed while modifying files that are not part of the extension.
+- Prevents the extension from acting on non-extension files.
 
 ### 0.1.0
 
