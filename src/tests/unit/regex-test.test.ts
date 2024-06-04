@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import RegexTest from '@/RegexTest';
+
 import { ParsedRegexTest } from '../../FileParser';
-import RegexTester from '../../RegexTester';
 
 vi.mock('vscode', () => ({
   window: {
@@ -19,7 +20,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(1);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -36,7 +38,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -61,7 +64,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
   });
 
@@ -74,7 +78,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(2);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -95,7 +100,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(1);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -112,7 +118,8 @@ describe('Regex Tester', () => {
       startTestIndex: 15,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -137,7 +144,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -162,7 +170,8 @@ describe('Regex Tester', () => {
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(parsedRegexTest);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
   });
 
@@ -176,7 +185,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabc');
@@ -196,7 +206,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabcxcba');
@@ -217,7 +228,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(3);
 
       expect(matchResult[0].substring).toBe('8axabc');
@@ -248,7 +260,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabcx');
@@ -269,7 +282,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(2);
 
       expect(matchResult[0].substring).toBe('8xabccba');
@@ -297,7 +311,8 @@ describe('Regex Tester', () => {
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(parsedRegexTest);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8xabccba');
