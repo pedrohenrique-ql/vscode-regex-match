@@ -15,7 +15,6 @@ import TextDecorationApplier from './decorations/TextDecorationApplier';
 import DiagnosticProvider from './DiagnosticProvider';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
-import RegexTester from './RegexTester';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
@@ -60,8 +59,8 @@ class RegexMatchService {
   }
 
   private updateRegexTest(document: TextDocument) {
-    const matchResults = this.parseAndTestRegex(document);
-    TextDecorationApplier.updateDecorations(document, matchResults);
+    const regexTests = this.parseAndTestRegex(document);
+    TextDecorationApplier.updateDecorations(document, regexTests);
   }
 
   private parseAndTestRegex(document: TextDocument) {
@@ -69,9 +68,9 @@ class RegexMatchService {
     const diagnostics: Diagnostic[] = [];
 
     try {
-      const parsedRegexTest = FileParser.parseFileContent(fileContent);
+      const parsedRegexTests = FileParser.parseFileContent(fileContent);
 
-      if (!parsedRegexTest) {
+      if (!parsedRegexTests) {
         const firstLine = document.lineAt(0).text;
         const errorRange = new Range(0, 0, 0, firstLine.length);
         const parsingDiagnosticError = this.diagnosticProvider.createErrorDiagnostic(
@@ -83,8 +82,7 @@ class RegexMatchService {
         return;
       }
 
-      const matchResults = RegexTester.testRegex(parsedRegexTest);
-      return matchResults;
+      return parsedRegexTests;
     } catch (error) {
       if (error instanceof Error) {
         const firstLine = document.lineAt(0).text;
