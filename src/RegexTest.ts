@@ -70,6 +70,18 @@ class RegexTest {
 
     return ranges;
   }
+
+  getMatchingRegex() {
+    return this.matchingRegex;
+  }
+
+  getTestLines() {
+    return this.testLines;
+  }
+
+  getStartTestIndex() {
+    return this.startTestIndex;
+  }
 }
 
 export default RegexTest;
