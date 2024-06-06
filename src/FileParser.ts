@@ -61,40 +61,6 @@ class FileParser {
     return regexTests;
   }
 
-  // static parseFileContent(fileContent: string): ParsedRegexTest | null {
-  //   const fileLines = fileContent.split('\n');
-
-  //   const firstDelimiterLineIndex = this.findFirstDelimiterLineIndex(fileLines);
-  //   if (
-  //     firstDelimiterLineIndex === undefined ||
-  //     firstDelimiterLineIndex === fileLines.length - 1 ||
-  //     firstDelimiterLineIndex === 0
-  //   ) {
-  //     return null;
-  //   }
-
-  //   const regexLine = fileLines[firstDelimiterLineIndex - 1];
-  //   const matchingRegex = this.transformStringToRegExp(regexLine);
-
-  //   if (!matchingRegex) {
-  //     return null;
-  //   }
-
-  //   const testLines = this.getTestLines(fileLines.slice(firstDelimiterLineIndex), matchingRegex.multiline);
-
-  //   const startTestIndex = fileContent.indexOf(TEST_AREA_DELIMITER) + TEST_AREA_DELIMITER.length + 1;
-
-  //   return { matchingRegex, testLines, startTestIndex };
-  // }
-
-  static findFirstDelimiterLineIndex(fileLines: string[]): number | undefined {
-    for (let i = 0; i < fileLines.length; i++) {
-      if (this.isTestAreaDelimiter(fileLines[i])) {
-        return i;
-      }
-    }
-  }
-
   static transformStringToRegExp(regexLine: string): RegExp | undefined {
     const matchGroups = regexLine.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
