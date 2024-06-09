@@ -1,3 +1,5 @@
+import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
+import RegexSyntaxError from './exceptions/RegexSyntaxError';
 import RegexTest from './RegexTest';
 
 export const TEST_AREA_DELIMITER = '---';
@@ -17,68 +19,78 @@ class FileParser {
     const fileLines = fileContent.split('\n');
 
     const regexTests: RegexTest[] = [];
-    let regexLine: string | undefined;
+    let regexLineIndex: number | undefined;
     let testLines: string[] = [];
     let isInTestStringArea = false;
 
     let startTestIndex = 0;
     let charCount = 0;
 
-    for (const line of fileLines) {
-      if (this.isTestAreaDelimiter(line)) {
+    for (let i = 0; i < fileLines.length; i++) {
+      if (this.isTestAreaDelimiter(fileLines[i])) {
         isInTestStringArea = !isInTestStringArea;
 
         if (isInTestStringArea) {
-          startTestIndex = charCount + line.length + NEW_LINE_LENGTH;
-        } else {
-          if (!regexLine) {
-            return null;
+          if (regexLineIndex === undefined) {
+            throw new RegexMatchFormatError(i);
           }
 
-          const matchingRegex = this.transformStringToRegExp(regexLine);
+          startTestIndex = charCount + fileLines[i].length + NEW_LINE_LENGTH;
+        } else if (regexLineIndex !== undefined) {
+          const matchingRegex = this.transformStringToRegExp(fileLines[regexLineIndex], regexLineIndex);
+
           if (!matchingRegex) {
-            return null;
+            throw new RegexMatchFormatError(i);
           }
 
           testLines = this.getTestLines(testLines, matchingRegex.multiline);
           regexTests.push(new RegexTest({ matchingRegex, testLines, startTestIndex }));
+
           testLines = [];
-          regexLine = undefined;
+          regexLineIndex = undefined;
         }
       } else if (isInTestStringArea) {
-        testLines.push(line);
+        testLines.push(fileLines[i]);
       } else {
-        regexLine = line;
+        regexLineIndex = i;
       }
 
-      charCount += line.length + NEW_LINE_LENGTH;
+      charCount += fileLines[i].length + NEW_LINE_LENGTH;
     }
 
-    if (isInTestStringArea || !!regexLine) {
-      return null;
+    if (isInTestStringArea || regexLineIndex !== undefined) {
+      throw new RegexMatchFormatError(0);
     }
 
     return regexTests;
   }
 
-  static transformStringToRegExp(regexLine: string): RegExp | undefined {
-    const matchGroups = regexLine.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+  static transformStringToRegExp(regexLine: string, lineNumber: number): RegExp | undefined {
+    try {
+      const matchGroups = regexLine.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
 
-    if (matchGroups) {
-      const [, pattern] = matchGroups;
-      const flagsGroup = matchGroups.groups?.flags;
+      if (matchGroups) {
+        const [, pattern] = matchGroups;
+        const flagsGroup = matchGroups.groups?.flags;
 
-      let flags = flagsGroup?.replace('/', '');
+        let flags = flagsGroup?.replace('/', '');
+        let matchingRegex = new RegExp(pattern, flags);
 
-      if (!flags) {
-        flags = DEFAULT_FLAGS.join('');
+        if (!flags) {
+          flags = DEFAULT_FLAGS.join('');
+        }
+
+        if (!flags.includes(REQUIRED_FLAG)) {
+          flags += REQUIRED_FLAG;
+        }
+
+        matchingRegex = new RegExp(pattern, flags);
+        return matchingRegex;
       }
-
-      if (!flags.includes(REQUIRED_FLAG)) {
-        flags += REQUIRED_FLAG;
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new RegexSyntaxError(error.message, lineNumber);
       }
-
-      return new RegExp(pattern, flags);
     }
   }
 
