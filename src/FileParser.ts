@@ -3,10 +3,9 @@ import RegexSyntaxError from './exceptions/RegexSyntaxError';
 import RegexTest from './RegexTest';
 
 export const TEST_AREA_DELIMITER = '---';
-const NEW_LINE_LENGTH = 1;
 
+const NEW_LINE_LENGTH = 1;
 const REQUIRED_FLAG = 'd';
-const DEFAULT_FLAGS = ['g', 'm'];
 
 export interface ParsedRegexTest {
   matchingRegex: RegExp;
@@ -73,12 +72,8 @@ class FileParser {
         const [, pattern] = matchGroups;
         const flagsGroup = matchGroups.groups?.flags;
 
-        let flags = flagsGroup?.replace('/', '');
+        let flags = flagsGroup?.replace('/', '') ?? '';
         let matchingRegex = new RegExp(pattern, flags);
-
-        if (!flags) {
-          flags = DEFAULT_FLAGS.join('');
-        }
 
         if (!flags.includes(REQUIRED_FLAG)) {
           flags += REQUIRED_FLAG;
