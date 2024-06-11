@@ -59,19 +59,17 @@ describe('File Parser', () => {
     expect(regexTests[0].getStartTestIndex()).toBe(15);
   });
 
-  it('should throw an error if the matching regex is invalid', () => {
+  it('should parse regex test with an error if the matching regex is invalid', () => {
     const fileContent = '/(?/gm\n---\nbb9abb\n---';
 
-    try {
-      FileParser.parseFileContent(fileContent);
-      expect.unreachable('Expected to throw an error');
-    } catch (error) {
-      expect(error).toBeInstanceOf(RegexSyntaxError);
+    const regexTests = FileParser.parseFileContent(fileContent);
+    expect(regexTests).not.toBeNull();
+    expect(regexTests).toHaveLength(1);
 
-      const regexMatchFormatError = error as RegexSyntaxError;
-      expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-      expect(regexMatchFormatError.line).toBe(0);
-    }
+    expect(regexTests[0].getError()).toBeInstanceOf(RegexSyntaxError);
+    expect(regexTests[0].getError()!.message).toContain('Invalid regular expression');
+
+    expect(regexTests[0].getMatchingRegex()).toBeUndefined();
   });
 
   it('should throw error if the file content does not contain the test area delimiter', () => {
@@ -150,19 +148,24 @@ describe('File Parser', () => {
       }
     });
 
-    it('should throw an error if the second matching regex is invalid', () => {
+    it('should parse correctly if the second matching regex is invalid', () => {
       const fileContent = '/[0-9]/gm\n---\nbb9abb\n---\n/[0-9](/gm\n---\n9\n---';
 
-      try {
-        FileParser.parseFileContent(fileContent);
-        expect.unreachable('Expected to throw an error');
-      } catch (error) {
-        expect(error).toBeInstanceOf(RegexSyntaxError);
+      const regexTests = FileParser.parseFileContent(fileContent);
+      expect(regexTests).not.toBeNull();
+      expect(regexTests).toHaveLength(2);
 
-        const regexMatchFormatError = error as RegexSyntaxError;
-        expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-        expect(regexMatchFormatError.line).toBe(4);
-      }
+      expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+      expect(regexTests[0].getTestLines()).toHaveLength(1);
+      expect(regexTests[0].getTestLines()[0]).toBe('bb9abb');
+      expect(regexTests[0].getStartTestIndex()).toBe(14);
+
+      expect(regexTests[1].getError()).toBeInstanceOf(RegexSyntaxError);
+      expect(regexTests[1].getError()!.message).toContain('Invalid regular expression');
+      expect(regexTests[1].getMatchingRegex()).toBeUndefined();
+      expect(regexTests[1].getTestLines()).toHaveLength(1);
+      expect(regexTests[1].getTestLines()[0]).toBe('9');
+      expect(regexTests[1].getStartTestIndex()).toBe(40);
     });
 
     it('should parse multiple regex tests correctly', () => {
@@ -202,6 +205,27 @@ describe('File Parser', () => {
       expect(regexTests[1].getTestLines()).toHaveLength(1);
       expect(regexTests[1].getTestLines()[0]).toBe('test3\ntest4');
       expect(regexTests[1].getStartTestIndex()).toBe(43);
+    });
+
+    it('should parse multiple regex tests correctly, if there is a regex with an error', () => {
+      const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n/[0-9](/gm\n---\n9\n---';
+
+      const regexTests = FileParser.parseFileContent(fileContent);
+      expect(regexTests).not.toBeNull();
+      expect(regexTests).toHaveLength(2);
+
+      expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+      expect(regexTests[0].getTestLines()).toHaveLength(2);
+      expect(regexTests[0].getTestLines()[0]).toBe('test1');
+      expect(regexTests[0].getTestLines()[1]).toBe('test2');
+      expect(regexTests[0].getStartTestIndex()).toBe(14);
+
+      expect(regexTests[1].getError()).toBeInstanceOf(RegexSyntaxError);
+      expect(regexTests[1].getError()!.message).toContain('Invalid regular expression');
+      expect(regexTests[1].getMatchingRegex()).toBeUndefined();
+      expect(regexTests[1].getTestLines()).toHaveLength(1);
+      expect(regexTests[1].getTestLines()[0]).toBe('9');
+      expect(regexTests[1].getStartTestIndex()).toBe(45);
     });
   });
 });
