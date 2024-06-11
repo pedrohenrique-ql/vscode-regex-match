@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.3.0
+
+- Allows multiple regex testing in the regex match window.
+
 ## 0.2.0
 
 - Highlight capturing groups in the test string.
