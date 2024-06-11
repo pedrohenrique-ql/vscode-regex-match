@@ -36,14 +36,12 @@ class FileParser {
 
           startTestIndex = charCount + fileLines[i].length + NEW_LINE_LENGTH;
         } else if (regexLineIndex !== undefined) {
-          const matchingRegex = this.transformStringToRegExp(fileLines[regexLineIndex], regexLineIndex);
-
-          if (!matchingRegex) {
+          const regexTest = this.createRegexTest(fileLines[regexLineIndex], regexLineIndex, testLines, startTestIndex);
+          if (!regexTest) {
             throw new RegexMatchFormatError(i);
           }
 
-          testLines = this.getTestLines(testLines, matchingRegex.multiline);
-          regexTests.push(new RegexTest({ matchingRegex, testLines, startTestIndex }));
+          regexTests.push(regexTest);
 
           testLines = [];
           regexLineIndex = undefined;
@@ -64,28 +62,46 @@ class FileParser {
     return regexTests;
   }
 
-  static transformStringToRegExp(regexLine: string, lineNumber: number): RegExp | undefined {
+  static createRegexTest(
+    regexLine: string,
+    regexLineIndex: number,
+    testLines: string[],
+    startTestIndex: number,
+  ): RegexTest | undefined {
     try {
-      const matchGroups = regexLine.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+      const matchingRegex = this.transformStringToRegExp(regexLine);
 
-      if (matchGroups) {
-        const [, pattern] = matchGroups;
-        const flagsGroup = matchGroups.groups?.flags;
-
-        let flags = flagsGroup?.replace('/', '') ?? '';
-        let matchingRegex = new RegExp(pattern, flags);
-
-        if (!flags.includes(REQUIRED_FLAG)) {
-          flags += REQUIRED_FLAG;
-        }
-
-        matchingRegex = new RegExp(pattern, flags);
-        return matchingRegex;
+      if (!matchingRegex) {
+        throw new RegexMatchFormatError(regexLineIndex);
       }
+
+      const formattedTestLines = this.getTestLines(testLines, matchingRegex.multiline);
+
+      return new RegexTest({ matchingRegex, testLines: formattedTestLines, startTestIndex });
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new RegexSyntaxError(error.message, lineNumber);
+        const regexSyntaxError = new RegexSyntaxError(error.message, regexLineIndex);
+        return new RegexTest({ error: regexSyntaxError, testLines, startTestIndex });
       }
+    }
+  }
+
+  static transformStringToRegExp(regexLine: string): RegExp | undefined {
+    const matchGroups = regexLine.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+
+    if (matchGroups) {
+      const [, pattern] = matchGroups;
+      const flagsGroup = matchGroups.groups?.flags;
+
+      let flags = flagsGroup?.replace('/', '') ?? '';
+      let matchingRegex = new RegExp(pattern, flags);
+
+      if (!flags.includes(REQUIRED_FLAG)) {
+        flags += REQUIRED_FLAG;
+      }
+
+      matchingRegex = new RegExp(pattern, flags);
+      return matchingRegex;
     }
   }
 

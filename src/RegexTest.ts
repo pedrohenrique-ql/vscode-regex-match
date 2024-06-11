@@ -1,5 +1,3 @@
-import { ParsedRegexTest } from './FileParser';
-
 const NEW_LINE_LENGTH = 1;
 
 export interface MatchResult {
@@ -8,18 +6,31 @@ export interface MatchResult {
   groupRanges?: number[][];
 }
 
+interface RegexTestProps {
+  matchingRegex?: RegExp;
+  testLines: string[];
+  startTestIndex: number;
+  error?: Error;
+}
+
 class RegexTest {
-  private matchingRegex: RegExp;
+  private matchingRegex?: RegExp;
   private testLines: string[];
   private startTestIndex: number;
+  private error?: Error;
 
-  constructor(parsedRegexTest: ParsedRegexTest) {
-    this.matchingRegex = parsedRegexTest.matchingRegex;
-    this.testLines = parsedRegexTest.testLines;
-    this.startTestIndex = parsedRegexTest.startTestIndex;
+  constructor({ matchingRegex, testLines, startTestIndex, error }: RegexTestProps) {
+    this.matchingRegex = matchingRegex;
+    this.testLines = testLines;
+    this.startTestIndex = startTestIndex;
+    this.error = error;
   }
 
   test(): MatchResult[] {
+    if (!this.matchingRegex) {
+      throw new Error('Regex not found');
+    }
+
     const matchResults: MatchResult[] = [];
 
     let lineStartIndex = this.startTestIndex;
@@ -81,6 +92,10 @@ class RegexTest {
 
   getStartTestIndex() {
     return this.startTestIndex;
+  }
+
+  getError() {
+    return this.error;
   }
 }
 

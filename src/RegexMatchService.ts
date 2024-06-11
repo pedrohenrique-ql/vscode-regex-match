@@ -17,6 +17,7 @@ import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
 import RegexSyntaxError from './exceptions/RegexSyntaxError';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
+import RegexTest from './RegexTest';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
@@ -69,7 +70,20 @@ class RegexMatchService {
 
     try {
       const parsedRegexTests = FileParser.parseFileContent(fileContent);
-      return parsedRegexTests;
+
+      const { regexTests, regexTestsWithError } = this.reduceParsedRegexTests(parsedRegexTests);
+
+      if (regexTestsWithError.length > 0) {
+        for (const regexTest of regexTestsWithError) {
+          const error = regexTest.getError();
+          if (error) {
+            const diagnosticError = this.handleError(error, document);
+            diagnostics.push(diagnosticError);
+          }
+        }
+      }
+
+      return regexTests;
     } catch (error) {
       if (error instanceof Error) {
         const diagnosticError = this.handleError(error, document);
@@ -78,6 +92,22 @@ class RegexMatchService {
     } finally {
       this.diagnosticProvider.updateDiagnostics(this.regexTestFileUri, diagnostics);
     }
+  }
+
+  private reduceParsedRegexTests(parsedRegexTests: RegexTest[]) {
+    const { regexTestsWithError, regexTests } = parsedRegexTests.reduce(
+      (acc: { regexTests: RegexTest[]; regexTestsWithError: RegexTest[] }, parsedRegexTest: RegexTest) => {
+        if (parsedRegexTest.getError()) {
+          acc.regexTestsWithError.push(parsedRegexTest);
+        } else {
+          acc.regexTests.push(parsedRegexTest);
+        }
+        return acc;
+      },
+      { regexTests: [], regexTestsWithError: [] },
+    );
+
+    return { regexTestsWithError, regexTests };
   }
 
   private handleError(error: Error, document: TextDocument): Diagnostic {
