@@ -13,13 +13,12 @@ import {
 
 import TextDecorationApplier from './decorations/TextDecorationApplier';
 import DiagnosticProvider from './DiagnosticProvider';
+import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
+import RegexSyntaxError from './exceptions/RegexSyntaxError';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
-import RegexTester from './RegexTester';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
-
-const REGEX_TEST_PATTERN_ERROR_MESSAGE = `Parsing error: The format of the regex test is incorrect. Please ensure your test follows the required pattern.\n\nExpected format:\n\n/regex/[flags]\n---\ntest string\n---`;
 
 class RegexMatchService {
   private regexTestFileUri: Uri;
@@ -60,8 +59,8 @@ class RegexMatchService {
   }
 
   private updateRegexTest(document: TextDocument) {
-    const matchResults = this.parseAndTestRegex(document);
-    TextDecorationApplier.updateDecorations(document, matchResults);
+    const regexTests = this.parseAndTestRegex(document);
+    TextDecorationApplier.updateDecorations(document, regexTests);
   }
 
   private parseAndTestRegex(document: TextDocument) {
@@ -69,33 +68,29 @@ class RegexMatchService {
     const diagnostics: Diagnostic[] = [];
 
     try {
-      const parsedRegexTest = FileParser.parseFileContent(fileContent);
-
-      if (!parsedRegexTest) {
-        const firstLine = document.lineAt(0).text;
-        const errorRange = new Range(0, 0, 0, firstLine.length);
-        const parsingDiagnosticError = this.diagnosticProvider.createErrorDiagnostic(
-          errorRange,
-          REGEX_TEST_PATTERN_ERROR_MESSAGE,
-        );
-
-        diagnostics.push(parsingDiagnosticError);
-        return;
-      }
-
-      const matchResults = RegexTester.testRegex(parsedRegexTest);
-      return matchResults;
+      const parsedRegexTests = FileParser.parseFileContent(fileContent);
+      return parsedRegexTests;
     } catch (error) {
       if (error instanceof Error) {
-        const firstLine = document.lineAt(0).text;
-        const errorRange = new Range(0, 0, 0, firstLine.length);
-        const regexSyntaxDiagnosticError = this.diagnosticProvider.createErrorDiagnostic(errorRange, error.message);
-
-        diagnostics.push(regexSyntaxDiagnosticError);
+        const diagnosticError = this.handleError(error, document);
+        diagnostics.push(diagnosticError);
       }
     } finally {
       this.diagnosticProvider.updateDiagnostics(this.regexTestFileUri, diagnostics);
     }
+  }
+
+  private handleError(error: Error, document: TextDocument): Diagnostic {
+    let documentErrorLine = document.lineAt(0).text;
+    let errorRange = new Range(0, 0, 0, documentErrorLine.length);
+
+    if (error instanceof RegexMatchFormatError || error instanceof RegexSyntaxError) {
+      documentErrorLine = document.lineAt(error.line).text;
+      errorRange = new Range(error.line, 0, error.line, documentErrorLine.length);
+    }
+
+    const diagnosticError = this.diagnosticProvider.createErrorDiagnostic(errorRange, error.message);
+    return diagnosticError;
   }
 
   private setupTextDocumentChangeHandling() {
