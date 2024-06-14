@@ -42,7 +42,7 @@ class FileParser {
         }
       } else if (isInTestStringArea) {
         testLines.push(fileLines[i]);
-      } else {
+      } else if (fileLines[i] !== '') {
         regexLineIndex = i;
       }
 
