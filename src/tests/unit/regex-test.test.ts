@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 
+import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 import RegexTest, { RegexTestProps } from '@/RegexTest';
 
 vi.mock('vscode', () => ({
@@ -8,7 +9,7 @@ vi.mock('vscode', () => ({
   },
 }));
 
-describe('Regex Tester', () => {
+describe('Regex Test', () => {
   it('should test regex correctly, if the regex matches and has one match', () => {
     const parsedRegexTest: RegexTestProps = {
       regexPattern: '/[0-9]a/g',
@@ -163,6 +164,26 @@ describe('Regex Tester', () => {
     const regexTest = new RegexTest(parsedRegexTest);
     const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
+  });
+
+  it('should throw an error, if the regex is invalid', () => {
+    const parsedRegexTest: RegexTestProps = {
+      regexPattern: '/(?/gm',
+      regexLineIndex: 6,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    try {
+      new RegexTest(parsedRegexTest);
+      expect.unreachable('Expected to throw an error');
+    } catch (error) {
+      expect(error).toBeInstanceOf(RegexSyntaxError);
+
+      const regexMatchFormatError = error as RegexSyntaxError;
+      expect(regexMatchFormatError.message).toContain('Invalid regular expression');
+      expect(regexMatchFormatError.line).toBe(parsedRegexTest.regexLineIndex);
+    }
   });
 
   describe('Capturing Groups', () => {
