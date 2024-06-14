@@ -1,4 +1,7 @@
+import RegexSyntaxError from './exceptions/RegexSyntaxError';
+
 const NEW_LINE_LENGTH = 1;
+const REQUIRED_FLAG = 'd';
 
 export interface MatchResult {
   substring: string;
@@ -6,8 +9,9 @@ export interface MatchResult {
   groupRanges?: number[][];
 }
 
-interface RegexTestProps {
-  matchingRegex?: RegExp;
+export interface RegexTestProps {
+  regexPattern: string;
+  regexLineIndex: number;
   testLines: string[];
   startTestIndex: number;
   error?: Error;
@@ -17,13 +21,17 @@ class RegexTest {
   private matchingRegex?: RegExp;
   private testLines: string[];
   private startTestIndex: number;
-  private error?: Error;
 
-  constructor({ matchingRegex, testLines, startTestIndex, error }: RegexTestProps) {
-    this.matchingRegex = matchingRegex;
-    this.testLines = testLines;
+  constructor({ regexPattern, regexLineIndex, testLines, startTestIndex }: RegexTestProps) {
+    this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
+
+    if (this.matchingRegex?.multiline) {
+      this.testLines = testLines;
+    } else {
+      this.testLines = [testLines.join('\n')];
+    }
+
     this.startTestIndex = startTestIndex;
-    this.error = error;
   }
 
   test(): MatchResult[] {
@@ -55,6 +63,31 @@ class RegexTest {
     }
 
     return matchResults;
+  }
+
+  private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
+    try {
+      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+
+      if (matchGroups) {
+        const [, pattern] = matchGroups;
+        const flagsGroup = matchGroups.groups?.flags;
+
+        let flags = flagsGroup?.replace('/', '') ?? '';
+        let matchingRegex = new RegExp(pattern, flags);
+
+        if (!flags.includes(REQUIRED_FLAG)) {
+          flags += REQUIRED_FLAG;
+        }
+
+        matchingRegex = new RegExp(pattern, flags);
+        return matchingRegex;
+      }
+    } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new RegexSyntaxError(error.message, regexLineIndex);
+      }
+    }
   }
 
   private processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
@@ -92,10 +125,6 @@ class RegexTest {
 
   getStartTestIndex() {
     return this.startTestIndex;
-  }
-
-  getError() {
-    return this.error;
   }
 }
 
