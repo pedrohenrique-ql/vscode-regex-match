@@ -218,5 +218,25 @@ describe('File Parser', () => {
         expect(regexMatchFormatError.line).toBe(5);
       }
     });
+
+    it('should parse multiple regex tests correctly, if there are empty lines between tests', () => {
+      const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n\n\n/[0-9]/gm\n---\ntest3\ntest4\n---';
+
+      const regexTests = FileParser.parseFileContent(fileContent);
+      expect(regexTests).not.toBeNull();
+      expect(regexTests).toHaveLength(2);
+
+      expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+      expect(regexTests[0].getTestLines()).toHaveLength(2);
+      expect(regexTests[0].getTestLines()[0]).toBe('test1');
+      expect(regexTests[0].getTestLines()[1]).toBe('test2');
+      expect(regexTests[0].getStartTestIndex()).toBe(14);
+
+      expect(regexTests[1].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+      expect(regexTests[1].getTestLines()).toHaveLength(2);
+      expect(regexTests[1].getTestLines()[0]).toBe('test3');
+      expect(regexTests[1].getTestLines()[1]).toBe('test4');
+      expect(regexTests[1].getStartTestIndex()).toBe(46);
+    });
   });
 });
