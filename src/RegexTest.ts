@@ -57,7 +57,7 @@ class RegexTest {
 
   private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
     try {
-      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/i);
+      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/);
 
       if (matchGroups) {
         const [, pattern] = matchGroups;

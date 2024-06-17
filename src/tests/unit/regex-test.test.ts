@@ -191,6 +191,23 @@ describe('Regex Test', () => {
     expect(matchResult[2].groupRanges).toBeUndefined();
   });
 
+  it('should test regex correctly, if the regex has a new line character', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a\\n\\d{3}b/gm',
+      regexLineIndex: 0,
+      testLines: ['9a', '123b', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(1);
+
+    expect(matchResult[0].substring).toBe('9a\n123b');
+    expect(matchResult[0].range).toEqual([0, 7]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+  });
+
   it('should throw an error, if the regex is invalid', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/(?/gm',
