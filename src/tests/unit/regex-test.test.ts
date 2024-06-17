@@ -166,6 +166,31 @@ describe('Regex Test', () => {
     expect(matchResult.length).toBe(0);
   });
 
+  it('should test regex correctly, if the regex is a wildcard regex', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/.*/gm',
+      regexLineIndex: 0,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(3);
+
+    expect(matchResult[0].substring).toBe('9ab');
+    expect(matchResult[0].range).toEqual([0, 3]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+
+    expect(matchResult[1].substring).toBe('8a');
+    expect(matchResult[1].range).toEqual([4, 6]);
+    expect(matchResult[1].groupRanges).toBeUndefined();
+
+    expect(matchResult[2].substring).toBe('7A');
+    expect(matchResult[2].range).toEqual([7, 9]);
+    expect(matchResult[2].groupRanges).toBeUndefined();
+  });
+
   it('should throw an error, if the regex is invalid', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/(?/gm',
