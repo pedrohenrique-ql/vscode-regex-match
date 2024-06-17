@@ -65,7 +65,7 @@ describe('Regex Test', () => {
     expect(matchResult.length).toBe(0);
   });
 
-  it('should test regex correctly, if there are many test lines and has multine flag', () => {
+  it('should test regex correctly, if there are many test lines and has multiline flag', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/^[0-9]a/gm',
       regexLineIndex: 0,
@@ -86,7 +86,7 @@ describe('Regex Test', () => {
     expect(matchResult[1].groupRanges).toBeUndefined();
   });
 
-  it('should test regex correctly, if there are many test lines and does not have multine flag', () => {
+  it('should test regex correctly, if there are many test lines and does not have multiline flag', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/^[0-9]a/g',
       regexLineIndex: 0,
@@ -164,6 +164,48 @@ describe('Regex Test', () => {
     const regexTest = new RegexTest(regexTestProps);
     const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
+  });
+
+  it('should test regex correctly, if the regex is a wildcard regex', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/.*/gm',
+      regexLineIndex: 0,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(3);
+
+    expect(matchResult[0].substring).toBe('9ab');
+    expect(matchResult[0].range).toEqual([0, 3]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+
+    expect(matchResult[1].substring).toBe('8a');
+    expect(matchResult[1].range).toEqual([4, 6]);
+    expect(matchResult[1].groupRanges).toBeUndefined();
+
+    expect(matchResult[2].substring).toBe('7A');
+    expect(matchResult[2].range).toEqual([7, 9]);
+    expect(matchResult[2].groupRanges).toBeUndefined();
+  });
+
+  it('should test regex correctly, if the regex has a new line character', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a\\n\\d{3}b/gm',
+      regexLineIndex: 0,
+      testLines: ['9a', '123b', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(1);
+
+    expect(matchResult[0].substring).toBe('9a\n123b');
+    expect(matchResult[0].range).toEqual([0, 7]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
   });
 
   it('should throw an error, if the regex is invalid', () => {

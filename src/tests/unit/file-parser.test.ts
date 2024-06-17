@@ -14,8 +14,8 @@ describe('File Parser', () => {
     expect(regexTests).toHaveLength(1);
 
     expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]a/dg);
-    expect(regexTests[0].getTestLines()).toHaveLength(1);
-    expect(regexTests[0].getTestLines()[0]).toBe('bb9abb');
+    expect(regexTests[0].getFormattedTestString()).toHaveLength(1);
+    expect(regexTests[0].getFormattedTestString()[0]).toBe('bb9abb');
     expect(regexTests[0].getStartTestIndex()).toBe(14);
   });
 
@@ -27,9 +27,9 @@ describe('File Parser', () => {
     expect(regexTests).toHaveLength(1);
 
     expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]a/dgm);
-    expect(regexTests[0].getTestLines()).toHaveLength(2);
-    expect(regexTests[0].getTestLines()[0]).toBe('bb9abb');
-    expect(regexTests[0].getTestLines()[1]).toBe('2a');
+    expect(regexTests[0].getFormattedTestString()).toHaveLength(2);
+    expect(regexTests[0].getFormattedTestString()[0]).toBe('bb9abb');
+    expect(regexTests[0].getFormattedTestString()[1]).toBe('2a');
     expect(regexTests[0].getStartTestIndex()).toBe(15);
   });
 
@@ -41,8 +41,9 @@ describe('File Parser', () => {
     expect(regexTests).toHaveLength(1);
 
     expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]a/dg);
-    expect(regexTests[0].getTestLines()).toHaveLength(1);
-    expect(regexTests[0].getTestLines()[0]).toBe('bb9abb\n2a');
+    expect(regexTests[0].getFormattedTestString()).toHaveLength(2);
+    expect(regexTests[0].getFormattedTestString()[0]).toBe('bb9abb');
+    expect(regexTests[0].getFormattedTestString()[1]).toBe('2a');
     expect(regexTests[0].getStartTestIndex()).toBe(14);
   });
 
@@ -54,8 +55,8 @@ describe('File Parser', () => {
     expect(regexTests).toHaveLength(1);
 
     expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]a/dgm);
-    expect(regexTests[0].getTestLines()).toHaveLength(1);
-    expect(regexTests[0].getTestLines()[0]).toBe('bb9abb');
+    expect(regexTests[0].getFormattedTestString()).toHaveLength(1);
+    expect(regexTests[0].getFormattedTestString()[0]).toBe('bb9abb');
     expect(regexTests[0].getStartTestIndex()).toBe(15);
   });
 
@@ -173,15 +174,15 @@ describe('File Parser', () => {
       expect(regexTests).toHaveLength(2);
 
       expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
-      expect(regexTests[0].getTestLines()).toHaveLength(2);
-      expect(regexTests[0].getTestLines()[0]).toBe('test1');
-      expect(regexTests[0].getTestLines()[1]).toBe('test2');
+      expect(regexTests[0].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[0].getFormattedTestString()[0]).toBe('test1');
+      expect(regexTests[0].getFormattedTestString()[1]).toBe('test2');
       expect(regexTests[0].getStartTestIndex()).toBe(14);
 
       expect(regexTests[1].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
-      expect(regexTests[1].getTestLines()).toHaveLength(2);
-      expect(regexTests[1].getTestLines()[0]).toBe('test3');
-      expect(regexTests[1].getTestLines()[1]).toBe('test4');
+      expect(regexTests[1].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[1].getFormattedTestString()[0]).toBe('test3');
+      expect(regexTests[1].getFormattedTestString()[1]).toBe('test4');
       expect(regexTests[1].getStartTestIndex()).toBe(44);
     });
 
@@ -193,14 +194,15 @@ describe('File Parser', () => {
       expect(regexTests).toHaveLength(2);
 
       expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
-      expect(regexTests[0].getTestLines()).toHaveLength(2);
-      expect(regexTests[0].getTestLines()[0]).toBe('test1');
-      expect(regexTests[0].getTestLines()[1]).toBe('test2');
+      expect(regexTests[0].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[0].getFormattedTestString()[0]).toBe('test1');
+      expect(regexTests[0].getFormattedTestString()[1]).toBe('test2');
       expect(regexTests[0].getStartTestIndex()).toBe(14);
 
       expect(regexTests[1].getMatchingRegex()).toStrictEqual(/[0-9]/di);
-      expect(regexTests[1].getTestLines()).toHaveLength(1);
-      expect(regexTests[1].getTestLines()[0]).toBe('test3\ntest4');
+      expect(regexTests[1].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[1].getFormattedTestString()[0]).toBe('test3');
+      expect(regexTests[1].getFormattedTestString()[1]).toBe('test4');
       expect(regexTests[1].getStartTestIndex()).toBe(43);
     });
 
@@ -227,15 +229,15 @@ describe('File Parser', () => {
       expect(regexTests).toHaveLength(2);
 
       expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
-      expect(regexTests[0].getTestLines()).toHaveLength(2);
-      expect(regexTests[0].getTestLines()[0]).toBe('test1');
-      expect(regexTests[0].getTestLines()[1]).toBe('test2');
+      expect(regexTests[0].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[0].getFormattedTestString()[0]).toBe('test1');
+      expect(regexTests[0].getFormattedTestString()[1]).toBe('test2');
       expect(regexTests[0].getStartTestIndex()).toBe(14);
 
       expect(regexTests[1].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
-      expect(regexTests[1].getTestLines()).toHaveLength(2);
-      expect(regexTests[1].getTestLines()[0]).toBe('test3');
-      expect(regexTests[1].getTestLines()[1]).toBe('test4');
+      expect(regexTests[1].getFormattedTestString()).toHaveLength(2);
+      expect(regexTests[1].getFormattedTestString()[0]).toBe('test3');
+      expect(regexTests[1].getFormattedTestString()[1]).toBe('test4');
       expect(regexTests[1].getStartTestIndex()).toBe(46);
     });
   });
