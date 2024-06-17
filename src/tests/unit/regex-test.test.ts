@@ -65,7 +65,7 @@ describe('Regex Test', () => {
     expect(matchResult.length).toBe(0);
   });
 
-  it('should test regex correctly, if there are many test lines and has multine flag', () => {
+  it('should test regex correctly, if there are many test lines and has multiline flag', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/^[0-9]a/gm',
       regexLineIndex: 0,
