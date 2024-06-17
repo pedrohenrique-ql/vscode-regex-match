@@ -1,6 +1,5 @@
 import RegexSyntaxError from './exceptions/RegexSyntaxError';
 
-const NEW_LINE_LENGTH = 1;
 const REQUIRED_FLAG = 'd';
 
 export interface MatchResult {
@@ -19,18 +18,12 @@ export interface RegexTestProps {
 
 class RegexTest {
   private matchingRegex?: RegExp;
-  private testLines: string[];
+  private testString: string;
   private startTestIndex: number;
 
   constructor({ regexPattern, regexLineIndex, testLines, startTestIndex }: RegexTestProps) {
     this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
-
-    if (this.matchingRegex?.multiline) {
-      this.testLines = testLines;
-    } else {
-      this.testLines = [testLines.join('\n')];
-    }
-
+    this.testString = testLines.join('\n');
     this.startTestIndex = startTestIndex;
   }
 
@@ -39,27 +32,24 @@ class RegexTest {
       throw new Error('Regex not found');
     }
 
+    const regexCopy = new RegExp(this.matchingRegex.source, this.matchingRegex.flags);
     const matchResults: MatchResult[] = [];
 
-    let lineStartIndex = this.startTestIndex;
+    let match: RegExpExecArray | null;
 
-    for (const line of this.testLines) {
-      let match: RegExpExecArray | null;
-
-      while ((match = this.matchingRegex.exec(line)) !== null) {
-        if (match[0].trim() === '') {
-          break;
-        }
-
-        const processedMatch = this.processMatch(match, lineStartIndex);
+    while ((match = regexCopy.exec(this.testString)) !== null) {
+      if (match[0] !== '') {
+        const processedMatch = this.processMatch(match, this.startTestIndex);
         matchResults.push(processedMatch);
-
-        if (!this.matchingRegex.global) {
-          break;
-        }
       }
 
-      lineStartIndex += line.length + NEW_LINE_LENGTH;
+      if (!regexCopy.global) {
+        break;
+      }
+
+      if (match.index === regexCopy.lastIndex) {
+        regexCopy.lastIndex++;
+      }
     }
 
     return matchResults;
@@ -119,8 +109,8 @@ class RegexTest {
     return this.matchingRegex;
   }
 
-  getTestLines() {
-    return this.testLines;
+  getFormattedTestString() {
+    return this.testString.split('\n');
   }
 
   getStartTestIndex() {
