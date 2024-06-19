@@ -2,7 +2,8 @@
 
 ## 0.3.0
 
-- Allows multiple regex testing in the regex match window.
+- Enables multiple regex testing in the regex match window.
+- Correction of regex testing with `\n` and wildcard character.
 
 ## 0.2.0
 

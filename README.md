@@ -31,6 +31,11 @@ Each group in a regular expression is highlighted in a different color, making i
 
 ## Release Notes
 
+### 0.3.0
+
+- Enables multiple regex testing in the regex match window.
+- Correction of regex testing with `\n` and wildcard character.
+
 ### 0.2.0
 
 - Highlight capturing groups in the test string.
