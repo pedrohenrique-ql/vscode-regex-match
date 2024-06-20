@@ -33,7 +33,7 @@ Each group in a regular expression is highlighted in a different color, making i
 
 You can test multiple regular expressions in the same file. Each regex test works independently, with its own test lines and capture groups. This feature allows you to test different regex patterns in the same place.
 
-![Test Multiple Regular Expressions](/resources/multiple-regex-feature.gif)
+![Test Multiple Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/multiple-regex-feature.gif)
 
 ## Release Notes
 
