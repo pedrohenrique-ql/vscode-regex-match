@@ -1,12 +1,12 @@
 import { Range, TextDocument, TextEditor, window } from 'vscode';
 
 import { TEST_AREA_DELIMITER } from '@/FileParser';
-import { MatchResult } from '@/RegexTester';
+import RegexTest, { MatchResult } from '@/RegexTest';
 
 import { DELIMITER_DECORATION, GROUP_DECORATIONS, MATCH_DECORATION } from './constants';
 
 class TextDecorationApplier {
-  static updateDecorations(document: TextDocument, matchResults?: MatchResult[]) {
+  static updateDecorations(document: TextDocument, regexTests?: RegexTest[]) {
     const activeEditor = window.activeTextEditor;
     if (!(activeEditor && document === activeEditor.document)) {
       return;
@@ -15,7 +15,8 @@ class TextDecorationApplier {
     this.resetDecorations(activeEditor);
     this.applyDelimiterDecorations(activeEditor);
 
-    if (matchResults) {
+    if (regexTests) {
+      const matchResults = regexTests.flatMap((regexTest) => regexTest.test());
       this.applyMatchDecorations(activeEditor, matchResults);
     }
   }
@@ -71,7 +72,7 @@ class TextDecorationApplier {
     const document = activeEditor.document;
     const fileContent = document.getText();
 
-    const delimiterRegex = new RegExp(TEST_AREA_DELIMITER, 'g');
+    const delimiterRegex = new RegExp(`^${TEST_AREA_DELIMITER}$`, 'gm');
     let match: RegExpExecArray | null;
 
     const ranges: Range[] = [];

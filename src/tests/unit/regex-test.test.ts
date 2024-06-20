@@ -1,7 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
-import { ParsedRegexTest } from '../../FileParser';
-import RegexTester from '../../RegexTester';
+import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
+import RegexTest, { RegexTestProps } from '@/RegexTest';
 
 vi.mock('vscode', () => ({
   window: {
@@ -9,17 +9,17 @@ vi.mock('vscode', () => ({
   },
 }));
 
-describe('Regex Tester', () => {
+describe('Regex Test', () => {
   it('should test regex correctly, if the regex matches and has one match', () => {
-    const regex = new RegExp('[0-9]a', 'g');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/g',
+      regexLineIndex: 0,
       testLines: ['bbb9abbbb'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(1);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -28,15 +28,15 @@ describe('Regex Tester', () => {
   });
 
   it('should test regex correctly, if the regex matches and has multiple matches in one line', () => {
-    const regex = new RegExp('[0-9]a', 'g');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/g',
+      regexLineIndex: 0,
       testLines: ['9abbbbbbbbb8abbbbb7a'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -53,28 +53,28 @@ describe('Regex Tester', () => {
   });
 
   it('should not return match results, if the regex does not match any test lines', () => {
-    const regex = new RegExp('[0-9]a', 'g');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/g',
+      regexLineIndex: 0,
       testLines: ['bbbb'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
   });
 
-  it('should test regex correctly, if there are many test lines and has multine flag', () => {
-    const regex = new RegExp('^[0-9]a', 'gm');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+  it('should test regex correctly, if there are many test lines and has multiline flag', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/^[0-9]a/gm',
+      regexLineIndex: 0,
       testLines: ['9abbb', 'bb8ab', '7abb'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(2);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -86,16 +86,16 @@ describe('Regex Tester', () => {
     expect(matchResult[1].groupRanges).toBeUndefined();
   });
 
-  it('should test regex correctly, if there are many test lines and does not have multine flag', () => {
-    const regex = new RegExp('^[0-9]a', 'g');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+  it('should test regex correctly, if there are many test lines and does not have multiline flag', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/^[0-9]a/g',
+      regexLineIndex: 0,
       testLines: ['9abbb\nbb8ab\n7abb'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(1);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -104,15 +104,15 @@ describe('Regex Tester', () => {
   });
 
   it('should test regex correctly, if the start test index is greater than zero', () => {
-    const regex = new RegExp('[0-9]a', 'gm');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/gm',
+      regexLineIndex: 0,
       testLines: ['9abbb', 'bb8ab', '7abb'],
       startTestIndex: 15,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -128,16 +128,16 @@ describe('Regex Tester', () => {
     expect(matchResult[2].groupRanges).toBeUndefined();
   });
 
-  it('should test regex correctly, if there is a flag other than defaults', () => {
-    const regex = new RegExp('[0-9]a', 'i');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+  it('should test regex correctly, if it has i flag', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/gi',
+      regexLineIndex: 0,
       testLines: ['9ab', '8a', '7A'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(3);
 
     expect(matchResult[0].substring).toBe('9a');
@@ -154,29 +154,91 @@ describe('Regex Tester', () => {
   });
 
   it('should test regex correctly, if the regex is empty', () => {
-    const regex = new RegExp('', 'gm');
-
-    const parsedRegexTest: ParsedRegexTest = {
-      matchingRegex: regex,
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '',
+      regexLineIndex: 0,
       testLines: ['9ab', '8a', '7A'],
       startTestIndex: 0,
     };
 
-    const matchResult = RegexTester.testRegex(parsedRegexTest);
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
     expect(matchResult.length).toBe(0);
+  });
+
+  it('should test regex correctly, if the regex is a wildcard regex', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/.*/gm',
+      regexLineIndex: 0,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(3);
+
+    expect(matchResult[0].substring).toBe('9ab');
+    expect(matchResult[0].range).toEqual([0, 3]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+
+    expect(matchResult[1].substring).toBe('8a');
+    expect(matchResult[1].range).toEqual([4, 6]);
+    expect(matchResult[1].groupRanges).toBeUndefined();
+
+    expect(matchResult[2].substring).toBe('7A');
+    expect(matchResult[2].range).toEqual([7, 9]);
+    expect(matchResult[2].groupRanges).toBeUndefined();
+  });
+
+  it('should test regex correctly, if the regex has a new line character', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a\\n\\d{3}b/gm',
+      regexLineIndex: 0,
+      testLines: ['9a', '123b', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(1);
+
+    expect(matchResult[0].substring).toBe('9a\n123b');
+    expect(matchResult[0].range).toEqual([0, 7]);
+    expect(matchResult[0].groupRanges).toBeUndefined();
+  });
+
+  it('should throw an error, if the regex is invalid', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/(?/gm',
+      regexLineIndex: 6,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    try {
+      new RegexTest(regexTestProps);
+      expect.unreachable('Expected to throw an error');
+    } catch (error) {
+      expect(error).toBeInstanceOf(RegexSyntaxError);
+
+      const regexMatchFormatError = error as RegexSyntaxError;
+      expect(regexMatchFormatError.message).toContain('Invalid regular expression');
+      expect(regexMatchFormatError.line).toBe(regexTestProps.regexLineIndex);
+    }
   });
 
   describe('Capturing Groups', () => {
     it('should extract capturing group ranges', () => {
-      const regex = new RegExp('[0-9]ax(abc)', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]ax(abc)/gm',
+        regexLineIndex: 0,
         testLines: ['bb8axabcx'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabc');
@@ -188,15 +250,15 @@ describe('Regex Tester', () => {
     });
 
     it('should extract ranges of many capturing groups', () => {
-      const regex = new RegExp('[0-9]ax(abc)x(cba)', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]ax(abc)x(cba)/gm',
+        regexLineIndex: 0,
         testLines: ['bb8axabcxcba'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabcxcba');
@@ -209,15 +271,15 @@ describe('Regex Tester', () => {
     });
 
     it('should extract the capture group ranges from each line, if there are many test lines', () => {
-      const regex = new RegExp('[0-9]ax(abc)', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]ax(abc)/gm',
+        regexLineIndex: 0,
         testLines: ['bb8axabcx', '9axabc123', '1234axabc'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(3);
 
       expect(matchResult[0].substring).toBe('8axabc');
@@ -240,15 +302,15 @@ describe('Regex Tester', () => {
     });
 
     it('should extract named capturing group ranges', () => {
-      const regex = new RegExp('[0-9]ax(?<group>abc)(x)', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]ax(?<group>abc)(x)/gm',
+        regexLineIndex: 0,
         testLines: ['bb8axabcx'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8axabcx');
@@ -261,15 +323,15 @@ describe('Regex Tester', () => {
     });
 
     it('should test regex correctly, if there is an optional capturing group', () => {
-      const regex = new RegExp('[0-9]x(?<group>abc)(cba)?', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]x(?<group>abc)(cba)?/gm',
+        regexLineIndex: 0,
         testLines: ['8xabccba', '9xabc'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(2);
 
       expect(matchResult[0].substring).toBe('8xabccba');
@@ -289,15 +351,15 @@ describe('Regex Tester', () => {
     });
 
     it('should test regex correctly, if there is a non-capturing group', () => {
-      const regex = new RegExp('[0-9]x(?<group>abc)(?:cba)', 'gmd');
-
-      const parsedRegexTest: ParsedRegexTest = {
-        matchingRegex: regex,
+      const regexTestProps: RegexTestProps = {
+        regexPattern: '/[0-9]x(?<group>abc)(?:cba)/gm',
+        regexLineIndex: 0,
         testLines: ['8xabccba'],
         startTestIndex: 0,
       };
 
-      const matchResult = RegexTester.testRegex(parsedRegexTest);
+      const regexTest = new RegexTest(regexTestProps);
+      const matchResult = regexTest.test();
       expect(matchResult.length).toBe(1);
 
       expect(matchResult[0].substring).toBe('8xabccba');
