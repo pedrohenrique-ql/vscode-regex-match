@@ -86,7 +86,7 @@ describe('Regex Test', () => {
     expect(matchResult[1].groupRanges).toBeUndefined();
   });
 
-  it('should test regex correctly, if there are many test lines and does not have multine flag', () => {
+  it('should test regex correctly, if there are many test lines and does not have multiline flag', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/^[0-9]a/g',
       regexLineIndex: 0,
