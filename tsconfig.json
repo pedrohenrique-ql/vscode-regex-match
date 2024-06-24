@@ -18,6 +18,6 @@
       "@@/*": ["./*"]
     }
   },
-  "include": ["**/*.ts", "vitest.config.mjs"],
+  "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }
