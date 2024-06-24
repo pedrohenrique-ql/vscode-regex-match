@@ -6,7 +6,7 @@ updates:
     schedule:
       interval: weekly
       day: sunday
-      time: 08:00
+      time: '08:00'
       timezone: America/Sao_Paulo
     commit-message:
       prefix: chore
