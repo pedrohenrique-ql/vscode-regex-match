@@ -30,8 +30,8 @@ class RegexMatchService {
   }
 
   registerCommands(): Disposable[] {
-    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', () =>
-      this.openRegexTestWindow(),
+    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', (codeRegex?: string) =>
+      this.openRegexTestWindow(codeRegex),
     );
 
     return [openRegexTextCommand];
@@ -47,8 +47,8 @@ class RegexMatchService {
     return this.diagnosticProvider.getDiagnosticCollection();
   }
 
-  private async openRegexTestWindow() {
-    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri);
+  private async openRegexTestWindow(codeRegex?: string) {
+    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri, codeRegex);
 
     const activeEditor = window.activeTextEditor;
     if (!(activeEditor && document === activeEditor.document)) {
