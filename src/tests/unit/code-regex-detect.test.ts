@@ -86,7 +86,7 @@ describe('Code Regex Detect', () => {
     it('should not detect regex in multiline comment', () => {
       const code = `
         /*
-          lorem ipsum /path/
+         * lorem ipsum /path/
         */
       `;
 
