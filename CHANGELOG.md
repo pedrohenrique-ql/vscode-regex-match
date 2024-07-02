@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.4.0
+
+- Added the functionality to test regex present in the code editor in the regex match window.
+
 ## 0.3.0
 
 - Enables multiple regex testing in the regex match window.

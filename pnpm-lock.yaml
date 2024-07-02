@@ -21,7 +21,7 @@ devDependencies:
     specifier: ^10.0.7
     version: 10.0.7
   '@types/node':
-    specifier: 20.14.9
+    specifier: ^20.14.9
     version: 20.14.9
   '@types/tmp':
     specifier: ^0.2.6
