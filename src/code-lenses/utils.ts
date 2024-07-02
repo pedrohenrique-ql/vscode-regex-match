@@ -1,4 +1,4 @@
-const JAVASCRIPT_REGEX_DETECT =
+export const JAVASCRIPT_REGEX_DETECT =
   /(?<!\/)(?<=[({=:>])\s*\/[^/\r\n][^\r\n]*\/[gimuy]*\s*(?=[}),;\n]|\n|$)(?![^/]*\/\*|\*\/)/g;
 
 export const REGEX_DETECTORS_MAP: { [key in string]: RegExp | undefined } = {
