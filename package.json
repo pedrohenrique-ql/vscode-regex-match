@@ -29,9 +29,15 @@
     "test"
   ],
   "icon": "./resources/icon.png",
-  "activationEvents": [],
   "packageManager": "pnpm@8.15.5",
   "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact",
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "regex-match.openRegexMatchWindow"
+  ],
   "contributes": {
     "commands": [
       {
