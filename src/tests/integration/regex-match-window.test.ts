@@ -5,8 +5,7 @@ import { ViewColumn, commands, window } from 'vscode';
 import { DEFAULT_FILE_CONTENT } from '@/FileCreator';
 import { REGEX_TEST_FILE_PATH } from '@/RegexMatchService';
 
-import { writeDefaultTestFile } from './utils';
-import { wait } from './utils/wait';
+import { wait, writeDefaultTestFile } from './utils';
 
 describe('Regex Match Window', () => {
   beforeEach(async () => {
