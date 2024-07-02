@@ -15,9 +15,9 @@ class TestRegexCodeLensProvider implements CodeLensProvider {
 
     let matches;
     while ((matches = regexDetect.exec(textCode)) !== null) {
-      const startPos = document.positionAt(matches.index);
-      const endPos = document.positionAt(matches.index + matches[0].length);
-      const range = new Range(startPos, endPos);
+      const startPosition = document.positionAt(matches.index);
+      const endPosition = document.positionAt(matches.index + matches[0].length);
+      const range = new Range(startPosition, endPosition);
 
       const pattern = matches[0].trim();
 
