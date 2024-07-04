@@ -15,7 +15,7 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match
   - [Usage](#usage)
   - [Testing](#testing)
 
-## Features
+## 🚀 Features
 
 ### Test Regular Expressions
 
@@ -35,7 +35,13 @@ You can test multiple regular expressions in the same file. Each regex test work
 
 ![Test Multiple Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/multiple-regex-feature.gif)
 
-## Release Notes
+### Test Regular Expressions from the Code Editor
+
+Through VS Code's code lens functionality, Regex Match makes it easy to test the regex present in your code. The code lens will appear above the regex, allowing you to test it in Regex Match window.
+
+![Test Regular Expressions from the Code Editor](./resources/code-lens-feature.gif)
+
+## 📝 Release Notes
 
 ### 0.3.0
 
@@ -54,7 +60,7 @@ You can test multiple regular expressions in the same file. Each regex test work
 - Highlight matches in the text.
 - Use `Ctrl+Alt+X`/`Cmd+Alt+X` to open the regex match window.
 
-## Development
+## 🛠️ Development
 
 ### Requirements
 
