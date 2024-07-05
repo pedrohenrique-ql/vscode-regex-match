@@ -49,6 +49,17 @@
       "command": "regex-match.openRegexMatchWindow",
       "key": "ctrl+alt+x",
       "mac": "cmd+alt+x"
+    },
+    "configuration": {
+      "type": "object",
+      "title": "Regex Match",
+      "properties": {
+        "regex-match.codeLens.enabled": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable the code lens that allows you to test the regex from code editor."
+        }
+      }
     }
   },
   "scripts": {

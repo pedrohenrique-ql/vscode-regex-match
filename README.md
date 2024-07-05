@@ -13,9 +13,9 @@
 <p align="center">
   <a href="https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match">
     <img alt="Visual Studio Marketplace Version" src="https://img.shields.io/visual-studio-marketplace/v/pedrohenrique-ql.regex-match?logo=visualstudiocode&logoColor=007acc&label=VS%20Marketplace&labelColor=2c2c32&color=007acc"></a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match">
-    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/pedrohenrique-ql/vscode-regex-match/ci.yaml?branch=canary&logo=github&label=CI&labelColor=2c2c32"></a>
   <a href="https://github.com/pedrohenrique-ql/vscode-regex-match/actions?query=branch%3Acanary">
+    <img alt="GitHub Actions Workflow Status" src="https://img.shields.io/github/actions/workflow/status/pedrohenrique-ql/vscode-regex-match/ci.yaml?branch=canary&logo=github&label=CI&labelColor=2c2c32"></a>
+  <a href="https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match">
     <img alt="Visual Studio Marketplace Installs" src="https://img.shields.io/visual-studio-marketplace/i/pedrohenrique-ql.regex-match?logo=visualstudiocode&logoColor=007acc&label=Installs&labelColor=2c2c32&color=007acc"></a>
   <a href="https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match">
     <img alt="Visual Studio Marketplace Downloads" src="https://img.shields.io/visual-studio-marketplace/d/pedrohenrique-ql.regex-match?logo=visualstudiocode&logoColor=007acc&label=Downloads&labelColor=2c2c32&color=007acc"></a>
@@ -65,6 +65,11 @@ Through VS Code's code lens functionality, Regex Match makes it easy to test the
 ![Test Regular Expressions from the Code Editor](./resources/code-lens-feature.gif)
 
 ## 📝 Release Notes
+
+## 0.4.0
+
+- Added the functionality to test regex present in the code editor in the regex match window.
+- Created configuration settings to enable/disable the code lens feature.
 
 ### 0.3.0
 
