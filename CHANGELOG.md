@@ -3,6 +3,7 @@
 ## 0.4.0
 
 - Added the functionality to test regex present in the code editor in the regex match window.
+- Created configuration settings to enable/disable the code lens feature.
 
 ## 0.3.0
 

@@ -66,10 +66,16 @@ Through VS Code's code lens functionality, Regex Match makes it easy to test the
 
 ## 📝 Release Notes
 
+## 0.4.0
+
+- Added the functionality to test regex present in the code editor in the regex match window.
+- Created configuration settings to enable/disable the code lens feature.
+
 ### 0.3.0
 
 - Enables multiple regex testing in the regex match window.
 - Correction of regex testing with `\n` and wildcard character.
+- Created configuration settings to enable/disable the code lens feature.
 
 ### 0.2.0
 
