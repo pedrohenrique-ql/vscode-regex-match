@@ -27,7 +27,7 @@
 
 Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights.
 
-![Regex Match Demo](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/regex-match-demo.gif)
+![Regex Match Demo](./resources/demo.gif)
 
 ## Table of Contents
 
