@@ -4,7 +4,6 @@ on:
   release:
     types:
       - published
-  workflow_dispatch:
 
 concurrency:
   group: publish-vs-marketplace-${{ github.ref_name }}
@@ -33,6 +32,6 @@ jobs:
         run: npm run compile
 
       - name: Publish
-        run: npm run deploy
+        run: npm run vscode:deploy
         env:
           VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
