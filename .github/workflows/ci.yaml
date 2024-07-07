@@ -25,7 +25,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set up Regex Match
+      - name: Setup Regex Match
         uses: ./.github/actions/regex-match-setup
 
       - name: Check formatting style

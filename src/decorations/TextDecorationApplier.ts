@@ -3,7 +3,7 @@ import { Range, TextDocument, TextEditor, window } from 'vscode';
 import { TEST_AREA_DELIMITER } from '@/FileParser';
 import RegexTest, { MatchResult } from '@/RegexTest';
 
-import { DELIMITER_DECORATION, GROUP_DECORATIONS, MATCH_DECORATION } from './utils';
+import { DELIMITER_DECORATION, GROUP_DECORATIONS, MATCH_DECORATION } from './constants';
 
 class TextDecorationApplier {
   static updateDecorations(document: TextDocument, regexTests?: RegexTest[]) {

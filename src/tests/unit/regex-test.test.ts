@@ -1,7 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 import RegexTest, { RegexTestProps } from '@/RegexTest';
+
+vi.mock('vscode', () => ({
+  window: {
+    showInformationMessage: vi.fn(),
+  },
+}));
 
 describe('Regex Test', () => {
   it('should test regex correctly, if the regex matches and has one match', () => {
