@@ -6,7 +6,7 @@ on:
       - published
 
 concurrency:
-  group: release-npm-${{ github.ref_name }}
+  group: publish-vs-marketplace-${{ github.ref_name }}
   cancel-in-progress: true
 
 jobs:
