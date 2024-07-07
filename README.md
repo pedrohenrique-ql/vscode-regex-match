@@ -27,7 +27,7 @@
 
 Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights.
 
-![Regex Match Demo](./resources/demo.gif)
+![Regex Match Demo](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/demo.gif)
 
 ## Table of Contents
 
@@ -62,7 +62,7 @@ You can test multiple regular expressions in the same file. Each regex test work
 
 Through VS Code's code lens functionality, Regex Match makes it easy to test the regex present in your code. The code lens will appear above the regex, allowing you to test it in Regex Match window.
 
-![Test Regular Expressions from the Code Editor](./resources/code-lens-feature.gif)
+![Test Regular Expressions from the Code Editor](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/code-lens-feature.gif)
 
 ## 📝 Release Notes
 
