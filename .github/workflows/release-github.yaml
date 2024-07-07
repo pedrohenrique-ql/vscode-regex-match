@@ -1,0 +1,44 @@
+name: Create Github Release
+
+on:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*.*.*'
+
+concurrency:
+  group: release-github-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  github-release:
+    name: GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Get version
+        id: get-version
+        run: |
+          version=v$(jq -r '.version' package.json)
+           echo "::set-output name=version::$version"
+
+      - name: Release to GitHub
+        uses: ncipollo/release-action@v1
+        with:
+          name: ${{ steps.get_version.outputs.version }}
+          tag: ${{ steps.get_version.outputs.version }}
+          commit: ${{ github.sha }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          makeLatest: ${{ startsWith(github.ref, 'refs/heads/') && github.ref_name == 'main' }}
+          allowUpdates: ${{ !(startsWith(github.ref, 'refs/heads/') && github.ref_name == 'main') }}
+          replacesArtifacts: ${{ !(startsWith(github.ref, 'refs/heads/') && github.ref_name == 'main') }}
+          generateReleaseNotes: true
+          draft: true
