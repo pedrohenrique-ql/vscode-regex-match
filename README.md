@@ -92,9 +92,13 @@ Through VS Code's code lens functionality, Regex Match makes it easy to test the
 
 ### Requirements
 
-- [Node.js v.20.11.0](https://nodejs.org/)
-- [Visual Studio Code v1.87.0](https://code.visualstudio.com/)
-- [pnpm v8.15.3](https://pnpm.io/)
+The following dependencies are required to run the project:
+
+| Dependency                                           | Version           |
+| ---------------------------------------------------- | ----------------- |
+| [Node.js](https://nodejs.org/)                       | >= 20.11.0 && <21 |
+| [Visual Studio Code](https://code.visualstudio.com/) | ^1.19.0           |
+| [pnpm](https://pnpm.io/)                             | 8.15.3            |
 
 ### Usage
 
