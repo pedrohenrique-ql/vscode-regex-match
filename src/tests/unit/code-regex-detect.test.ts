@@ -93,5 +93,12 @@ describe('Code Regex Detect', () => {
       const matches = regexDetect!.exec(code);
       expect(matches).toBeNull();
     });
+
+    it('should not detect regex in comment started by "/*"', () => {
+      const code = `{/* eslint-disable-next-line jsx-ally-/no-static-element/interactions */}`;
+
+      const matches = regexDetect!.exec(code);
+      expect(matches).toBeNull();
+    });
   });
 });

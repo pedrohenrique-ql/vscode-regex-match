@@ -7,6 +7,7 @@ import {
   Range,
   TextDocument,
   TextDocumentChangeEvent,
+  TextEditor,
   Uri,
   commands,
   languages,
@@ -52,11 +53,16 @@ class RegexMatchService {
 
   registerDisposables(): Disposable[] {
     const onChangeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
+
     const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) =>
       this.onChangeConfiguration(event),
     );
 
-    return [onChangeTextDocumentDisposable, onChangeConfigurationDisposable];
+    const onChangeActiveTextEditorDisposable = window.onDidChangeActiveTextEditor((editor) =>
+      this.onChangeActiveTextEditor(editor),
+    );
+
+    return [onChangeTextDocumentDisposable, onChangeConfigurationDisposable, onChangeActiveTextEditorDisposable];
   }
 
   getDiagnosticCollection() {
@@ -124,6 +130,12 @@ class RegexMatchService {
       event.contentChanges.length > 0
     ) {
       this.updateRegexTest(eventDocument);
+    }
+  }
+
+  private onChangeActiveTextEditor(activeEditor: TextEditor | undefined) {
+    if (activeEditor && activeEditor.document.uri.path === this.regexTestFileUri.path) {
+      this.updateRegexTest(activeEditor.document);
     }
   }
 
