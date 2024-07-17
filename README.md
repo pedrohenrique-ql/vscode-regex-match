@@ -102,7 +102,7 @@ The following dependencies are required to run the project:
 | Dependency                                           | Version           |
 | ---------------------------------------------------- | ----------------- |
 | [Node.js](https://nodejs.org/)                       | >= 20.11.0 && <21 |
-| [Visual Studio Code](https://code.visualstudio.com/) | ^1.19.0           |
+| [Visual Studio Code](https://code.visualstudio.com/) | ^1.91.0           |
 | [pnpm](https://pnpm.io/)                             | 8.15.3            |
 
 ### Usage
