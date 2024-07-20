@@ -1,4 +1,4 @@
-import RegexSyntaxError from './exceptions/RegexSyntaxError';
+import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 
 const REQUIRED_FLAG = 'd';
 

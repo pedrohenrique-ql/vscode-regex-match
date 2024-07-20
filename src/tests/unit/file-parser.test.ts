@@ -2,8 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import RegexMatchFormatError, { DEFAULT_REGEX_MATCH_FORMAT_ERROR_MESSAGE } from '@/exceptions/RegexMatchFormatError';
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
-
-import FileParser from '../../FileParser';
+import FileParser from '@/regex-match-window/FileParser';
 
 describe('File Parser', () => {
   it('should parse file content correctly', () => {

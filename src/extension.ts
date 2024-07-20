@@ -2,7 +2,7 @@ import { ConfigurationChangeEvent, Disposable, ExtensionContext, languages, work
 
 import TestRegexCodeLensProvider from './providers/code-lenses/TestRegexCodeLensProvider';
 import DiagnosticProvider from './providers/DiagnosticProvider';
-import RegexMatchService from './RegexMatchService';
+import RegexMatchService from './regex-match-window/RegexMatchService';
 
 function updateCodeLensProvider(testRegexCodeLensProvider: TestRegexCodeLensProvider, context: ExtensionContext) {
   const isCodeLensEnabled = workspace.getConfiguration('regex-match').get<boolean>('codeLens.enabled');

@@ -1,4 +1,4 @@
-import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
+import RegexMatchFormatError from '../exceptions/RegexMatchFormatError';
 import RegexTest from './RegexTest';
 
 export const TEST_AREA_DELIMITER = '---';

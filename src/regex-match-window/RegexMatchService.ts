@@ -12,13 +12,13 @@ import {
   workspace,
 } from 'vscode';
 
-import TextDecorationApplier from './decorations/TextDecorationApplier';
-import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
-import RegexSyntaxError from './exceptions/RegexSyntaxError';
+import TextDecorationApplier from '../decorations/TextDecorationApplier';
+import RegexMatchFormatError from '../exceptions/RegexMatchFormatError';
+import RegexSyntaxError from '../exceptions/RegexSyntaxError';
+import DiagnosticProvider from '../providers/DiagnosticProvider';
+import { disposeAll } from '../utils/dipose';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
-import DiagnosticProvider from './providers/DiagnosticProvider';
-import { disposeAll } from './utils/dipose';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 

@@ -2,8 +2,8 @@ import assert from 'assert';
 import { after, beforeEach, describe, it } from 'mocha';
 import { ViewColumn, commands, window } from 'vscode';
 
-import { DEFAULT_FILE_CONTENT } from '@/FileCreator';
-import { REGEX_TEST_FILE_PATH } from '@/RegexMatchService';
+import { DEFAULT_FILE_CONTENT } from '@/regex-match-window/FileCreator';
+import { REGEX_TEST_FILE_PATH } from '@/regex-match-window/RegexMatchService';
 
 import { wait, writeDefaultTestFile } from './utils';
 
