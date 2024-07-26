@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.4.1
+
+- Fixed Javascript regex detector to avoid detecting comments starting by `/*`.
+- Fixed the problem of losing the highlights of the regex test when switching tabs in the editor.
+
 ## 0.4.0
 
 - Added the functionality to test regex present in the code editor in the regex match window.
