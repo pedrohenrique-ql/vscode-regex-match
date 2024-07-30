@@ -1,5 +1,10 @@
 # Change Log
 
+## 0.4.2
+
+- Fixed the regex detector to detect two or more regex in the same line.
+- Fixed packaging to ensure only required files are included in the `.vsix` package.
+
 ## 0.4.1
 
 - Fixed Javascript regex detector to avoid detecting comments starting by `/*`.
