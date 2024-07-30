@@ -66,17 +66,17 @@ Through VS Code's code lens functionality, Regex Match makes it easy to test the
 
 ## 📝 Release Notes
 
-## 0.4.2
+## v0.4.2
 
 - Fixed the regex detector to detect two or more regex in the same line.
-- Fixed packaging to ensure only required files are included in the `.vsix` package.
+- Reduced the extension package size by removing unnecessary files.
 
-## 0.4.1
+## v0.4.1
 
 - Fixed Javascript regex detector to avoid detecting comments starting by `/*`.
 - Fixed the problem of losing the highlights of the regex test when switching tabs in the editor.
 
-## 0.4.0
+## v0.4.0
 
 - Added the functionality to test regex present in the code editor in the regex match window.
 - Created configuration settings to enable/disable the code lens feature.

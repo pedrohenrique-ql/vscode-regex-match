@@ -2,8 +2,8 @@
 
 ## [v0.4.2] - 30/07/2024
 
-- Reduced the extension package size by removing unnecessary files
-- Fixed packaging to ensure only required files are included in the `.vsix` package.
+- Fixed the regex detector to detect two or more regex in the same line.
+- Reduced the extension package size by removing unnecessary files.
 
 ## [v0.4.1] - 17/07/2024
 
