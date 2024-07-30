@@ -64,8 +64,9 @@
   },
   "scripts": {
     "vscode:prepublish": "pnpm run compile",
-    "vscode:deploy": "vsce publish",
-    "compile": "tsup",
+    "vscode:package": "pnpm vsce package --no-dependencies",
+    "vscode:publish": "pnpm vsce publish --no-dependencies",
+    "compile": "pnpm run types:check && tsup",
     "pre:test": "pnpm run compile",
     "test:vsc": "pnpm pre:test && vscode-test",
     "test:vi": "vitest",
