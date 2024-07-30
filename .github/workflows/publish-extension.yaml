@@ -25,4 +25,4 @@ jobs:
       - name: Publish
         run: pnpm run vscode:publish
         env:
-          VSCE_TOKEN: ${{ secrets.VSCE_TOKEN }}
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
