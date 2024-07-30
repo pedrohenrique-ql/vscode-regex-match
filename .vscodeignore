@@ -1,15 +1,26 @@
+# Node
+node_modules/*
+!node_modules/important-dependency/
+
+# Testing
+*/tests/**
+vitest.config.mjs
+
+# Configuration files
 .vscode/**
-.vscode-test/**
-src/**
+.husky/**
+.github/**
+.prettierignore
+.prettierrc
+.eslintrc
+.eslintignore
+.eslintcache
 .gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/.eslintignore
-**/.prettierrc
-**/.prettierignore
-**/*.map
-**/*.ts
-**/.vscode-test.*
-.github
+.vscode-test.mjs
+.lintstagedrc.js
+pnpm-lock.yaml
+tsconfig.json
+tsup.config.ts
+
+## TS files
+src/**
