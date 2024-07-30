@@ -3,6 +3,21 @@ import { expect, beforeEach, describe, it } from 'vitest';
 import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/code-lenses/utils';
 
 describe('Code Regex Detect', () => {
+  function getAllMatches(regex: RegExp, text: string): RegExpExecArray[] {
+    if (!regex.global) {
+      throw new Error("A expressão regular deve ter a flag global 'g' para capturar todas as correspondências.");
+    }
+
+    const matches: RegExpExecArray[] = [];
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      matches.push(match);
+    }
+
+    return matches;
+  }
+
   it.each(['javascript', 'typescript', 'javascriptreact', 'typescriptreact'])(
     'should get regex detect for %s',
     (languageId) => {
@@ -24,10 +39,10 @@ describe('Code Regex Detect', () => {
         const regex = /hello/g;
       `;
 
-      const matches = regexDetect!.exec(code);
+      const matches = getAllMatches(regexDetect!, code);
       expect(matches).not.toBeNull();
-      expect(matches!).toHaveLength(1);
-      expect(matches![0].trim()).toEqual('/hello/g');
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/hello/g');
     });
 
     it('should detect regex in function call', () => {
@@ -37,10 +52,10 @@ describe('Code Regex Detect', () => {
         const result = someFunction(/hello/g);
       `;
 
-      const matches = regexDetect!.exec(code);
+      const matches = getAllMatches(regexDetect!, code);
       expect(matches).not.toBeNull();
-      expect(matches!).toHaveLength(1);
-      expect(matches![0].trim()).toEqual('/hello/g');
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/hello/g');
     });
 
     it('should detect regex in object property', () => {
@@ -50,10 +65,10 @@ describe('Code Regex Detect', () => {
         };
       `;
 
-      const matches = regexDetect!.exec(code);
+      const matches = getAllMatches(regexDetect!, code);
       expect(matches).not.toBeNull();
-      expect(matches!).toHaveLength(1);
-      expect(matches![0].trim()).toEqual('/hello/g');
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/hello/g');
     });
 
     it('should not detect regex in import', () => {
@@ -61,8 +76,8 @@ describe('Code Regex Detect', () => {
         import { xpto } from './path/to/file';
       `;
 
-      const matches = regexDetect!.exec(code);
-      expect(matches).toBeNull();
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(0);
     });
 
     it('should not detect regex in string', () => {
@@ -70,8 +85,8 @@ describe('Code Regex Detect', () => {
         const str = 'hello /path/';
       `;
 
-      const matches = regexDetect!.exec(code);
-      expect(matches).toBeNull();
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(0);
     });
 
     it('should not detect regex in comment', () => {
@@ -79,8 +94,8 @@ describe('Code Regex Detect', () => {
         // /path/g
       `;
 
-      const matches = regexDetect!.exec(code);
-      expect(matches).toBeNull();
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(0);
     });
 
     it('should not detect regex in multiline comment', () => {
@@ -90,15 +105,25 @@ describe('Code Regex Detect', () => {
         */
       `;
 
-      const matches = regexDetect!.exec(code);
-      expect(matches).toBeNull();
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(0);
     });
 
     it('should not detect regex in comment started by "/*"', () => {
       const code = `{/* eslint-disable-next-line jsx-ally-/no-static-element/interactions */}`;
 
-      const matches = regexDetect!.exec(code);
-      expect(matches).toBeNull();
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(0);
+    });
+
+    it('should detect two regexes on the same line', () => {
+      const code = `.replace(/ ./g, '.').replace(/ ,/, ',')`;
+
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).not.toBeNull();
+      expect(matches).toHaveLength(2);
+      expect(matches[0][0].trim()).toEqual('/ ./g');
+      expect(matches[1][0].trim()).toEqual('/ ,/');
     });
   });
 });
