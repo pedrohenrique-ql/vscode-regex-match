@@ -1,0 +1,28 @@
+name: Publish Extension to Visual Studio Marketplace
+
+on:
+  release:
+    types:
+      - published
+
+concurrency:
+  group: publish-extension-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  publish:
+    name: Visual Studio Marketplace Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Regex Match
+        uses: ./.github/actions/regex-match-setup
+
+      - name: Publish
+        run: pnpm run vscode:publish
+        env:
+          VSCE_PAT: ${{ secrets.VSCE_PAT }}
