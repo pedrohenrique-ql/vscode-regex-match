@@ -2,6 +2,12 @@ import { CodeLens, CodeLensProvider, Command, ProviderResult, Range, TextDocumen
 
 import { getRegexDetect } from './utils';
 
+export interface CodeRegex {
+  pattern: string;
+  range: Range;
+  document: TextDocument;
+}
+
 class TestRegexCodeLensProvider implements CodeLensProvider {
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
     const codeLenses: CodeLens[] = [];
@@ -20,11 +26,12 @@ class TestRegexCodeLensProvider implements CodeLensProvider {
       const range = new Range(startPosition, endPosition);
 
       const pattern = matches[0].trim();
+      const codeRegex: CodeRegex = { pattern, range, document };
 
       const command: Command = {
         title: 'Test Regex',
         command: 'regex-match.openRegexMatchWindow',
-        arguments: [pattern],
+        arguments: [codeRegex],
       };
 
       codeLenses.push(new CodeLens(range, command));
