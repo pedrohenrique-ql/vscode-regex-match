@@ -1,8 +1,8 @@
 import fs from 'fs';
 import path from 'path';
 
-import { DEFAULT_FILE_CONTENT } from '@/regex-match-window/FileCreator';
-import { REGEX_TEST_FILE_PATH } from '@/regex-match-window/RegexMatchService';
+import { DEFAULT_FILE_CONTENT } from '@/services/regex-match/FileCreator';
+import { REGEX_TEST_FILE_PATH } from '@/services/regex-match/RegexMatchService';
 
 export function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));

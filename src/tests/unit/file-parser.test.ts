@@ -2,13 +2,13 @@ import { describe, expect, it } from 'vitest';
 
 import RegexMatchFormatError, { DEFAULT_REGEX_MATCH_FORMAT_ERROR_MESSAGE } from '@/exceptions/RegexMatchFormatError';
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
-import FileParser from '@/regex-match-window/FileParser';
+import FileParser from '@/services/regex-match/FileParser';
 
 describe('File Parser', () => {
   it('should parse file content correctly', () => {
     const fileContent = '/[0-9]a/g\n---\nbb9abb\n---';
 
-    const regexTests = FileParser.parseFileContent(fileContent);
+    const regexTests = FileParser.parseFileContent(fileContent, []);
     expect(regexTests).not.toBeNull();
     expect(regexTests).toHaveLength(1);
 
@@ -21,7 +21,7 @@ describe('File Parser', () => {
   it('should parse file content correctly, if the regex has multiline flag', () => {
     const fileContent = '/[0-9]a/gm\n---\nbb9abb\n2a\n---';
 
-    const regexTests = FileParser.parseFileContent(fileContent);
+    const regexTests = FileParser.parseFileContent(fileContent, []);
     expect(regexTests).not.toBeNull();
     expect(regexTests).toHaveLength(1);
 
@@ -35,7 +35,7 @@ describe('File Parser', () => {
   it('should parse file content correctly, if the regex does not have multiline flag', () => {
     const fileContent = '/[0-9]a/g\n---\nbb9abb\n2a\n---';
 
-    const regexTests = FileParser.parseFileContent(fileContent);
+    const regexTests = FileParser.parseFileContent(fileContent, []);
     expect(regexTests).not.toBeNull();
     expect(regexTests).toHaveLength(1);
 
@@ -49,7 +49,7 @@ describe('File Parser', () => {
   it("should set the required 'd' flag in matching regex", () => {
     const fileContent = '/[0-9]a/gm\n---\nbb9abb\n---';
 
-    const regexTests = FileParser.parseFileContent(fileContent);
+    const regexTests = FileParser.parseFileContent(fileContent, []);
     expect(regexTests).not.toBeNull();
     expect(regexTests).toHaveLength(1);
 
@@ -63,7 +63,7 @@ describe('File Parser', () => {
     const fileContent = '/(?/gm\n---\nbb9abb\n---';
 
     try {
-      FileParser.parseFileContent(fileContent);
+      FileParser.parseFileContent(fileContent, []);
       expect.unreachable('Expected to throw an error');
     } catch (error) {
       expect(error).toBeInstanceOf(RegexSyntaxError);
@@ -78,7 +78,7 @@ describe('File Parser', () => {
     const fileContent = '/[0-9]a/g\nbb9abb\n---';
 
     try {
-      FileParser.parseFileContent(fileContent);
+      FileParser.parseFileContent(fileContent, []);
       expect.unreachable('Expected to throw an error');
     } catch (error) {
       expect(error).toBeInstanceOf(RegexMatchFormatError);
@@ -93,7 +93,7 @@ describe('File Parser', () => {
     const fileContent = '---\nbb9abb\n---';
 
     try {
-      FileParser.parseFileContent(fileContent);
+      FileParser.parseFileContent(fileContent, []);
       expect.unreachable('Expected to throw an error');
     } catch (error) {
       expect(error).toBeInstanceOf(RegexMatchFormatError);
@@ -108,7 +108,7 @@ describe('File Parser', () => {
     const fileContent = '/[0-9]a/g\n---';
 
     try {
-      FileParser.parseFileContent(fileContent);
+      FileParser.parseFileContent(fileContent, []);
       expect.unreachable('Expected to throw an error');
     } catch (error) {
       expect(error).toBeInstanceOf(RegexMatchFormatError);
@@ -124,7 +124,7 @@ describe('File Parser', () => {
       const fileContent = '/[0-9]/\n---\ntest\ntest\n---\n/[0-9]/';
 
       try {
-        FileParser.parseFileContent(fileContent);
+        FileParser.parseFileContent(fileContent, []);
         expect.unreachable('Expected to throw an error');
       } catch (error) {
         expect(error).toBeInstanceOf(RegexMatchFormatError);
@@ -139,7 +139,7 @@ describe('File Parser', () => {
       const fileContent = '/[0-9]/\n---\ntest\ntest\n---\n/[0-9]/\n---\ntest\ntest';
 
       try {
-        FileParser.parseFileContent(fileContent);
+        FileParser.parseFileContent(fileContent, []);
         expect.unreachable('Expected to throw an error');
       } catch (error) {
         expect(error).toBeInstanceOf(RegexMatchFormatError);
@@ -154,7 +154,7 @@ describe('File Parser', () => {
       const fileContent = '/[0-9]/gm\n---\nbb9abb\n---\n/[0-9](/gm\n---\n9\n---';
 
       try {
-        FileParser.parseFileContent(fileContent);
+        FileParser.parseFileContent(fileContent, []);
         expect.unreachable('Expected to throw an error');
       } catch (error) {
         expect(error).toBeInstanceOf(RegexSyntaxError);
@@ -168,7 +168,7 @@ describe('File Parser', () => {
     it('should parse multiple regex tests correctly', () => {
       const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n/[0-9]/gm\n---\ntest3\ntest4\n---';
 
-      const regexTests = FileParser.parseFileContent(fileContent);
+      const regexTests = FileParser.parseFileContent(fileContent, []);
       expect(regexTests).not.toBeNull();
       expect(regexTests).toHaveLength(2);
 
@@ -188,7 +188,7 @@ describe('File Parser', () => {
     it('should parse multiple regex tests correctly, if the second regex test does not have multiline flag', () => {
       const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n/[0-9]/i\n---\ntest3\ntest4\n---';
 
-      const regexTests = FileParser.parseFileContent(fileContent);
+      const regexTests = FileParser.parseFileContent(fileContent, []);
       expect(regexTests).not.toBeNull();
       expect(regexTests).toHaveLength(2);
 
@@ -209,7 +209,7 @@ describe('File Parser', () => {
       const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n/[0-9](/gm\n---\n9\n---';
 
       try {
-        FileParser.parseFileContent(fileContent);
+        FileParser.parseFileContent(fileContent, []);
         expect.unreachable('Expected to throw an error');
       } catch (error) {
         expect(error).toBeInstanceOf(RegexSyntaxError);
@@ -223,7 +223,7 @@ describe('File Parser', () => {
     it('should parse multiple regex tests correctly, if there are empty lines between tests', () => {
       const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n\n\n/[0-9]/gm\n---\ntest3\ntest4\n---';
 
-      const regexTests = FileParser.parseFileContent(fileContent);
+      const regexTests = FileParser.parseFileContent(fileContent, []);
       expect(regexTests).not.toBeNull();
       expect(regexTests).toHaveLength(2);
 

@@ -1,4 +1,5 @@
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
+import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
 const REQUIRED_FLAG = 'd';
 
@@ -13,6 +14,8 @@ export interface RegexTestProps {
   regexLineIndex: number;
   testLines: string[];
   startTestIndex: number;
+  isCodeRegex?: boolean;
+  codeRegex?: CodeRegex;
   error?: Error;
 }
 
@@ -20,11 +23,13 @@ class RegexTest {
   private matchingRegex?: RegExp;
   private testString: string;
   private startTestIndex: number;
+  private codeRegex?: CodeRegex;
 
-  constructor({ regexPattern, regexLineIndex, testLines, startTestIndex }: RegexTestProps) {
+  constructor({ regexPattern, regexLineIndex, testLines, startTestIndex, codeRegex }: RegexTestProps) {
     this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
     this.testString = testLines.join('\n');
     this.startTestIndex = startTestIndex;
+    this.codeRegex = codeRegex;
   }
 
   test(): MatchResult[] {
@@ -115,6 +120,18 @@ class RegexTest {
 
   getStartTestIndex() {
     return this.startTestIndex;
+  }
+
+  isCodeRegex() {
+    return this.codeRegex !== undefined;
+  }
+
+  getCodeRegex() {
+    return this.codeRegex;
+  }
+
+  setCodeRegex(codeRegex?: CodeRegex) {
+    this.codeRegex = codeRegex;
   }
 }
 

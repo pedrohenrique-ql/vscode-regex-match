@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
-import RegexTest, { RegexTestProps } from '@/RegexTest';
+import RegexTest, { RegexTestProps } from '@/services/regex-match/RegexTest';
 
 describe('Regex Test', () => {
   it('should test regex correctly, if the regex matches and has one match', () => {

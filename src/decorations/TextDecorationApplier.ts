@@ -1,7 +1,7 @@
 import { Range, TextDocument, TextEditor, window } from 'vscode';
 
-import { TEST_AREA_DELIMITER } from '@/regex-match-window/FileParser';
-import RegexTest, { MatchResult } from '@/regex-match-window/RegexTest';
+import { TEST_AREA_DELIMITER } from '@/services/regex-match/FileParser';
+import RegexTest, { MatchResult } from '@/services/regex-match/RegexTest';
 
 import { DELIMITER_DECORATION, GROUP_DECORATIONS, MATCH_DECORATION } from './utils';
 
