@@ -4,8 +4,8 @@ import { getRegexDetect } from './utils';
 
 export interface CodeRegex {
   pattern: string;
-  range: Range;
-  document: TextDocument;
+  range?: Range;
+  document?: TextDocument;
 }
 
 class TestRegexCodeLensProvider implements CodeLensProvider {
