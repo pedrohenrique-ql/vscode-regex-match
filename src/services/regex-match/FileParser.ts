@@ -1,4 +1,6 @@
-import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
+import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
+
+import RegexMatchFormatError from '../../exceptions/RegexMatchFormatError';
 import RegexTest from './RegexTest';
 
 export const TEST_AREA_DELIMITER = '---';
@@ -6,7 +8,7 @@ export const TEST_AREA_DELIMITER = '---';
 const NEW_LINE_LENGTH = 1;
 
 class FileParser {
-  static parseFileContent(fileContent: string) {
+  static parseFileContent(fileContent: string, currentRegexTests: RegexTest[], codeRegex?: CodeRegex) {
     const fileLines = fileContent.split('\n');
 
     const regexTests: RegexTest[] = [];
@@ -33,7 +35,15 @@ class FileParser {
             regexLineIndex,
             testLines,
             startTestIndex,
+            codeRegex,
           });
+
+          if (currentRegexTests.length > regexTests.length) {
+            const currentTest = currentRegexTests[regexTests.length];
+            const isCodeRegex = codeRegex?.pattern === fileLines[regexLineIndex];
+
+            regexTest.setCodeRegex(isCodeRegex ? codeRegex : currentTest.getCodeRegex());
+          }
 
           regexTests.push(regexTest);
 

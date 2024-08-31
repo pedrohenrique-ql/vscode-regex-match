@@ -1,13 +1,16 @@
 import { ExtensionContext } from 'vscode';
 
-import RegexMatchService from './RegexMatchService';
+import TestRegexCodeLensProvider from './providers/code-lenses/TestRegexCodeLensProvider';
+import DiagnosticProvider from './providers/DiagnosticProvider';
+import RegexMatchService from './services/regex-match/RegexMatchService';
+import TestRegexCodeLensManagerService from './services/test-regex-code-lens/TestRegexCodeLensManagerService';
 
 export function activate(context: ExtensionContext) {
-  const regexMatchService = new RegexMatchService(context);
+  const diagnosticProvider = new DiagnosticProvider('regex-match');
+  const regexMatchService = new RegexMatchService(context, diagnosticProvider);
 
-  const regexMatchCommands = regexMatchService.registerCommands();
-  const regexMatchDisposables = regexMatchService.registerDisposables();
-  const diagnosticCollection = regexMatchService.getDiagnosticCollection();
+  const testRegexCodeLensProvider = new TestRegexCodeLensProvider();
+  const testRegexCodeLensManagerService = new TestRegexCodeLensManagerService(context, testRegexCodeLensProvider);
 
-  context.subscriptions.push(...regexMatchCommands, ...regexMatchDisposables, diagnosticCollection);
+  context.subscriptions.push(regexMatchService, testRegexCodeLensManagerService);
 }

@@ -1,6 +1,6 @@
 import { expect, beforeEach, describe, it } from 'vitest';
 
-import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/code-lenses/utils';
+import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
 
 describe('Code Regex Detect', () => {
   function getAllMatches(regex: RegExp, text: string): RegExpExecArray[] {

@@ -1,6 +1,4 @@
 import {
-  CodeLensProvider,
-  ConfigurationChangeEvent,
   Diagnostic,
   Disposable,
   ExtensionContext,
@@ -10,41 +8,45 @@ import {
   TextEditor,
   Uri,
   commands,
-  languages,
   window,
   workspace,
 } from 'vscode';
 
-import TestRegexCodeLensProvider from './code-lenses/TestRegexCodeLensProvider';
-import TextDecorationApplier from './decorations/TextDecorationApplier';
-import DiagnosticProvider from './DiagnosticProvider';
-import RegexMatchFormatError from './exceptions/RegexMatchFormatError';
-import RegexSyntaxError from './exceptions/RegexSyntaxError';
+import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
+
+import TextDecorationApplier from '../../decorations/TextDecorationApplier';
+import RegexMatchFormatError from '../../exceptions/RegexMatchFormatError';
+import RegexSyntaxError from '../../exceptions/RegexSyntaxError';
+import DiagnosticProvider from '../../providers/DiagnosticProvider';
+import { disposeAll } from '../../utils/dipose';
 import FileCreator from './FileCreator';
 import FileParser from './FileParser';
+import RegexTest from './RegexTest';
 
 export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
-class RegexMatchService {
-  private context: ExtensionContext;
-
+class RegexMatchService implements Disposable {
   private regexTestFileUri: Uri;
   private diagnosticProvider: DiagnosticProvider;
+  private disposables: Disposable[] = [];
 
-  private testRegexCodeLensProvider: CodeLensProvider;
-  private codeLensDisposable: Disposable | undefined;
+  private regexTests: RegexTest[] = [];
 
-  constructor(context: ExtensionContext) {
-    this.context = context;
+  constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
+    this.diagnosticProvider = diagnosticProvider;
     this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
-    this.diagnosticProvider = new DiagnosticProvider('regex-match');
-    this.testRegexCodeLensProvider = new TestRegexCodeLensProvider();
 
-    this.updateCodeLensProvider();
+    const commands = this.registerCommands();
+    const disposables = this.registerDisposables();
+    this.disposables.push(...commands, ...disposables);
+  }
+
+  getRegexTests() {
+    return this.regexTests;
   }
 
   registerCommands(): Disposable[] {
-    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', (codeRegex?: string) =>
+    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', (codeRegex?: CodeRegex) =>
       this.openRegexTestWindow(codeRegex),
     );
 
@@ -54,43 +56,37 @@ class RegexMatchService {
   registerDisposables(): Disposable[] {
     const onChangeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
 
-    const onChangeConfigurationDisposable = workspace.onDidChangeConfiguration((event) =>
-      this.onChangeConfiguration(event),
-    );
-
     const onChangeActiveTextEditorDisposable = window.onDidChangeActiveTextEditor((editor) =>
       this.onChangeActiveTextEditor(editor),
     );
 
-    return [onChangeTextDocumentDisposable, onChangeConfigurationDisposable, onChangeActiveTextEditorDisposable];
+    return [onChangeTextDocumentDisposable, onChangeActiveTextEditorDisposable];
   }
 
-  getDiagnosticCollection() {
-    return this.diagnosticProvider.getDiagnosticCollection();
-  }
-
-  private async openRegexTestWindow(codeRegex?: string) {
-    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri, codeRegex);
+  private async openRegexTestWindow(codeRegex?: CodeRegex) {
+    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri, codeRegex?.pattern);
 
     const activeEditor = window.activeTextEditor;
     if (!(activeEditor && document === activeEditor.document)) {
       return;
     }
 
-    this.updateRegexTest(document);
+    this.updateRegexTest(document, codeRegex);
   }
 
-  private updateRegexTest(document: TextDocument) {
-    const regexTests = this.parseAndTestRegex(document);
+  private updateRegexTest(document: TextDocument, codeRegex?: CodeRegex) {
+    const regexTests = this.parseAndTestRegex(document, codeRegex);
     TextDecorationApplier.updateDecorations(document, regexTests);
   }
 
-  private parseAndTestRegex(document: TextDocument) {
+  private parseAndTestRegex(document: TextDocument, codeRegex?: CodeRegex) {
     const fileContent = document.getText();
     const diagnostics: Diagnostic[] = [];
 
     try {
-      const parsedRegexTests = FileParser.parseFileContent(fileContent);
+      const parsedRegexTests = FileParser.parseFileContent(fileContent, this.regexTests, codeRegex);
+      this.regexTests = parsedRegexTests;
+
       return parsedRegexTests;
     } catch (error) {
       if (error instanceof Error) {
@@ -139,28 +135,8 @@ class RegexMatchService {
     }
   }
 
-  private onChangeConfiguration(event: ConfigurationChangeEvent) {
-    if (event.affectsConfiguration('regex-match.codeLens.enabled')) {
-      this.updateCodeLensProvider();
-    }
-  }
-
-  private updateCodeLensProvider() {
-    const isCodeLensEnabled = workspace.getConfiguration('regex-match').get<boolean>('codeLens.enabled');
-
-    if (isCodeLensEnabled) {
-      if (!this.codeLensDisposable) {
-        this.codeLensDisposable = languages.registerCodeLensProvider(
-          { pattern: '**/*' },
-          this.testRegexCodeLensProvider,
-        );
-
-        this.context.subscriptions.push(this.codeLensDisposable);
-      }
-    } else if (this.codeLensDisposable) {
-      this.codeLensDisposable.dispose();
-      this.codeLensDisposable = undefined;
-    }
+  dispose() {
+    disposeAll(this.disposables);
   }
 }
 
