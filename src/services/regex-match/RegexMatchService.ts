@@ -86,7 +86,6 @@ class RegexMatchService implements Disposable {
     try {
       const parsedRegexTests = FileParser.parseFileContent(fileContent, this.regexTests, codeRegex);
       this.regexTests = parsedRegexTests;
-      console.log('parsedRegexTests', parsedRegexTests);
 
       return parsedRegexTests;
     } catch (error) {
