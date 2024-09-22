@@ -3,10 +3,12 @@ import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
 const REQUIRED_FLAG = 'd';
 
+export type MatchRange = [number, number];
+
 export interface MatchResult {
   substring: string;
-  range: number[];
-  groupRanges?: number[][];
+  range: MatchRange;
+  groupRanges?: MatchRange[];
 }
 
 export interface RegexTestProps {
@@ -86,9 +88,9 @@ class RegexTest {
   }
 
   private processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
-    const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
+    const range: MatchRange = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
 
-    let groupRanges: number[][] | undefined;
+    let groupRanges: MatchRange[] | undefined;
     if (match.indices && match.indices.length > 1) {
       const matchGroupIndexes = match.indices.slice(1);
       groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
@@ -97,8 +99,8 @@ class RegexTest {
     return { substring: match[0], range, groupRanges };
   }
 
-  private getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): number[][] {
-    const ranges: number[][] = [];
+  private getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): MatchRange[] {
+    const ranges: MatchRange[] = [];
 
     for (const range of matchIndexes) {
       if (range) {

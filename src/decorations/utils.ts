@@ -1,26 +1,35 @@
-import { window } from 'vscode';
+import { TextEditorDecorationType } from 'vscode';
 
-const DECORATION_COLORS = {
+export type DecorationKey =
+  | 'match'
+  | 'delimiter'
+  | 'firstGroup'
+  | 'secondGroup'
+  | 'thirdGroup'
+  | 'fourthGroup'
+  | 'fifthGroup'
+  | 'sixthGroup';
+
+export type DecorationMapping = { [type in DecorationKey]: TextEditorDecorationType };
+
+export const DECORATION_KEYS = [
+  'match',
+  'delimiter',
+  'firstGroup',
+  'secondGroup',
+  'thirdGroup',
+  'fourthGroup',
+  'fifthGroup',
+  'sixthGroup',
+] as const;
+
+export const DEFAULT_DECORATION_COLORS: { [Decoration in DecorationKey]: string } = {
   match: '#FFA50080',
   delimiter: '#BD93F9FF',
-  groups: ['#07925C99', '#3164CACC', '#6E25B7B2', '#D339DF99', '#006B6BCC', '#B82F2F99'],
+  firstGroup: '#518241',
+  secondGroup: '#3164CACC',
+  thirdGroup: '#6E25B7B2',
+  fourthGroup: '#D339DF99',
+  fifthGroup: '#006B6BCC',
+  sixthGroup: '#B82F2F99',
 };
-
-export const MATCH_DECORATION = window.createTextEditorDecorationType({
-  backgroundColor: DECORATION_COLORS.match,
-});
-
-export const DELIMITER_DECORATION = window.createTextEditorDecorationType({
-  color: DECORATION_COLORS.delimiter,
-  fontWeight: 'bold',
-});
-
-export function getCapturingGroupDecoration(index: number) {
-  return window.createTextEditorDecorationType({ backgroundColor: DECORATION_COLORS.groups[index] });
-}
-
-export const FIRST_GROUP_DECORATION = window.createTextEditorDecorationType({
-  backgroundColor: DECORATION_COLORS.groups[0],
-});
-
-export const GROUP_DECORATIONS = DECORATION_COLORS.groups.map((_, index) => getCapturingGroupDecoration(index));

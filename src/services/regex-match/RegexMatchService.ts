@@ -28,6 +28,7 @@ export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 class RegexMatchService implements Disposable {
   private regexTestFileUri: Uri;
   private diagnosticProvider: DiagnosticProvider;
+  private textDecorationApplier: TextDecorationApplier;
   private disposables: Disposable[] = [];
 
   private regexTests: RegexTest[] = [];
@@ -35,6 +36,7 @@ class RegexMatchService implements Disposable {
   constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
     this.diagnosticProvider = diagnosticProvider;
     this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
+    this.textDecorationApplier = new TextDecorationApplier();
 
     const commands = this.registerCommands();
     const disposables = this.registerDisposables();
@@ -76,7 +78,7 @@ class RegexMatchService implements Disposable {
 
   private updateRegexTest(document: TextDocument, codeRegex?: CodeRegex) {
     const regexTests = this.parseAndTestRegex(document, codeRegex);
-    TextDecorationApplier.updateDecorations(document, regexTests);
+    this.textDecorationApplier.updateDecorations(document, regexTests);
   }
 
   private parseAndTestRegex(document: TextDocument, codeRegex?: CodeRegex) {
@@ -136,6 +138,7 @@ class RegexMatchService implements Disposable {
   }
 
   dispose() {
+    this.textDecorationApplier.dispose();
     disposeAll(this.disposables);
   }
 }
