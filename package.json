@@ -58,6 +58,54 @@
           "type": "boolean",
           "default": true,
           "description": "Enable the code lens that allows you to test the regex from code editor."
+        },
+        "regex-match.colorHighlighting": {
+          "type": "object",
+          "description": "Colors used to highlight the matches and capturing groups.",
+          "properties": {
+            "match": {
+              "type": "string",
+              "default": "#FFA50080",
+              "format": "color-hex",
+              "description": "Color used to highlight the matches."
+            },
+            "firstGroup": {
+              "type": "string",
+              "default": "#07925C99",
+              "format": "color-hex",
+              "description": "Color used to highlight the first group."
+            },
+            "secondGroup": {
+              "type": "string",
+              "default": "#3164CACC",
+              "format": "color-hex",
+              "description": "Color used to highlight the second group."
+            },
+            "thirdGroup": {
+              "type": "string",
+              "default": "#6E25B7B2",
+              "format": "color-hex",
+              "description": "Color used to highlight the third group."
+            },
+            "fourthGroup": {
+              "type": "string",
+              "default": "#D339DF99",
+              "format": "color-hex",
+              "description": "Color used to highlight the fourth group."
+            },
+            "fifthGroup": {
+              "type": "string",
+              "default": "#006B6BCC",
+              "format": "color-hex",
+              "description": "Color used to highlight the fifth group."
+            },
+            "sixthGroup": {
+              "type": "string",
+              "default": "#B82F2F99",
+              "format": "color-hex",
+              "description": "Color used to highlight the sixth group."
+            }
+          }
         }
       }
     }
