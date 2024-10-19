@@ -9,7 +9,6 @@
 
 # TypeScript
 *.tsbuildinfo
-next-env.d.ts
 
 # ESlint
 .eslintcache

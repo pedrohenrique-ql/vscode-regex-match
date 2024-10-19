@@ -28,7 +28,11 @@ class TestRegexCodeLensManagerService implements Disposable {
     const isCodeLensEnabled = workspace.getConfiguration('regex-match').get<boolean>('codeLens.enabled');
 
     if (isCodeLensEnabled && !this.codeLensDisposable) {
-      this.codeLensDisposable = languages.registerCodeLensProvider({ pattern: '**/*' }, this.codeLensProvider);
+      this.codeLensDisposable = languages.registerCodeLensProvider(
+        { pattern: '**/*', scheme: 'file' },
+        this.codeLensProvider,
+      );
+
       this.context.subscriptions.push(this.codeLensDisposable);
     } else if (!isCodeLensEnabled && this.codeLensDisposable) {
       this.codeLensDisposable.dispose();

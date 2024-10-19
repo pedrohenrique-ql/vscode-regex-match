@@ -28,6 +28,7 @@ export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 class RegexMatchService implements Disposable {
   private regexTestFileUri: Uri;
   private diagnosticProvider: DiagnosticProvider;
+  private textDecorationApplier: TextDecorationApplier;
   private disposables: Disposable[] = [];
 
   private regexTests: RegexTest[] = [];
@@ -35,6 +36,7 @@ class RegexMatchService implements Disposable {
   constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
     this.diagnosticProvider = diagnosticProvider;
     this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
+    this.textDecorationApplier = new TextDecorationApplier();
 
     const commands = this.registerCommands();
     const disposables = this.registerDisposables();
@@ -54,13 +56,19 @@ class RegexMatchService implements Disposable {
   }
 
   registerDisposables(): Disposable[] {
-    const onChangeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
+    const changeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
 
-    const onChangeActiveTextEditorDisposable = window.onDidChangeActiveTextEditor((editor) =>
+    const changeActiveTextEditorDisposable = window.onDidChangeActiveTextEditor((editor) =>
       this.onChangeActiveTextEditor(editor),
     );
 
-    return [onChangeTextDocumentDisposable, onChangeActiveTextEditorDisposable];
+    const changeColorHighlightingConfigurationDisposable = this.onChangeColorHighlightingConfiguration();
+
+    return [
+      changeTextDocumentDisposable,
+      changeActiveTextEditorDisposable,
+      changeColorHighlightingConfigurationDisposable,
+    ];
   }
 
   private async openRegexTestWindow(codeRegex?: CodeRegex) {
@@ -71,12 +79,12 @@ class RegexMatchService implements Disposable {
       return;
     }
 
-    this.updateRegexTest(document, codeRegex);
+    this.updateRegexTest(activeEditor, codeRegex);
   }
 
-  private updateRegexTest(document: TextDocument, codeRegex?: CodeRegex) {
-    const regexTests = this.parseAndTestRegex(document, codeRegex);
-    TextDecorationApplier.updateDecorations(document, regexTests);
+  private updateRegexTest(textEditor: TextEditor, codeRegex?: CodeRegex) {
+    const regexTests = this.parseAndTestRegex(textEditor.document, codeRegex);
+    this.textDecorationApplier.applyDecorations(textEditor, regexTests);
   }
 
   private parseAndTestRegex(document: TextDocument, codeRegex?: CodeRegex) {
@@ -125,17 +133,36 @@ class RegexMatchService implements Disposable {
       eventDocument === activeEditor.document &&
       event.contentChanges.length > 0
     ) {
-      this.updateRegexTest(eventDocument);
+      this.updateRegexTest(activeEditor);
     }
   }
 
   private onChangeActiveTextEditor(activeEditor: TextEditor | undefined) {
     if (activeEditor && activeEditor.document.uri.path === this.regexTestFileUri.path) {
-      this.updateRegexTest(activeEditor.document);
+      this.updateRegexTest(activeEditor);
     }
   }
 
+  private onChangeColorHighlightingConfiguration() {
+    return workspace.onDidChangeConfiguration((event) => {
+      if (event.affectsConfiguration('regex-match.colorHighlighting')) {
+        const visibleEditors = window.visibleTextEditors;
+
+        const regexMatchEditor = visibleEditors.find(
+          (editor) => editor.document.uri.path === this.regexTestFileUri.path,
+        );
+
+        if (regexMatchEditor) {
+          this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests, {
+            isToUpdateDecorations: true,
+          });
+        }
+      }
+    });
+  }
+
   dispose() {
+    this.textDecorationApplier.dispose();
     disposeAll(this.disposables);
   }
 }
