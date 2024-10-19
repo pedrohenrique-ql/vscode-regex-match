@@ -15,17 +15,19 @@ import RegexTest, { MatchRange, MatchResult } from '@/services/regex-match/Regex
 import { DECORATION_KEYS, DecorationKey, DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
 
 class TextDecorationApplier implements Disposable {
-  private decorations: DecorationMapping;
+  private decorations: DecorationMapping = {} as DecorationMapping;
   private configurationChangeDisposable: Disposable = Disposable.from();
 
   constructor() {
-    this.decorations = this.createDecorations();
-    this.configurationChangeDisposable = this.watchConfigurationChanges();
+    this.updateDecorations();
   }
 
-  private createDecorations(): DecorationMapping {
+  private updateDecorations() {
     const colorSettings = this.loadColorSettings();
+    this.decorations = this.createDecorations(colorSettings);
+  }
 
+  private createDecorations(colorSettings: Record<string, string>): DecorationMapping {
     return {
       ...this.createMatchDecorations(colorSettings),
       delimiter: this.createTextDecorationType({ color: colorSettings.delimiter, fontWeight: 'bold' }),
@@ -61,28 +63,24 @@ class TextDecorationApplier implements Disposable {
       .get<string>(decorationKey, DEFAULT_DECORATION_COLORS[decorationKey]);
   }
 
-  private watchConfigurationChanges() {
-    return workspace.onDidChangeConfiguration((event) => {
-      if (event.affectsConfiguration('regex-match.colorHighlighting')) {
-        this.createDecorations();
-      }
-    });
-  }
+  applyDecorations(
+    textEditor: TextEditor,
+    regexTests?: RegexTest[],
+    options: { isToUpdateDecorations: boolean } = { isToUpdateDecorations: false },
+  ) {
+    this.clearDecorations(textEditor);
 
-  updateDecorations(document: TextDocument, regexTests?: RegexTest[]) {
-    const activeEditor = window.activeTextEditor;
-    if (!(activeEditor && document === activeEditor.document)) {
-      return;
+    if (options.isToUpdateDecorations) {
+      this.updateDecorations();
     }
 
     const capturingGroupDecorations = this.getCapturingGroupDecorations();
 
-    this.resetDecorations(activeEditor, capturingGroupDecorations);
-    this.applyDelimiterDecorations(activeEditor);
+    this.applyDelimiterDecorations(textEditor);
 
     if (regexTests) {
       const matchResults = regexTests.flatMap((regexTest) => regexTest.test());
-      this.applyMatchDecorations(activeEditor, matchResults, capturingGroupDecorations);
+      this.applyMatchDecorations(textEditor, matchResults, capturingGroupDecorations);
     }
   }
 
@@ -193,11 +191,12 @@ class TextDecorationApplier implements Disposable {
     activeEditor.setDecorations(this.decorations.delimiter, ranges);
   }
 
-  private resetDecorations(activeEditor: TextEditor, capturingGroupDecorations: TextEditorDecorationType[]) {
-    activeEditor.setDecorations(this.decorations.match, []);
-    activeEditor.setDecorations(this.decorations.delimiter, []);
+  clearDecorations(textEditor: TextEditor) {
+    textEditor.setDecorations(this.decorations.match, []);
+    textEditor.setDecorations(this.decorations.delimiter, []);
 
-    capturingGroupDecorations.forEach((groupDecoration) => activeEditor.setDecorations(groupDecoration, []));
+    const capturingGroupDecorations = this.getCapturingGroupDecorations();
+    capturingGroupDecorations.forEach((groupDecoration) => textEditor.setDecorations(groupDecoration, []));
   }
 
   dispose() {
