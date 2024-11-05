@@ -38,11 +38,12 @@ class FileParser {
             codeRegex,
           });
 
-          if (currentRegexTests.length > regexTests.length) {
-            const currentTest = currentRegexTests[regexTests.length];
-            const isCodeRegex = codeRegex?.pattern === fileLines[regexLineIndex];
+          if (currentRegexTests.length > 0 && !codeRegex) {
+            const currentParsingRegex = currentRegexTests.at(regexTests.length);
 
-            regexTest.setCodeRegex(isCodeRegex ? codeRegex : currentTest.getCodeRegex());
+            if (currentParsingRegex?.isCodeRegex()) {
+              regexTest.setCodeRegex(currentParsingRegex.getCodeRegex());
+            }
           }
 
           regexTests.push(regexTest);

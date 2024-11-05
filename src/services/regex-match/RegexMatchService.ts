@@ -52,7 +52,12 @@ class RegexMatchService implements Disposable {
       this.openRegexTestWindow(codeRegex),
     );
 
-    return [openRegexTextCommand];
+    const applyRegexToCodeCommand = commands.registerCommand(
+      'regex-match.applyRegexToCode',
+      (codeRegex: CodeRegex, updatedRegexSource?: string) => this.onApplyRegexToCode(codeRegex, updatedRegexSource),
+    );
+
+    return [openRegexTextCommand, applyRegexToCodeCommand];
   }
 
   registerDisposables(): Disposable[] {
@@ -140,6 +145,35 @@ class RegexMatchService implements Disposable {
   private onChangeActiveTextEditor(activeEditor: TextEditor | undefined) {
     if (activeEditor && activeEditor.document.uri.path === this.regexTestFileUri.path) {
       this.updateRegexTest(activeEditor);
+    }
+  }
+
+  private async onApplyRegexToCode(codeRegex: CodeRegex, updatedRegexSource?: string) {
+    if (!updatedRegexSource) {
+      return;
+    }
+
+    const editor = window.visibleTextEditors.find(
+      (editor) => editor.document.uri.toString() === codeRegex.documentUri.toString(),
+    );
+
+    if (!editor) {
+      window.showErrorMessage('The code editor for the regex test was not found.');
+      return;
+    }
+
+    await editor.edit((editBuilder) => {
+      console.log(`Replacing ${codeRegex.pattern} with ${updatedRegexSource}`);
+      editBuilder.replace(codeRegex.range, updatedRegexSource);
+    });
+
+    const newRange = new Range(codeRegex.range.start, codeRegex.range.start.translate(0, updatedRegexSource.length));
+
+    const regexTest = this.regexTests.find((regexTest) => regexTest.getCodeRegex() === codeRegex);
+    const updatedCodeRegex: CodeRegex = { ...codeRegex, range: newRange, pattern: updatedRegexSource };
+
+    if (regexTest) {
+      regexTest.setCodeRegex(updatedCodeRegex);
     }
   }
 

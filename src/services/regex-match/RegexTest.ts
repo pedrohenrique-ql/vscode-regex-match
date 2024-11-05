@@ -1,7 +1,7 @@
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
-const REQUIRED_FLAG = 'd';
+export const REQUIRED_FLAG = 'd';
 
 export type MatchRange = [number, number];
 
@@ -64,7 +64,7 @@ class RegexTest {
 
   private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
     try {
-      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/);
+      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
 
       if (matchGroups) {
         const [, pattern] = matchGroups;
@@ -116,6 +116,17 @@ class RegexTest {
     return this.matchingRegex;
   }
 
+  getMatchingRegexSource() {
+    const codeRegExp = this.getCodeRegExp();
+    const hasIndicesFlag = codeRegExp?.hasIndices;
+
+    const newRegexFlags = hasIndicesFlag
+      ? this.matchingRegex?.flags
+      : this.matchingRegex?.flags.replace(REQUIRED_FLAG, '');
+
+    return `/${this.matchingRegex?.source}/${newRegexFlags}`;
+  }
+
   getFormattedTestString() {
     return this.testString.split('\n');
   }
@@ -130,6 +141,25 @@ class RegexTest {
 
   getCodeRegex() {
     return this.codeRegex;
+  }
+
+  getCodeRegExp(): RegExp | undefined {
+    if (!this.codeRegex) {
+      return;
+    }
+
+    const codeRegexPattern = this.codeRegex.pattern;
+    const matchGroups = codeRegexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
+
+    if (matchGroups) {
+      const [, pattern] = matchGroups;
+      const flagsGroup = matchGroups.groups?.flags;
+
+      const flags = flagsGroup?.replace('/', '') ?? '';
+      const codeRegex = new RegExp(pattern, flags);
+
+      return codeRegex;
+    }
   }
 
   setCodeRegex(codeRegex?: CodeRegex) {

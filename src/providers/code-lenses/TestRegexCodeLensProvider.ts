@@ -1,11 +1,11 @@
-import { CodeLens, CodeLensProvider, Command, ProviderResult, Range, TextDocument } from 'vscode';
+import { CodeLens, CodeLensProvider, Command, ProviderResult, Range, TextDocument, Uri } from 'vscode';
 
 import { getRegexDetect } from './utils';
 
 export interface CodeRegex {
   pattern: string;
-  range?: Range;
-  document?: TextDocument;
+  range: Range;
+  documentUri: Uri;
 }
 
 class TestRegexCodeLensProvider implements CodeLensProvider {
@@ -26,7 +26,7 @@ class TestRegexCodeLensProvider implements CodeLensProvider {
       const range = new Range(startPosition, endPosition);
 
       const pattern = matches[0].trim();
-      const codeRegex: CodeRegex = { pattern, range, document };
+      const codeRegex: CodeRegex = { pattern, range, documentUri: document.uri };
 
       const command: Command = {
         title: 'Test Regex',
