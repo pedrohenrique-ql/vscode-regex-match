@@ -19,5 +19,7 @@ export function activate(context: ExtensionContext) {
     applyRegexCodeLensProvider,
   );
 
+  regexMatchService.setApplyRegexCodeLensProvider(applyRegexCodeLensProvider);
+
   context.subscriptions.push(regexMatchService, testRegexCodeLensManagerService, applyRegexDisposable);
 }

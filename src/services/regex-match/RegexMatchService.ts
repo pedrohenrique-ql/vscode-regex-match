@@ -7,11 +7,13 @@ import {
   TextDocumentChangeEvent,
   TextEditor,
   Uri,
+  ViewColumn,
   commands,
   window,
   workspace,
 } from 'vscode';
 
+import ApplyRegexCodeLensProvider from '@/providers/code-lenses/ApplyRegexCodeLensProvider';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
 import TextDecorationApplier from '../../decorations/TextDecorationApplier';
@@ -27,11 +29,14 @@ export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
 
 class RegexMatchService implements Disposable {
   private regexTestFileUri: Uri;
+  private regexTests: RegexTest[] = [];
+
   private diagnosticProvider: DiagnosticProvider;
   private textDecorationApplier: TextDecorationApplier;
+  private applyRegexCodeLensProvider: ApplyRegexCodeLensProvider | undefined;
   private disposables: Disposable[] = [];
 
-  private regexTests: RegexTest[] = [];
+  private currentViewColumn: ViewColumn | undefined;
 
   constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
     this.diagnosticProvider = diagnosticProvider;
@@ -41,10 +46,20 @@ class RegexMatchService implements Disposable {
     const commands = this.registerCommands();
     const disposables = this.registerDisposables();
     this.disposables.push(...commands, ...disposables);
+
+    this.checkCurrentViewColumn();
   }
 
   getRegexTests() {
     return this.regexTests;
+  }
+
+  private checkCurrentViewColumn() {
+    const regexMatchEditor = window.visibleTextEditors.find(
+      (editor) => editor.document.uri.path === this.regexTestFileUri.path,
+    );
+
+    this.currentViewColumn = regexMatchEditor?.viewColumn;
   }
 
   registerCommands(): Disposable[] {
@@ -61,10 +76,10 @@ class RegexMatchService implements Disposable {
   }
 
   registerDisposables(): Disposable[] {
-    const changeTextDocumentDisposable = this.setupTextDocumentChangeHandling();
+    const changeTextDocumentDisposable = workspace.onDidChangeTextDocument((event) => this.onChangeTextDocument(event));
 
-    const changeActiveTextEditorDisposable = window.onDidChangeActiveTextEditor((editor) =>
-      this.onChangeActiveTextEditor(editor),
+    const changeActiveTextEditorDisposable = window.onDidChangeVisibleTextEditors((editors) =>
+      this.onChangeRegexMatchViewColumn(editors),
     );
 
     const changeColorHighlightingConfigurationDisposable = this.onChangeColorHighlightingConfiguration();
@@ -84,6 +99,7 @@ class RegexMatchService implements Disposable {
       return;
     }
 
+    this.currentViewColumn = activeEditor.viewColumn;
     this.updateRegexTest(activeEditor, codeRegex);
   }
 
@@ -124,10 +140,6 @@ class RegexMatchService implements Disposable {
     return diagnosticError;
   }
 
-  private setupTextDocumentChangeHandling() {
-    return workspace.onDidChangeTextDocument((event) => this.onChangeTextDocument(event));
-  }
-
   private onChangeTextDocument(event: TextDocumentChangeEvent) {
     const activeEditor = window.activeTextEditor;
     const eventDocument = event.document;
@@ -142,10 +154,23 @@ class RegexMatchService implements Disposable {
     }
   }
 
-  private onChangeActiveTextEditor(activeEditor: TextEditor | undefined) {
-    if (activeEditor && activeEditor.document.uri.path === this.regexTestFileUri.path) {
-      this.updateRegexTest(activeEditor);
+  private onChangeRegexMatchViewColumn(textEditors: readonly TextEditor[]) {
+    const regexMatchEditor = textEditors.find(
+      (editor) => editor.document.uri.toString() === this.regexTestFileUri.toString(),
+    );
+
+    if (
+      regexMatchEditor &&
+      this.currentViewColumn !== undefined &&
+      this.currentViewColumn !== regexMatchEditor.viewColumn
+    ) {
+      this.currentViewColumn = regexMatchEditor.viewColumn;
+      this.updateRegexTest(regexMatchEditor);
     }
+  }
+
+  setApplyRegexCodeLensProvider(applyRegexCodeLensProvider: ApplyRegexCodeLensProvider) {
+    this.applyRegexCodeLensProvider = applyRegexCodeLensProvider;
   }
 
   private async onApplyRegexToCode(codeRegex: CodeRegex, updatedRegexSource?: string) {
@@ -163,7 +188,6 @@ class RegexMatchService implements Disposable {
     }
 
     await editor.edit((editBuilder) => {
-      console.log(`Replacing ${codeRegex.pattern} with ${updatedRegexSource}`);
       editBuilder.replace(codeRegex.range, updatedRegexSource);
     });
 
@@ -174,6 +198,10 @@ class RegexMatchService implements Disposable {
 
     if (regexTest) {
       regexTest.setCodeRegex(updatedCodeRegex);
+
+      if (this.applyRegexCodeLensProvider) {
+        this.applyRegexCodeLensProvider.refresh();
+      }
     }
   }
 

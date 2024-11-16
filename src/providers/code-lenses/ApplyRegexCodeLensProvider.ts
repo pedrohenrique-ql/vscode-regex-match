@@ -1,9 +1,21 @@
-import { CodeLens, CodeLensProvider, ProviderResult, Range, TextDocument, workspace } from 'vscode';
+import {
+  CodeLens,
+  CodeLensProvider,
+  Event,
+  EventEmitter,
+  ProviderResult,
+  Range,
+  TextDocument,
+  workspace,
+} from 'vscode';
 
 import RegexMatchService from '@/services/regex-match/RegexMatchService';
 
 class ApplyRegexCodeLensProvider implements CodeLensProvider {
   private regexMatchService: RegexMatchService;
+
+  private _onDidChangeCodeLenses: EventEmitter<void> = new EventEmitter<void>();
+  readonly onDidChangeCodeLenses: Event<void> = this._onDidChangeCodeLenses.event;
 
   constructor(regexMatchService: RegexMatchService) {
     this.regexMatchService = regexMatchService;
@@ -66,6 +78,10 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
     }
 
     return codeLenses;
+  }
+
+  refresh(): void {
+    this._onDidChangeCodeLenses.fire();
   }
 }
 
