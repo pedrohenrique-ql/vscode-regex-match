@@ -6,10 +6,12 @@ import {
   ProviderResult,
   Range,
   TextDocument,
+  window,
   workspace,
 } from 'vscode';
 
 import RegexMatchService from '@/services/regex-match/RegexMatchService';
+import RegexTest from '@/services/regex-match/RegexTest';
 
 class ApplyRegexCodeLensProvider implements CodeLensProvider {
   private regexMatchService: RegexMatchService;
@@ -62,7 +64,7 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
       const searchRegex = new RegExp(escapedRegexString, 'g');
       const match = searchRegex.exec(documentText);
 
-      if (match) {
+      if (match && this.isCodeRegexInEditor(regexTest)) {
         const startPosition = document.positionAt(match.index);
         const endPosition = document.positionAt(match.index + match[0].length);
         const matchRange = new Range(startPosition, endPosition);
@@ -78,6 +80,17 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
     }
 
     return codeLenses;
+  }
+
+  private isCodeRegexInEditor(regexTest: RegexTest): boolean {
+    const codeRegex = regexTest.getCodeRegex();
+    const editor = window.visibleTextEditors.find(
+      (editor) => editor.document.uri.toString() === codeRegex?.documentUri.toString(),
+    );
+
+    const editorDocumentText = editor?.document.getText();
+
+    return !!(codeRegex && editor && editorDocumentText?.includes(codeRegex.pattern));
   }
 
   refresh(): void {
