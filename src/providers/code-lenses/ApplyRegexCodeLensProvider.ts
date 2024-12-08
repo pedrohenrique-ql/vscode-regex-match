@@ -6,7 +6,6 @@ import {
   ProviderResult,
   Range,
   TextDocument,
-  window,
   workspace,
 } from 'vscode';
 
@@ -51,14 +50,6 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
         continue;
       }
 
-      const codeRegexDocument = workspace.textDocuments.find(
-        (document) => document.uri.toString() === regexTest.getCodeRegex()?.documentUri.toString(),
-      );
-
-      if (!codeRegexDocument) {
-        continue;
-      }
-
       const updatedRegexSource = updatedRegex.source;
       const escapedRegexString = updatedRegexSource.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       const searchRegex = new RegExp(escapedRegexString, 'g');
@@ -84,13 +75,17 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
 
   private isCodeRegexInEditor(regexTest: RegexTest): boolean {
     const codeRegex = regexTest.getCodeRegex();
-    const editor = window.visibleTextEditors.find(
-      (editor) => editor.document.uri.toString() === codeRegex?.documentUri.toString(),
+    const codeRegexDocumentUri = codeRegex?.documentUri;
+
+    if (!codeRegexDocumentUri) {
+      return false;
+    }
+
+    const codeRegexDocument = workspace.textDocuments.find(
+      (document) => document.uri.toString() === codeRegexDocumentUri.toString(),
     );
 
-    const editorDocumentText = editor?.document.getText();
-
-    return !!(codeRegex && editor && editorDocumentText?.includes(codeRegex.pattern));
+    return !!codeRegexDocument?.getText().includes(codeRegex.pattern);
   }
 
   refresh(): void {

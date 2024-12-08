@@ -38,6 +38,8 @@ class RegexMatchService implements Disposable {
 
   private currentViewColumn: ViewColumn | undefined;
 
+  private isOpeningWithCodeRegex = false;
+
   constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
     this.diagnosticProvider = diagnosticProvider;
     this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
@@ -92,6 +94,8 @@ class RegexMatchService implements Disposable {
   }
 
   private async openRegexTestWindow(codeRegex?: CodeRegex) {
+    this.isOpeningWithCodeRegex = !!codeRegex;
+
     const document = await FileCreator.openRegexTestFile(this.regexTestFileUri, codeRegex?.pattern);
 
     const activeEditor = window.activeTextEditor;
@@ -148,9 +152,14 @@ class RegexMatchService implements Disposable {
       activeEditor &&
       eventDocument.uri.path === this.regexTestFileUri.path &&
       eventDocument === activeEditor.document &&
-      event.contentChanges.length > 0
+      event.contentChanges.length > 0 &&
+      !this.isOpeningWithCodeRegex
     ) {
       this.updateRegexTest(activeEditor);
+    }
+
+    if (this.isOpeningWithCodeRegex) {
+      this.isOpeningWithCodeRegex = false;
     }
   }
 

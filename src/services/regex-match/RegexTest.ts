@@ -127,6 +127,10 @@ class RegexTest {
     return `/${this.matchingRegex?.source}/${newRegexFlags}`;
   }
 
+  getTestString() {
+    return this.testString;
+  }
+
   getFormattedTestString() {
     return this.testString.split('\n');
   }

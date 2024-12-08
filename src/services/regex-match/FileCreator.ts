@@ -1,5 +1,5 @@
 import { TextEncoder } from 'util';
-import { Uri, ViewColumn, window, workspace } from 'vscode';
+import { Range, Uri, ViewColumn, window, workspace } from 'vscode';
 
 export const DEFAULT_FILE_CONTENT = '/[0-9]+a+/gm\n---\n123aaa\nb2507ab\n2024aa\n---';
 
@@ -11,15 +11,29 @@ class FileCreator {
       console.error('File not found, creating default test file.');
       await this.writeTestFile(fileUri, DEFAULT_FILE_CONTENT);
     } finally {
-      if (codeRegex) {
-        const fileContent = `${codeRegex}\n---\nType the test string here...\n---`;
-        await this.writeTestFile(fileUri, fileContent);
+      const editor = window.visibleTextEditors.find((editor) => editor.document.uri.toString() === fileUri.toString());
+      const fileContentWithCodeRegex = `${codeRegex}\n---\nType the test string here...\n---`;
+
+      if (editor && codeRegex) {
+        await editor.edit((editBuilder) => {
+          editBuilder.replace(new Range(0, 0, editor.document.lineCount, 0), fileContentWithCodeRegex);
+        });
+
+        const document = editor.document;
+        await document.save();
+        await window.showTextDocument(document, ViewColumn.Two, false);
+
+        return document;
+      } else {
+        if (codeRegex) {
+          await this.writeTestFile(fileUri, fileContentWithCodeRegex);
+        }
+
+        const document = await workspace.openTextDocument(fileUri);
+        await window.showTextDocument(document, ViewColumn.Two, false);
+
+        return document;
       }
-
-      const document = await workspace.openTextDocument(fileUri);
-      await window.showTextDocument(document, ViewColumn.Two, false);
-
-      return document;
     }
   }
 

@@ -38,14 +38,6 @@ class FileParser {
             codeRegex,
           });
 
-          if (currentRegexTests.length > 0 && !codeRegex) {
-            const currentParsingRegex = currentRegexTests.at(regexTests.length);
-
-            if (currentParsingRegex?.isCodeRegex()) {
-              regexTest.setCodeRegex(currentParsingRegex.getCodeRegex());
-            }
-          }
-
           regexTests.push(regexTest);
 
           testLines = [];
@@ -64,7 +56,77 @@ class FileParser {
       throw new RegexMatchFormatError(0);
     }
 
+    if (!codeRegex) {
+      this.insertCodeRegex(currentRegexTests, regexTests);
+    }
+
     return regexTests;
+  }
+
+  private static insertCodeRegex(currentRegexTests: RegexTest[], newRegexTests: RegexTest[]) {
+    const hasCodeRegex = currentRegexTests.some((regexTest) => regexTest.isCodeRegex());
+    if (currentRegexTests.length === 0 || !hasCodeRegex) {
+      return;
+    }
+
+    if (currentRegexTests.length === newRegexTests.length) {
+      for (let i = 0; i < currentRegexTests.length; i++) {
+        const currentRegexTest = currentRegexTests.at(i);
+        const newRegexTest = newRegexTests.at(i);
+
+        if (currentRegexTest?.isCodeRegex() && newRegexTest) {
+          newRegexTest.setCodeRegex(currentRegexTest.getCodeRegex());
+        }
+      }
+    }
+
+    if (newRegexTests.length > currentRegexTests.length) {
+      const newRegexTestsCopy = newRegexTests.slice();
+
+      for (let i = 0; i < currentRegexTests.length; i++) {
+        const currentRegexTest = currentRegexTests.at(i);
+
+        if (!currentRegexTest?.isCodeRegex()) {
+          continue;
+        }
+
+        const regexTestWithSameMatchingRegexIndex = newRegexTests.findIndex(
+          (regexTest) => regexTest.getMatchingRegexSource() === currentRegexTest.getMatchingRegexSource(),
+        );
+
+        if (regexTestWithSameMatchingRegexIndex !== -1) {
+          newRegexTests[regexTestWithSameMatchingRegexIndex].setCodeRegex(currentRegexTest.getCodeRegex());
+          newRegexTestsCopy.splice(regexTestWithSameMatchingRegexIndex, 1);
+        }
+
+        const regexTestWithSameTestStringIndex = newRegexTests.findIndex(
+          (regexTest) => regexTest.getTestString() === currentRegexTest.getTestString(),
+        );
+
+        if (regexTestWithSameTestStringIndex !== -1) {
+          newRegexTests[regexTestWithSameTestStringIndex].setCodeRegex(currentRegexTest.getCodeRegex());
+          newRegexTestsCopy.splice(regexTestWithSameTestStringIndex, 1);
+        }
+      }
+    }
+
+    if (newRegexTests.length < currentRegexTests.length) {
+      for (let i = 0; i < newRegexTests.length; i++) {
+        const newRegexTest = newRegexTests.at(i);
+
+        if (!newRegexTest) {
+          continue;
+        }
+
+        const currentRegexTest = currentRegexTests.find(
+          (regexTest) => regexTest.getMatchingRegexSource() === newRegexTest.getMatchingRegexSource(),
+        );
+
+        if (currentRegexTest) {
+          newRegexTest.setCodeRegex(currentRegexTest.getCodeRegex());
+        }
+      }
+    }
   }
 
   private static isTestAreaDelimiter(line: string): boolean {
