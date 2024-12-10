@@ -11,6 +11,7 @@ import {
 
 import RegexMatchService from '@/services/regex-match/RegexMatchService';
 import RegexTest from '@/services/regex-match/RegexTest';
+import { escapeRegexSource } from '@/utils/regex';
 
 class ApplyRegexCodeLensProvider implements CodeLensProvider {
   private regexMatchService: RegexMatchService;
@@ -51,7 +52,7 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
       }
 
       const updatedRegexSource = updatedRegex.source;
-      const escapedRegexString = updatedRegexSource.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const escapedRegexString = escapeRegexSource(updatedRegexSource);
       const searchRegex = new RegExp(escapedRegexString, 'g');
       const match = searchRegex.exec(documentText);
 
