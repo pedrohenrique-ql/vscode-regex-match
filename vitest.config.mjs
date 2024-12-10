@@ -9,7 +9,7 @@ export default defineConfig({
     maxWorkers: 1,
     minWorkers: 1,
     environment: 'node',
-    include: ['**/unit/*.test.ts'],
+    include: ['**/unit/**/*.test.ts'],
     exclude: ['**/integration/*.test.ts'],
   },
   resolve: {

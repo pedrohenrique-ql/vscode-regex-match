@@ -43,6 +43,10 @@
       {
         "command": "regex-match.openRegexMatchWindow",
         "title": "Regex Match: Open Regex Match Window"
+      },
+      {
+        "command": "regex-match.applyRegexToCode",
+        "title": "Regex Match: Apply Regex to Code"
       }
     ],
     "keybindings": {
