@@ -6,7 +6,7 @@ import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 import { DEFAULT_FILE_CONTENT } from '@/services/regex-match/FileCreator';
 import { REGEX_TEST_FILE_PATH } from '@/services/regex-match/RegexMatchService';
 
-import { wait, writeDefaultTestFile } from './utils';
+import { createTemporaryFile, wait, writeDefaultTestFile } from './utils';
 
 describe('Regex Match Window', () => {
   beforeEach(async () => {
@@ -32,12 +32,10 @@ describe('Regex Match Window', () => {
   });
 
   it('should open the regex test window by command with correct content if a code regex is provided', async () => {
+    const documentUri = createTemporaryFile('Hello, world!');
+
     const pattern = /^\d{2}\w{3}/;
-    const codeRegex: CodeRegex = {
-      pattern: `${pattern}`,
-      range: new Range(0, 0, 0, 0),
-      documentUri: window.activeTextEditor!.document.uri,
-    };
+    const codeRegex: CodeRegex = { pattern: `${pattern}`, range: new Range(0, 0, 0, 0), documentUri };
     await commands.executeCommand('regex-match.openRegexMatchWindow', codeRegex);
     await wait(100);
 

@@ -5,7 +5,7 @@ import { getRegexDetect } from './utils';
 export interface CodeRegex {
   pattern: string;
   range: Range;
-  documentUri: Uri;
+  documentUri: Uri | null;
 }
 
 class TestRegexCodeLensProvider implements CodeLensProvider {

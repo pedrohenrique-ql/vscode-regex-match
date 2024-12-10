@@ -188,7 +188,7 @@ class RegexMatchService implements Disposable {
     }
 
     const editor = window.visibleTextEditors.find(
-      (editor) => editor.document.uri.toString() === codeRegex.documentUri.toString(),
+      (editor) => editor.document.uri.toString() === codeRegex.documentUri?.toString(),
     );
 
     if (!editor) {
