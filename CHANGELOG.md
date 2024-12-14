@@ -1,5 +1,12 @@
 # Change Log
 
+## [v0.5.0]
+
+- Refactored services to implement disposables, improving resource management and extension stability.
+- Added configurable settings to customize the color highlighting of regex matches.
+- Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
+- Fixed regex code detector by adding support the flags `s`, `v` and `d`.
+
 ## [v0.4.2] - 30/07/2024
 
 - Fixed the regex detector to detect two or more regex in the same line.
