@@ -27,13 +27,17 @@ updates:
         update-types:
           - version-update:semver-major
 
-      - dependency-name: '@types/glob'
+      - dependency-name: 'mocha'
         update-types:
           - version-update:semver-major
 
-      - dependency-name: '@types/vscode'
+      - dependency-name: '@types/mocha'
         update-types:
-          - version-update:semver-minor
+          - version-update:semver-major
+
+      - dependency-name: '@types/glob'
+        update-types:
+          - version-update:semver-major
 
   - package-ecosystem: github-actions
     directory: /
