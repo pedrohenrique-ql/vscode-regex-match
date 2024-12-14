@@ -44,7 +44,7 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match
 
 Create, test and debug your regex in the Regex Match file. To do this, use this syntax:
 
-```
+```py
 /your-regex-here/[flags]
 ---
 test input line 1
