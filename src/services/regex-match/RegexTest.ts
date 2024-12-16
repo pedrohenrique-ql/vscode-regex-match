@@ -1,11 +1,14 @@
-import RegexSyntaxError from './exceptions/RegexSyntaxError';
+import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
+import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
-const REQUIRED_FLAG = 'd';
+export const REQUIRED_FLAG = 'd';
+
+export type MatchRange = [number, number];
 
 export interface MatchResult {
   substring: string;
-  range: number[];
-  groupRanges?: number[][];
+  range: MatchRange;
+  groupRanges?: MatchRange[];
 }
 
 export interface RegexTestProps {
@@ -13,6 +16,8 @@ export interface RegexTestProps {
   regexLineIndex: number;
   testLines: string[];
   startTestIndex: number;
+  isCodeRegex?: boolean;
+  codeRegex?: CodeRegex;
   error?: Error;
 }
 
@@ -20,11 +25,13 @@ class RegexTest {
   private matchingRegex?: RegExp;
   private testString: string;
   private startTestIndex: number;
+  private codeRegex?: CodeRegex;
 
-  constructor({ regexPattern, regexLineIndex, testLines, startTestIndex }: RegexTestProps) {
+  constructor({ regexPattern, regexLineIndex, testLines, startTestIndex, codeRegex }: RegexTestProps) {
     this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
     this.testString = testLines.join('\n');
     this.startTestIndex = startTestIndex;
+    this.codeRegex = codeRegex;
   }
 
   test(): MatchResult[] {
@@ -57,7 +64,7 @@ class RegexTest {
 
   private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
     try {
-      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[igmsuy]*)?$/);
+      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
 
       if (matchGroups) {
         const [, pattern] = matchGroups;
@@ -81,9 +88,9 @@ class RegexTest {
   }
 
   private processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
-    const range = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
+    const range: MatchRange = [lineStartIndex + match.index, lineStartIndex + match.index + match[0].length];
 
-    let groupRanges: number[][] | undefined;
+    let groupRanges: MatchRange[] | undefined;
     if (match.indices && match.indices.length > 1) {
       const matchGroupIndexes = match.indices.slice(1);
       groupRanges = this.getGroupRanges(matchGroupIndexes, lineStartIndex);
@@ -92,8 +99,8 @@ class RegexTest {
     return { substring: match[0], range, groupRanges };
   }
 
-  private getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): number[][] {
-    const ranges: number[][] = [];
+  private getGroupRanges(matchIndexes: (number[] | undefined)[], startIndex: number): MatchRange[] {
+    const ranges: MatchRange[] = [];
 
     for (const range of matchIndexes) {
       if (range) {
@@ -109,12 +116,58 @@ class RegexTest {
     return this.matchingRegex;
   }
 
+  getMatchingRegexSource() {
+    const codeRegExp = this.getCodeRegExp();
+    const hasIndicesFlag = codeRegExp?.hasIndices;
+
+    const newRegexFlags = hasIndicesFlag
+      ? this.matchingRegex?.flags
+      : this.matchingRegex?.flags.replace(REQUIRED_FLAG, '');
+
+    return `/${this.matchingRegex?.source}/${newRegexFlags}`;
+  }
+
+  getTestString() {
+    return this.testString;
+  }
+
   getFormattedTestString() {
     return this.testString.split('\n');
   }
 
   getStartTestIndex() {
     return this.startTestIndex;
+  }
+
+  isCodeRegex() {
+    return this.codeRegex !== undefined;
+  }
+
+  getCodeRegex() {
+    return this.codeRegex;
+  }
+
+  getCodeRegExp(): RegExp | undefined {
+    if (!this.codeRegex) {
+      return;
+    }
+
+    const codeRegexPattern = this.codeRegex.pattern;
+    const matchGroups = codeRegexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
+
+    if (matchGroups) {
+      const [, pattern] = matchGroups;
+      const flagsGroup = matchGroups.groups?.flags;
+
+      const flags = flagsGroup?.replace('/', '') ?? '';
+      const codeRegex = new RegExp(pattern, flags);
+
+      return codeRegex;
+    }
+  }
+
+  setCodeRegex(codeRegex?: CodeRegex) {
+    this.codeRegex = codeRegex;
   }
 }
 

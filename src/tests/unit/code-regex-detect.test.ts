@@ -1,6 +1,6 @@
 import { expect, beforeEach, describe, it } from 'vitest';
 
-import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/code-lenses/utils';
+import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
 
 describe('Code Regex Detect', () => {
   function getAllMatches(regex: RegExp, text: string): RegExpExecArray[] {
@@ -124,6 +124,17 @@ describe('Code Regex Detect', () => {
       expect(matches).toHaveLength(2);
       expect(matches[0][0].trim()).toEqual('/ ./g');
       expect(matches[1][0].trim()).toEqual('/ ,/');
+    });
+
+    it.each(['g', 'i', 'm', 'u', 'y', 's', 'v'])(`should detect regex with flag '%s'`, (flag) => {
+      const code = `
+        const regex = /hello/${flag};
+      `;
+
+      const matches = getAllMatches(regexDetect!, code);
+      expect(matches).not.toBeNull();
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual(`/hello/${flag}`);
     });
   });
 });

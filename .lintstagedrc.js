@@ -1,4 +1,4 @@
-const ignoredFilenamesWithoutExtension = ['.lintstagedrc', 'postcss.config', 'tailwind.config', 'next.config'];
+const ignoredFilenamesWithoutExtension = ['.lintstagedrc'];
 
 module.exports = {
   '*': ['pnpm style:format'],

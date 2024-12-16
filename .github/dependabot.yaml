@@ -4,7 +4,7 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
       time: '08:00'
       timezone: America/Sao_Paulo
@@ -27,18 +27,22 @@ updates:
         update-types:
           - version-update:semver-major
 
+      - dependency-name: 'mocha'
+        update-types:
+          - version-update:semver-major
+
+      - dependency-name: '@types/mocha'
+        update-types:
+          - version-update:semver-major
+
       - dependency-name: '@types/glob'
         update-types:
           - version-update:semver-major
 
-      - dependency-name: '@types/vscode'
-        update-types:
-          - version-update:semver-minor
-
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: weekly
+      interval: monthly
       day: sunday
       time: '08:00'
       timezone: America/Sao_Paulo

@@ -42,9 +42,24 @@ Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match
 
 ### Test Regular Expressions
 
-Create, test and debug your regex in a text window. To do this, use the standard format with the regex on the first line of the file with the flags required for your case, plus the test string between the text area delimiters (`---`).
+Create, test and debug your regex in the Regex Match file. To do this, use this syntax:
+
+```py
+/your-regex-here/[flags]
+---
+test input line 1
+test input line 2
+test input line n
+---
+```
 
 ![Testing Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/test-regex-feature.gif)
+
+### Test Regular Expressions from the Code Editor
+
+With VS Code's CodeLens functionality, Regex Match allows you to test the regular expressions directly from your code. By using the `Test Regex` CodeLens, you can send the regex from your code to the Regex Match extension for testing. Once edited, you can update the original regex in the code using the `Apply Regex to Code` CodeLens.
+
+![Test Regular Expressions from the Code Editor](./resources/code-lens-feature.gif)
 
 ### Highlight of Capturing Groups
 
@@ -54,17 +69,32 @@ Each group in a regular expression is highlighted in a different color, making i
 
 ### Test Multiple Regular Expressions
 
-You can test multiple regular expressions in the same file. Each regex test works independently, with its own test lines and capture groups. This feature allows you to test different regex patterns in the same place.
+You can test multiple regular expressions in the same file. Each regex test should follow the specified syntax, with its own test lines and capture groups. This feature allows you to test different regex patterns independently in the same file.
 
 ![Test Multiple Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/multiple-regex-feature.gif)
 
-### Test Regular Expressions from the Code Editor
+## ⚙️ Extension Settings
 
-Through VS Code's code lens functionality, Regex Match makes it easy to test the regex present in your code. The code lens will appear above the regex, allowing you to test it in Regex Match window.
+The following settings are available to customize the extension:
 
-![Test Regular Expressions from the Code Editor](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/code-lens-feature.gif)
+| Setting Type                                | Default Value | Description                                                                  |
+| ------------------------------------------- | ------------- | ---------------------------------------------------------------------------- |
+| `regex-match.codeLens.enabled`              | `true`        | Enable the code lens that allows you to test the regex from the code editor. |
+| `regex-match.colorHighlighting.match`       | `#FFA50080`   | Color used to highlight the matches.                                         |
+| `regex-match.colorHighlighting.firstGroup`  | `#07925C99`   | Color used to highlight the first group.                                     |
+| `regex-match.colorHighlighting.secondGroup` | `#3164CACC`   | Color used to highlight the second group.                                    |
+| `regex-match.colorHighlighting.thirdGroup`  | `#6E25B7B2`   | Color used to highlight the third group.                                     |
+| `regex-match.colorHighlighting.fourthGroup` | `#D339DF99`   | Color used to highlight the fourth group.                                    |
+| `regex-match.colorHighlighting.fifthGroup`  | `#006B6BCC`   | Color used to highlight the fifth group.                                     |
+| `regex-match.colorHighlighting.sixthGroup`  | `#B82F2F99`   | Color used to highlight the sixth group.                                     |
 
 ## 📝 Release Notes
+
+### v0.5.0
+
+- Refactored services to implement disposables, improving resource management and extension stability.
+- Added configurable settings to customize the color highlighting of regex matches.
+- Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
 
 ## v0.4.2
 
@@ -75,11 +105,6 @@ Through VS Code's code lens functionality, Regex Match makes it easy to test the
 
 - Fixed Javascript regex detector to avoid detecting comments starting by `/*`.
 - Fixed the problem of losing the highlights of the regex test when switching tabs in the editor.
-
-## v0.4.0
-
-- Added the functionality to test regex present in the code editor in the regex match window.
-- Created configuration settings to enable/disable the code lens feature.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 

@@ -1,11 +1,8 @@
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { glob } from 'glob';
 import Mocha from 'mocha';
 import * as path from 'path';
 
 export function run(): Promise<void> {
-  // Create the mocha test
   const mocha = new Mocha({
     ui: 'tdd',
   });
@@ -13,17 +10,15 @@ export function run(): Promise<void> {
   const testsRoot = path.resolve(__dirname, '..');
 
   return new Promise((c, e) => {
-    void glob('**/**.test.js', { cwd: testsRoot }, (err: any, files: any[]) => {
+    void glob('**/**.test.js', { cwd: testsRoot }, (err: Error | null, files: string[]) => {
       if (err) {
         e(err);
         return;
       }
 
-      // Add files to the test suite
-      files.forEach((f: string) => mocha.addFile(path.resolve(testsRoot, f)));
+      files.forEach((file: string) => mocha.addFile(path.resolve(testsRoot, file)));
 
       try {
-        // Run the mocha test
         mocha.run((failures) => {
           if (failures > 0) {
             e(new Error(`${failures} tests failed.`));

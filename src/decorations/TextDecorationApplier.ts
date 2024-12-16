@@ -1,60 +1,149 @@
-import { Range, TextDocument, TextEditor, window } from 'vscode';
+import {
+  DecorationRenderOptions,
+  Disposable,
+  Range,
+  TextDocument,
+  TextEditor,
+  TextEditorDecorationType,
+  window,
+  workspace,
+} from 'vscode';
 
-import { TEST_AREA_DELIMITER } from '@/FileParser';
-import RegexTest, { MatchResult } from '@/RegexTest';
+import { TEST_AREA_DELIMITER } from '@/services/regex-match/FileParser';
+import RegexTest, { MatchRange, MatchResult } from '@/services/regex-match/RegexTest';
 
-import { DELIMITER_DECORATION, GROUP_DECORATIONS, MATCH_DECORATION } from './utils';
+import { DECORATION_KEYS, DecorationKey, DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
 
-class TextDecorationApplier {
-  static updateDecorations(document: TextDocument, regexTests?: RegexTest[]) {
-    const activeEditor = window.activeTextEditor;
-    if (!(activeEditor && document === activeEditor.document)) {
-      return;
+class TextDecorationApplier implements Disposable {
+  private decorations: DecorationMapping = {} as DecorationMapping;
+  private configurationChangeDisposable: Disposable = Disposable.from();
+
+  constructor() {
+    this.updateDecorations();
+  }
+
+  private updateDecorations() {
+    const colorSettings = this.loadColorSettings();
+    this.decorations = this.createDecorations(colorSettings);
+  }
+
+  private createDecorations(colorSettings: Record<string, string>): DecorationMapping {
+    return {
+      ...this.createMatchDecorations(colorSettings),
+      delimiter: this.createTextDecorationType({ color: colorSettings.delimiter, fontWeight: 'bold' }),
+    };
+  }
+
+  private createMatchDecorations(colorSettings: Record<string, string>): DecorationMapping {
+    const decorations: DecorationMapping = {} as DecorationMapping;
+
+    DECORATION_KEYS.forEach((key) => {
+      decorations[key] = this.createTextDecorationType({ backgroundColor: colorSettings[key] });
+    });
+
+    return decorations;
+  }
+
+  private loadColorSettings() {
+    const settings: Record<string, string> = {};
+    DECORATION_KEYS.forEach((key) => {
+      settings[key] = this.getConfigurationColor(key);
+    });
+
+    return settings;
+  }
+
+  private createTextDecorationType(options: DecorationRenderOptions) {
+    return window.createTextEditorDecorationType(options);
+  }
+
+  private getConfigurationColor(decorationKey: DecorationKey) {
+    return workspace
+      .getConfiguration('regex-match.colorHighlighting')
+      .get<string>(decorationKey, DEFAULT_DECORATION_COLORS[decorationKey]);
+  }
+
+  applyDecorations(
+    textEditor: TextEditor,
+    regexTests?: RegexTest[],
+    options: { isToUpdateDecorations: boolean } = { isToUpdateDecorations: false },
+  ) {
+    this.clearDecorations(textEditor);
+
+    if (options.isToUpdateDecorations) {
+      this.updateDecorations();
     }
 
-    this.resetDecorations(activeEditor);
-    this.applyDelimiterDecorations(activeEditor);
+    const capturingGroupDecorations = this.getCapturingGroupDecorations();
+
+    this.applyDelimiterDecorations(textEditor);
 
     if (regexTests) {
       const matchResults = regexTests.flatMap((regexTest) => regexTest.test());
-      this.applyMatchDecorations(activeEditor, matchResults);
+      this.applyMatchDecorations(textEditor, matchResults, capturingGroupDecorations);
     }
   }
 
-  private static applyMatchDecorations(activeEditor: TextEditor, matchResults: MatchResult[]) {
+  private applyMatchDecorations(
+    activeEditor: TextEditor,
+    matchResults: MatchResult[],
+    capturingGroupDecorations: TextEditorDecorationType[],
+  ) {
     const document = activeEditor.document;
 
     const ranges = matchResults.map(({ range, groupRanges: groupIndexes }) => {
-      const start = document.positionAt(range[0]);
-      const end = document.positionAt(range[1]);
+      const matchRanges = this.findMatchRanges(document, range, groupIndexes);
+      const groupRanges = this.findCapturingGroupRanges(document, groupIndexes);
 
-      const matchRange = new Range(start, end);
-      activeEditor.setDecorations(MATCH_DECORATION, [matchRange]);
-
-      const groupRanges = this.getCapturingGroupRanges(document, groupIndexes);
-
-      return { matchRange, groupRanges };
+      return { matchRanges, groupRanges };
     });
 
-    const matchRanges = ranges.map(({ matchRange }) => matchRange);
-    activeEditor.setDecorations(MATCH_DECORATION, matchRanges);
+    activeEditor.setDecorations(
+      this.decorations.match,
+      ranges.flatMap(({ matchRanges }) => matchRanges),
+    );
 
-    const groupRanges = this.organizeGroupRangesByDecoration(ranges);
-    this.applyCapturingGroupDecorations(activeEditor, groupRanges);
+    const groupRanges = this.organizeGroupRangesByDecoration(ranges, capturingGroupDecorations);
+    this.applyCapturingGroupDecorations(activeEditor, groupRanges, capturingGroupDecorations);
   }
 
-  private static getCapturingGroupRanges(document: TextDocument, groupIndexes?: number[][]): Range[] | undefined {
+  private findMatchRanges(document: TextDocument, matchRange: MatchRange, groupIndexes: MatchRange[] = []): Range[] {
+    if (groupIndexes.length === 0) {
+      return [new Range(document.positionAt(matchRange[0]), document.positionAt(matchRange[1]))];
+    }
+
+    const nonGroupRanges: MatchRange[] = [];
+    let lastEnd = matchRange[0];
+
+    groupIndexes.forEach(([groupStart, groupEnd]) => {
+      if (lastEnd < groupStart) {
+        nonGroupRanges.push([lastEnd, groupStart]);
+      }
+      lastEnd = groupEnd;
+    });
+
+    if (lastEnd < matchRange[1]) {
+      nonGroupRanges.push([lastEnd, matchRange[1]]);
+    }
+
+    return nonGroupRanges.map(([start, end]) => new Range(document.positionAt(start), document.positionAt(end)));
+  }
+
+  private findCapturingGroupRanges(document: TextDocument, groupIndexes?: number[][]): Range[] | undefined {
     if (groupIndexes) {
       return groupIndexes.map(([start, end]) => new Range(document.positionAt(start), document.positionAt(end)));
     }
   }
 
-  private static organizeGroupRangesByDecoration(ranges: { matchRange: Range; groupRanges: Range[] | undefined }[]) {
-    const organizedGroupRanges: Range[][] = Array.from({ length: GROUP_DECORATIONS.length }, () => []);
+  private organizeGroupRangesByDecoration(
+    ranges: { matchRanges: Range[]; groupRanges: Range[] | undefined }[],
+    capturingGroupDecorations: TextEditorDecorationType[],
+  ) {
+    const organizedGroupRanges: Range[][] = Array.from({ length: capturingGroupDecorations.length }, () => []);
 
     ranges.forEach(({ groupRanges }) => {
       groupRanges?.forEach((groupRange, index) => {
-        const targetIndex = index % GROUP_DECORATIONS.length;
+        const targetIndex = index % capturingGroupDecorations.length;
         organizedGroupRanges[targetIndex].push(groupRange);
       });
     });
@@ -62,13 +151,28 @@ class TextDecorationApplier {
     return organizedGroupRanges;
   }
 
-  private static applyCapturingGroupDecorations(activeEditor: TextEditor, groupRanges: Range[][]) {
+  private applyCapturingGroupDecorations(
+    activeEditor: TextEditor,
+    groupRanges: Range[][],
+    capturingGroupDecorations: TextEditorDecorationType[],
+  ) {
     groupRanges.forEach((groupRange, index) => {
-      activeEditor.setDecorations(GROUP_DECORATIONS[index % GROUP_DECORATIONS.length], groupRange);
+      activeEditor.setDecorations(capturingGroupDecorations[index % capturingGroupDecorations.length], groupRange);
     });
   }
 
-  private static applyDelimiterDecorations(activeEditor: TextEditor) {
+  private getCapturingGroupDecorations() {
+    return [
+      this.decorations.firstGroup,
+      this.decorations.secondGroup,
+      this.decorations.thirdGroup,
+      this.decorations.fourthGroup,
+      this.decorations.fifthGroup,
+      this.decorations.sixthGroup,
+    ];
+  }
+
+  private applyDelimiterDecorations(activeEditor: TextEditor) {
     const document = activeEditor.document;
     const fileContent = document.getText();
 
@@ -84,14 +188,19 @@ class TextDecorationApplier {
       ranges.push(new Range(start, end));
     }
 
-    activeEditor.setDecorations(DELIMITER_DECORATION, ranges);
+    activeEditor.setDecorations(this.decorations.delimiter, ranges);
   }
 
-  private static resetDecorations(activeEditor: TextEditor) {
-    activeEditor.setDecorations(MATCH_DECORATION, []);
-    activeEditor.setDecorations(DELIMITER_DECORATION, []);
+  clearDecorations(textEditor: TextEditor) {
+    textEditor.setDecorations(this.decorations.match, []);
+    textEditor.setDecorations(this.decorations.delimiter, []);
 
-    GROUP_DECORATIONS.forEach((groupDecoration) => activeEditor.setDecorations(groupDecoration, []));
+    const capturingGroupDecorations = this.getCapturingGroupDecorations();
+    capturingGroupDecorations.forEach((groupDecoration) => textEditor.setDecorations(groupDecoration, []));
+  }
+
+  dispose() {
+    this.configurationChangeDisposable.dispose();
   }
 }
 

@@ -1,13 +1,25 @@
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, languages } from 'vscode';
 
-import RegexMatchService from './RegexMatchService';
+import ApplyRegexCodeLensProvider from './providers/code-lenses/ApplyRegexCodeLensProvider';
+import TestRegexCodeLensProvider from './providers/code-lenses/TestRegexCodeLensProvider';
+import DiagnosticProvider from './providers/DiagnosticProvider';
+import RegexMatchService, { REGEX_TEST_FILE_PATH } from './services/regex-match/RegexMatchService';
+import TestRegexCodeLensManagerService from './services/test-regex-code-lens/TestRegexCodeLensManagerService';
 
 export function activate(context: ExtensionContext) {
-  const regexMatchService = new RegexMatchService(context);
+  const diagnosticProvider = new DiagnosticProvider('regex-match');
+  const regexMatchService = new RegexMatchService(context, diagnosticProvider);
 
-  const regexMatchCommands = regexMatchService.registerCommands();
-  const regexMatchDisposables = regexMatchService.registerDisposables();
-  const diagnosticCollection = regexMatchService.getDiagnosticCollection();
+  const testRegexCodeLensProvider = new TestRegexCodeLensProvider();
+  const testRegexCodeLensManagerService = new TestRegexCodeLensManagerService(context, testRegexCodeLensProvider);
 
-  context.subscriptions.push(...regexMatchCommands, ...regexMatchDisposables, diagnosticCollection);
+  const applyRegexCodeLensProvider = new ApplyRegexCodeLensProvider(regexMatchService);
+  const applyRegexDisposable = languages.registerCodeLensProvider(
+    { pattern: `${context.extensionPath}${REGEX_TEST_FILE_PATH}`, scheme: 'file' },
+    applyRegexCodeLensProvider,
+  );
+
+  regexMatchService.setApplyRegexCodeLensProvider(applyRegexCodeLensProvider);
+
+  context.subscriptions.push(regexMatchService, testRegexCodeLensManagerService, applyRegexDisposable);
 }
