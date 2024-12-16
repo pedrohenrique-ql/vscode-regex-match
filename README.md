@@ -73,7 +73,7 @@ You can test multiple regular expressions in the same file. Each regex test shou
 
 ![Test Multiple Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/multiple-regex-feature.gif)
 
-## ⚙️ Settings
+## ⚙️ Extension Settings
 
 The following settings are available to customize the extension:
 
