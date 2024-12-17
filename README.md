@@ -59,7 +59,7 @@ test input line n
 
 With VS Code's CodeLens functionality, Regex Match allows you to test the regular expressions directly from your code. By using the `Test Regex` CodeLens, you can send the regex from your code to the Regex Match extension for testing. Once edited, you can update the original regex in the code using the `Apply Regex to Code` CodeLens.
 
-![Test Regular Expressions from the Code Editor](./resources/code-lens-feature.gif)
+![Test Regular Expressions from the Code Editor](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/code-lens-feature.gif)
 
 ### Highlight of Capturing Groups
 
