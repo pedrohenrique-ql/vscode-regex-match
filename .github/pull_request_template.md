@@ -2,17 +2,31 @@
 
 ### Features <!-- Describe the features that you have added -->
 
+-
+
 ### Fixes <!-- Describe the bug fixes that you have made -->
+
+-
 
 ### Refactors <!-- Describe the refactors that you have made -->
 
+-
+
 ### Tests <!-- Describe the tests that you have added or updated -->
+
+-
 
 ### Documentation <!-- Describe the documentation changes that you have made -->
 
+-
+
 ### Chores <!-- Describe the chores that you have done -->
 
+-
+
 ### Release <!-- List the changes that will be included in the release -->
+
+-
 
 ### Visual Changes <!-- Add screenshots, videos or GIFs to show the visual changes -->
 
