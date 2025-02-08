@@ -20,6 +20,7 @@
   "categories": [
     "Other",
     "Programming Languages",
+    "Snippets",
     "Testing"
   ],
   "keywords": [
@@ -49,11 +50,30 @@
         "title": "Regex Match: Apply Regex to Code"
       }
     ],
-    "keybindings": {
-      "command": "regex-match.openRegexMatchWindow",
-      "key": "ctrl+alt+x",
-      "mac": "cmd+alt+x"
-    },
+    "snippets": [
+      {
+        "language": "plaintext",
+        "path": "./snippets/snippets.json",
+        "name": "Regex Test Block"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "regex-match.openRegexMatchWindow",
+        "key": "ctrl+alt+x",
+        "mac": "cmd+alt+x"
+      },
+      {
+        "command": "editor.action.insertSnippet",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "when": "editorTextFocus && editorLangId == 'plaintext'",
+        "args": {
+          "langId": "plaintext",
+          "name": "Regex Test Block"
+        }
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Regex Match",
