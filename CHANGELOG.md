@@ -1,6 +1,10 @@
 # Change Log
 
-## [v0.5.0]
+## [v0.6.0]
+
+- Created a snippet to insert a regex test block into the regex test file.
+
+## [v0.5.0] - 17/12/2024
 
 - Refactored services to implement disposables, improving resource management and extension stability.
 - Added configurable settings to customize the color highlighting of regex matches.

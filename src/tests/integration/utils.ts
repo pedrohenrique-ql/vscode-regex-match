@@ -1,4 +1,5 @@
 import fs from 'fs';
+import { writeFile } from 'fs/promises';
 import path from 'path';
 import { Uri } from 'vscode';
 
@@ -9,9 +10,10 @@ export function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-export function writeDefaultTestFile() {
+export async function writeDefaultTestFile() {
   const filePath: string = path.join(__dirname, `../../../${REGEX_TEST_FILE_PATH}`);
-  fs.writeFileSync(filePath, DEFAULT_FILE_CONTENT);
+  await writeFile(filePath, DEFAULT_FILE_CONTENT);
+  await wait(100);
 }
 
 export function createTemporaryFile(content: string): Uri {
