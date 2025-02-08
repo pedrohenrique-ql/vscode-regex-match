@@ -1,0 +1,7 @@
+{
+  "Regex Test Block": {
+    "prefix": "regex",
+    "body": ["/${1:regex}/${2:flags}", "---", "${3:Type the test string here...}", "---"],
+    "description": "Create a regex test block"
+  }
+}
