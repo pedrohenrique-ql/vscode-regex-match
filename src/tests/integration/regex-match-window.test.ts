@@ -11,12 +11,12 @@ import { createTemporaryFile, wait, writeDefaultTestFile } from './utils';
 
 describe('Regex Match Window', () => {
   beforeEach(async () => {
-    writeDefaultTestFile();
+    await writeDefaultTestFile();
     await commands.executeCommand('workbench.action.closeAllEditors');
   });
 
-  after(() => {
-    writeDefaultTestFile();
+  after(async () => {
+    await writeDefaultTestFile();
   });
 
   it('should open the regex test window by command with correct content', async () => {
