@@ -3,6 +3,7 @@
 ## [v0.6.0]
 
 - Created a snippet to insert a regex test block into the regex test file.
+- Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
 
 ## [v0.5.0] - 17/12/2024
 
