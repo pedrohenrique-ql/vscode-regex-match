@@ -35,7 +35,6 @@ class FileParser {
             regexLineIndex,
             testLines,
             startTestIndex,
-            codeRegex,
           });
 
           regexTests.push(regexTest);
@@ -56,16 +55,19 @@ class FileParser {
       throw new RegexMatchFormatError(0);
     }
 
-    if (!codeRegex) {
-      this.insertCodeRegex(currentRegexTests, regexTests);
-    }
+    this.insertCodeRegex(currentRegexTests, regexTests, codeRegex);
 
     return regexTests;
   }
 
-  private static insertCodeRegex(currentRegexTests: RegexTest[], newRegexTests: RegexTest[]) {
+  private static insertCodeRegex(currentRegexTests: RegexTest[], newRegexTests: RegexTest[], newCodeRegex?: CodeRegex) {
+    const lastNewRegexTest = newRegexTests.at(-1);
+    if (lastNewRegexTest && newCodeRegex) {
+      lastNewRegexTest.setCodeRegex(newCodeRegex);
+    }
+
     const hasCodeRegex = currentRegexTests.some((regexTest) => regexTest.isCodeRegex());
-    if (currentRegexTests.length === 0 || !hasCodeRegex) {
+    if (currentRegexTests.length === 0 || (!hasCodeRegex && !newCodeRegex)) {
       return;
     }
 
@@ -97,6 +99,7 @@ class FileParser {
         if (regexTestWithSameMatchingRegexIndex !== -1) {
           newRegexTests[regexTestWithSameMatchingRegexIndex].setCodeRegex(currentRegexTest.getCodeRegex());
           newRegexTestsCopy.splice(regexTestWithSameMatchingRegexIndex, 1);
+          continue;
         }
 
         const regexTestWithSameTestStringIndex = newRegexTests.findIndex(
