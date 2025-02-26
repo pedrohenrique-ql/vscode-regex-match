@@ -1,5 +1,5 @@
 import { TextEncoder } from 'util';
-import { Range, Uri, ViewColumn, window, workspace } from 'vscode';
+import { Position, Uri, ViewColumn, window, workspace } from 'vscode';
 
 export const DEFAULT_FILE_CONTENT = '/[0-9]+a+/gm\n---\n123aaa\nb2507ab\n2024aa\n---';
 
@@ -11,29 +11,30 @@ class FileCreator {
       console.error('File not found, creating default test file.');
       await this.writeTestFile(fileUri, DEFAULT_FILE_CONTENT);
     } finally {
-      const editor = window.visibleTextEditors.find((editor) => editor.document.uri.toString() === fileUri.toString());
+      let editor = window.visibleTextEditors.find((editor) => editor.document.uri.toString() === fileUri.toString());
       const fileContentWithCodeRegex = `${codeRegex}\n---\nType the test string here...\n---`;
 
-      if (editor && codeRegex) {
+      if (!editor) {
+        const document = await workspace.openTextDocument(fileUri);
+        editor = await window.showTextDocument(document, ViewColumn.Two, false);
+      } else {
+        await window.showTextDocument(editor.document, ViewColumn.Two, false);
+      }
+
+      if (codeRegex) {
         await editor.edit((editBuilder) => {
-          editBuilder.replace(new Range(0, 0, editor.document.lineCount, 0), fileContentWithCodeRegex);
+          const lastLine = editor.document.lineCount;
+          const lastChar = editor.document.lineAt(lastLine - 1).range.end.character;
+          const position = new Position(lastLine, lastChar);
+
+          editBuilder.insert(position, `\n\n${fileContentWithCodeRegex}`);
         });
 
         const document = editor.document;
         await document.save();
-        await window.showTextDocument(document, ViewColumn.Two, false);
-
-        return document;
-      } else {
-        if (codeRegex) {
-          await this.writeTestFile(fileUri, fileContentWithCodeRegex);
-        }
-
-        const document = await workspace.openTextDocument(fileUri);
-        await window.showTextDocument(document, ViewColumn.Two, false);
-
-        return document;
       }
+
+      return editor.document;
     }
   }
 

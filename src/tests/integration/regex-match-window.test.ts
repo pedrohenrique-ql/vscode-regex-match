@@ -47,7 +47,11 @@ describe('Regex Match Window', () => {
     const realEndPath = activeTextEditor!.document.fileName.replace(/[/\\]/g, '');
     const expectedEndPath = REGEX_TEST_FILE_PATH.replace(/\//g, '');
     assert.ok(realEndPath.endsWith(expectedEndPath));
-    assert.equal(activeTextEditor!.document.getText(), '/^\\d{2}\\w{3}/\n---\nType the test string here...\n---');
+
+    const expectedContent = `${DEFAULT_FILE_CONTENT}\n\n${codeRegex.pattern}\n---\nType the test string here...\n---`;
+    console.log('expectedContent', expectedContent);
+    console.log('activeTextEditor!.document.getText()', activeTextEditor!.document.getText());
+    assert.equal(activeTextEditor!.document.getText(), expectedContent);
   });
 
   it('should insert a regex test block using the snippet', async () => {
