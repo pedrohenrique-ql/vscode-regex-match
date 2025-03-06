@@ -45,24 +45,24 @@ body:
       label: Installed Extensions
       description: Paste the output of `code --list-extensions --show-versions` here.
       render: shell
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: input
     id: current-behavior
     attributes:
       label: Current Behavior
       description: What is the current behavior?
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     id: expected-behavior
     attributes:
       label: Expected Behavior
       description: What is the expected behavior?
-      validations:
-        required: true
+    validations:
+      required: true
 
   - type: textarea
     id: logs
@@ -70,5 +70,5 @@ body:
       label: Logs (if available)
       description: Paste any relevant logs from `Help > Toggle Developer Tools > Console`.
       render: shell
-      validations:
-        required: false
+    validations:
+      required: false
