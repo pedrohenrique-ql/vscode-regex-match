@@ -1,0 +1,74 @@
+name: 🐞 Bug Report
+description: Report an issue or unexpected behavior.
+labels: [bug, needs triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! 
+        Please provide the details below to help us to reproduce and fix the issue you're experiencing.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Before submitting this issue, please confirm that you have completed the following steps.
+      options:
+        - label: I have searched for [existing issues](https://github.com/pedrohenrique-ql/vscode-regex-match/issues) to avoid duplicates.
+          required: true
+        - label: I have read the [documentation](https://github.com/pedrohenrique-ql/vscode-regex-match/blob/canary/README.md) and did not find an answer to my question.
+          required: true
+        - label: I am using the latest version of the extension.
+          required: true
+
+  - type: input
+    id: vscode-version
+    attributes:
+      label: VS Code Version
+      description: Which version of VS Code are you using? (Find it in Help > About or run `code --version` in the terminal)
+      placeholder: e.g., 1.86.0
+    validations:
+      required: true
+
+  - type: input
+    id: os-version
+    attributes:
+      label: Operating System
+      description: Which OS and version are you using? (Windows / macOS / Linux and its specific version)
+      placeholder: e.g., Windows 11, macOS Sonoma 14.2, Ubuntu 22.04
+    validations:
+      required: true
+
+  - type: textarea
+    id: installed-extensions
+    attributes:
+      label: Installed Extensions
+      description: Paste the output of `code --list-extensions --show-versions` here.
+      render: shell
+      validations:
+        required: true
+
+  - type: input
+    id: current-behavior
+    attributes:
+      label: Current Behavior
+      description: What is the current behavior?
+      validations:
+        required: true
+
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What is the expected behavior?
+      validations:
+        required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs (if available)
+      description: Paste any relevant logs from `Help > Toggle Developer Tools > Console`.
+      render: shell
+      validations:
+        required: false
