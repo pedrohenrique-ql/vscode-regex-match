@@ -1,0 +1,38 @@
+name: 💡 Feature Request
+description: Suggest a new feature or improvement
+labels: [feature, needs triage]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to suggest a new feature! 
+        Please fill out the details below to help us understand your request.
+
+  - type: checkboxes
+    id: prerequisites
+    attributes:
+      label: Prerequisites
+      description: Before submitting this feature request, please confirm that no existing issues match your suggestion.
+      options:
+        - label: I have searched for [existing issues](https://github.com/pedrohenrique-ql/vscode-regex-match/issues) to avoid duplicates.
+          required: true
+        - label: I have read the [changelog](https://github.com/pedrohenrique-ql/vscode-regex-match/blob/main/CHANGELOG.md) and [release notes](https://github.com/pedrohenrique-ql/vscode-regex-match/releases) to confirm this feature is not already implemented.
+          required: true
+
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: Describe the problem or pain point this feature would address.
+      placeholder: E.g., It's hard to construct complex regex patterns without syntax highlighting.
+    validations:
+      required: true
+
+  - type: textarea
+    id: solution
+    attributes:
+      label: Describe the solution you would like
+      description: Describe the feature you would like to see implemented. Feel free to include examples and code snippets.
+      placeholder: E.g., Add syntax highlighting for regex patterns in the editor.
+    validations:
+      required: true

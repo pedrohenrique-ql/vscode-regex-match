@@ -37,6 +37,7 @@ class RegexMatchService implements Disposable {
   private disposables: Disposable[] = [];
 
   private currentViewColumn: ViewColumn | undefined;
+  private isEditorVisible = false;
 
   private isOpeningWithCodeRegex = false;
 
@@ -49,19 +50,24 @@ class RegexMatchService implements Disposable {
     const disposables = this.registerDisposables();
     this.disposables.push(...commands, ...disposables);
 
-    this.checkCurrentViewColumn();
+    this.checkRegexMatchEditorVisibility();
   }
 
   getRegexTests() {
     return this.regexTests;
   }
 
-  private checkCurrentViewColumn() {
+  private checkRegexMatchEditorVisibility() {
     const regexMatchEditor = window.visibleTextEditors.find(
       (editor) => editor.document.uri.path === this.regexTestFileUri.path,
     );
 
     this.currentViewColumn = regexMatchEditor?.viewColumn;
+
+    if (regexMatchEditor) {
+      this.updateRegexTest(regexMatchEditor);
+      this.isEditorVisible = true;
+    }
   }
 
   registerCommands(): Disposable[] {
@@ -81,7 +87,7 @@ class RegexMatchService implements Disposable {
     const changeTextDocumentDisposable = workspace.onDidChangeTextDocument((event) => this.onChangeTextDocument(event));
 
     const changeActiveTextEditorDisposable = window.onDidChangeVisibleTextEditors((editors) =>
-      this.onChangeRegexMatchViewColumn(editors),
+      this.onChangeVisibleEditors(editors),
     );
 
     const changeColorHighlightingConfigurationDisposable = this.onChangeColorHighlightingConfiguration();
@@ -104,6 +110,8 @@ class RegexMatchService implements Disposable {
     }
 
     this.currentViewColumn = activeEditor.viewColumn;
+    this.isEditorVisible = true;
+
     this.updateRegexTest(activeEditor, codeRegex);
   }
 
@@ -163,18 +171,29 @@ class RegexMatchService implements Disposable {
     }
   }
 
-  private onChangeRegexMatchViewColumn(textEditors: readonly TextEditor[]) {
+  private onChangeVisibleEditors(textEditors: readonly TextEditor[]) {
     const regexMatchEditor = textEditors.find(
       (editor) => editor.document.uri.toString() === this.regexTestFileUri.toString(),
     );
 
-    if (
-      regexMatchEditor &&
-      this.currentViewColumn !== undefined &&
-      this.currentViewColumn !== regexMatchEditor.viewColumn
-    ) {
-      this.currentViewColumn = regexMatchEditor.viewColumn;
+    if (!regexMatchEditor) {
+      this.isEditorVisible = false;
+      return;
+    }
+
+    if (!this.textDecorationApplier.hasPreviousDecorations() && !this.isEditorVisible) {
       this.updateRegexTest(regexMatchEditor);
+    }
+
+    const shouldApplyPreviousDecorations =
+      (this.currentViewColumn !== undefined && this.currentViewColumn !== regexMatchEditor.viewColumn) ||
+      !this.isEditorVisible;
+
+    if (shouldApplyPreviousDecorations) {
+      this.currentViewColumn = regexMatchEditor.viewColumn;
+      this.isEditorVisible = true;
+
+      this.textDecorationApplier.applyPreviousDecorations(regexMatchEditor);
     }
   }
 

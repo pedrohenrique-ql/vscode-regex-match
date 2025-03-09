@@ -1,0 +1,6 @@
+blank_issues_enabled: true
+
+contact_links:
+  - name: Discussions
+    url: https://github.com/pedrohenrique-ql/vscode-regex-match/discussions
+    about: Use the Discussions tab for general questions, feedback, and discussions.
