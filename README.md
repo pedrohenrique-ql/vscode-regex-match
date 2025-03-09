@@ -90,21 +90,22 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
-### v0.5.0
+## [v0.6.0]
+
+- Created a snippet to insert a regex test block into the regex test file.
+- Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
+- Fixed loss of highlights when opening regex test file when opening VSCode.
+
+### [v0.5.0]
 
 - Refactored services to implement disposables, improving resource management and extension stability.
 - Added configurable settings to customize the color highlighting of regex matches.
 - Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
 
-## v0.4.2
+## [v0.4.2]
 
 - Fixed the regex detector to detect two or more regex in the same line.
 - Reduced the extension package size by removing unnecessary files.
-
-## v0.4.1
-
-- Fixed Javascript regex detector to avoid detecting comments starting by `/*`.
-- Fixed the problem of losing the highlights of the regex test when switching tabs in the editor.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 
@@ -117,7 +118,7 @@ The following dependencies are required to run the project:
 | Dependency                                           | Version           |
 | ---------------------------------------------------- | ----------------- |
 | [Node.js](https://nodejs.org/)                       | >= 20.11.0 && <21 |
-| [Visual Studio Code](https://code.visualstudio.com/) | ^1.91.0           |
+| [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
 | [pnpm](https://pnpm.io/)                             | 8.15.3            |
 
 ### Usage

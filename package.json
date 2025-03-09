@@ -2,7 +2,7 @@
   "name": "regex-match",
   "displayName": "Regex Match",
   "description": "Create, test and debug regular expressions in Visual Studio Code",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "author": {
     "name": "Pedro Henrique Queiroz Lúcio",
     "email": "pedrohenriqueql.dev@gmail.com"
@@ -20,6 +20,7 @@
   "categories": [
     "Other",
     "Programming Languages",
+    "Snippets",
     "Testing"
   ],
   "keywords": [
@@ -36,6 +37,7 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
+    "onLanguage:plaintext",
     "regex-match.openRegexMatchWindow"
   ],
   "contributes": {
@@ -49,11 +51,30 @@
         "title": "Regex Match: Apply Regex to Code"
       }
     ],
-    "keybindings": {
-      "command": "regex-match.openRegexMatchWindow",
-      "key": "ctrl+alt+x",
-      "mac": "cmd+alt+x"
-    },
+    "snippets": [
+      {
+        "language": "plaintext",
+        "path": "./snippets/snippets.json",
+        "name": "Regex Test Block"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "regex-match.openRegexMatchWindow",
+        "key": "ctrl+alt+x",
+        "mac": "cmd+alt+x"
+      },
+      {
+        "command": "editor.action.insertSnippet",
+        "key": "ctrl+alt+g",
+        "mac": "cmd+alt+g",
+        "when": "editorTextFocus && editorLangId == 'plaintext'",
+        "args": {
+          "langId": "plaintext",
+          "name": "Regex Test Block"
+        }
+      }
+    ],
     "configuration": {
       "type": "object",
       "title": "Regex Match",
@@ -132,37 +153,37 @@
     "prepare": "husky"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.6.0",
-    "@commitlint/config-conventional": "^19.6.0",
+    "@commitlint/cli": "^19.8.0",
+    "@commitlint/config-conventional": "^19.8.0",
     "@types/fs-extra": "^11.0.4",
     "@types/glob": "^7.2.0",
     "@types/mocha": "^10.0.7",
-    "@types/node": "^22.10.2",
+    "@types/node": "^22.13.10",
     "@types/tmp": "^0.2.6",
     "@types/vscode": "^1.96.0",
-    "@typescript-eslint/eslint-plugin": "^8.18.0",
-    "@typescript-eslint/parser": "^8.18.0",
+    "@typescript-eslint/eslint-plugin": "^8.26.0",
+    "@typescript-eslint/parser": "^8.26.0",
     "@vscode/test-cli": "^0.0.10",
     "@vscode/test-electron": "^2.4.1",
-    "@vscode/vsce": "^3.2.1",
-    "concurrently": "^9.1.0",
+    "@vscode/vsce": "^3.2.2",
+    "concurrently": "^9.1.2",
     "eslint": "^8.57.0",
-    "eslint-config-prettier": "^9.1.0",
-    "eslint-import-resolver-typescript": "^3.7.0",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-import-resolver-typescript": "^3.8.3",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-import-helpers": "^2.0.1",
-    "eslint-plugin-prettier": "^5.2.1",
-    "fs-extra": "^11.2.0",
+    "eslint-plugin-prettier": "^5.2.3",
+    "fs-extra": "^11.3.0",
     "glob": "^7.2.3",
     "husky": "^9.1.7",
-    "lint-staged": "^15.2.11",
+    "lint-staged": "^15.4.3",
     "mocha": "^10.7.3",
-    "prettier": "^3.4.2",
-    "prettier-plugin-sh": "^0.14.0",
+    "prettier": "^3.5.3",
+    "prettier-plugin-sh": "^0.15.0",
     "tmp": "^0.2.3",
-    "tsup": "^8.3.5",
-    "typescript": "^5.7.2",
+    "tsup": "^8.4.0",
+    "typescript": "^5.8.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.1.8"
+    "vitest": "^3.0.8"
   }
 }
