@@ -15,16 +15,18 @@ import RegexTest, { MatchRange, MatchResult } from '@/services/regex-match/Regex
 import { DECORATION_KEYS, DecorationKey, DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
 
 class TextDecorationApplier implements Disposable {
-  private decorations: DecorationMapping = {} as DecorationMapping;
+  private decorationSettings: DecorationMapping = {} as DecorationMapping;
   private configurationChangeDisposable: Disposable = Disposable.from();
 
+  private previousDecorations: Map<TextEditorDecorationType, Range[]> = new Map<TextEditorDecorationType, Range[]>();
+
   constructor() {
-    this.updateDecorations();
+    this.updateDecorationSettings();
   }
 
-  private updateDecorations() {
+  private updateDecorationSettings() {
     const colorSettings = this.loadColorSettings();
-    this.decorations = this.createDecorations(colorSettings);
+    this.decorationSettings = this.createDecorations(colorSettings);
   }
 
   private createDecorations(colorSettings: Record<string, string>): DecorationMapping {
@@ -71,7 +73,7 @@ class TextDecorationApplier implements Disposable {
     this.clearDecorations(textEditor);
 
     if (options.isToUpdateDecorations) {
-      this.updateDecorations();
+      this.updateDecorationSettings();
     }
 
     const capturingGroupDecorations = this.getCapturingGroupDecorations();
@@ -98,10 +100,10 @@ class TextDecorationApplier implements Disposable {
       return { matchRanges, groupRanges };
     });
 
-    activeEditor.setDecorations(
-      this.decorations.match,
-      ranges.flatMap(({ matchRanges }) => matchRanges),
-    );
+    const matchRanges = ranges.flatMap(({ matchRanges }) => matchRanges);
+
+    activeEditor.setDecorations(this.decorationSettings.match, matchRanges);
+    this.previousDecorations.set(this.decorationSettings.match, matchRanges);
 
     const groupRanges = this.organizeGroupRangesByDecoration(ranges, capturingGroupDecorations);
     this.applyCapturingGroupDecorations(activeEditor, groupRanges, capturingGroupDecorations);
@@ -158,17 +160,18 @@ class TextDecorationApplier implements Disposable {
   ) {
     groupRanges.forEach((groupRange, index) => {
       activeEditor.setDecorations(capturingGroupDecorations[index % capturingGroupDecorations.length], groupRange);
+      this.previousDecorations.set(capturingGroupDecorations[index % capturingGroupDecorations.length], groupRange);
     });
   }
 
   private getCapturingGroupDecorations() {
     return [
-      this.decorations.firstGroup,
-      this.decorations.secondGroup,
-      this.decorations.thirdGroup,
-      this.decorations.fourthGroup,
-      this.decorations.fifthGroup,
-      this.decorations.sixthGroup,
+      this.decorationSettings.firstGroup,
+      this.decorationSettings.secondGroup,
+      this.decorationSettings.thirdGroup,
+      this.decorationSettings.fourthGroup,
+      this.decorationSettings.fifthGroup,
+      this.decorationSettings.sixthGroup,
     ];
   }
 
@@ -188,15 +191,25 @@ class TextDecorationApplier implements Disposable {
       ranges.push(new Range(start, end));
     }
 
-    activeEditor.setDecorations(this.decorations.delimiter, ranges);
+    activeEditor.setDecorations(this.decorationSettings.delimiter, ranges);
   }
 
   clearDecorations(textEditor: TextEditor) {
-    textEditor.setDecorations(this.decorations.match, []);
-    textEditor.setDecorations(this.decorations.delimiter, []);
+    textEditor.setDecorations(this.decorationSettings.match, []);
+    textEditor.setDecorations(this.decorationSettings.delimiter, []);
 
     const capturingGroupDecorations = this.getCapturingGroupDecorations();
     capturingGroupDecorations.forEach((groupDecoration) => textEditor.setDecorations(groupDecoration, []));
+  }
+
+  applyPreviousDecorations(textEditor: TextEditor) {
+    this.previousDecorations.forEach((ranges, decorationType) => {
+      textEditor.setDecorations(decorationType, ranges);
+    });
+  }
+
+  hasPreviousDecorations() {
+    return this.previousDecorations.size > 0;
   }
 
   dispose() {

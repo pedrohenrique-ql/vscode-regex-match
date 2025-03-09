@@ -4,6 +4,7 @@
 
 - Created a snippet to insert a regex test block into the regex test file.
 - Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
+- Fixed loss of highlights when opening regex test file when opening VSCode.
 
 ## [v0.5.0] - 17/12/2024
 

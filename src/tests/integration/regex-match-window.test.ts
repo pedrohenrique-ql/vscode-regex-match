@@ -49,8 +49,6 @@ describe('Regex Match Window', () => {
     assert.ok(realEndPath.endsWith(expectedEndPath));
 
     const expectedContent = `${DEFAULT_FILE_CONTENT}\n\n${codeRegex.pattern}\n---\nType the test string here...\n---`;
-    console.log('expectedContent', expectedContent);
-    console.log('activeTextEditor!.document.getText()', activeTextEditor!.document.getText());
     assert.equal(activeTextEditor!.document.getText(), expectedContent);
   });
 
