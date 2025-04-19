@@ -9,7 +9,6 @@ import {
   workspace,
 } from 'vscode';
 
-import { TEST_AREA_DELIMITER } from '@/services/regex-match/FileParser';
 import RegexTest, { MatchRange, MatchResult } from '@/services/regex-match/RegexTest';
 
 import { DECORATION_KEYS, DecorationKey, DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
@@ -32,7 +31,6 @@ class TextDecorationApplier implements Disposable {
   private createDecorations(colorSettings: Record<string, string>): DecorationMapping {
     return {
       ...this.createMatchDecorations(colorSettings),
-      delimiter: this.createTextDecorationType({ color: colorSettings.delimiter, fontWeight: 'bold' }),
     };
   }
 
@@ -77,8 +75,6 @@ class TextDecorationApplier implements Disposable {
     }
 
     const capturingGroupDecorations = this.getCapturingGroupDecorations();
-
-    this.applyDelimiterDecorations(textEditor);
 
     if (regexTests) {
       const matchResults = regexTests.flatMap((regexTest) => regexTest.test());
@@ -175,28 +171,8 @@ class TextDecorationApplier implements Disposable {
     ];
   }
 
-  private applyDelimiterDecorations(activeEditor: TextEditor) {
-    const document = activeEditor.document;
-    const fileContent = document.getText();
-
-    const delimiterRegex = new RegExp(`^${TEST_AREA_DELIMITER}$`, 'gm');
-    let match: RegExpExecArray | null;
-
-    const ranges: Range[] = [];
-
-    while ((match = delimiterRegex.exec(fileContent))) {
-      const start = document.positionAt(match.index);
-      const end = document.positionAt(match.index + TEST_AREA_DELIMITER.length);
-
-      ranges.push(new Range(start, end));
-    }
-
-    activeEditor.setDecorations(this.decorationSettings.delimiter, ranges);
-  }
-
   clearDecorations(textEditor: TextEditor) {
     textEditor.setDecorations(this.decorationSettings.match, []);
-    textEditor.setDecorations(this.decorationSettings.delimiter, []);
 
     const capturingGroupDecorations = this.getCapturingGroupDecorations();
     capturingGroupDecorations.forEach((groupDecoration) => textEditor.setDecorations(groupDecoration, []));

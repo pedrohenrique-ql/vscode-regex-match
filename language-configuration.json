@@ -1,0 +1,17 @@
+{
+  "brackets": [["---", "---"]],
+  "autoClosingPairs": [["---", "\n---"]],
+  "surroundingPairs": [
+    ["{", "}"],
+    ["[", "]"],
+    ["(", ")"]
+  ],
+  "onEnterRules": [
+    {
+      "beforeText": "^\\s*---\\s*$",
+      "action": {
+        "indent": "none"
+      }
+    }
+  ]
+}
