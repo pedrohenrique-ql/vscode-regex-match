@@ -9,23 +9,21 @@ import {
   workspace,
 } from 'vscode';
 
-import RegexMatchService from '@/services/regex-match/RegexMatchService';
-import RegexTest from '@/services/regex-match/RegexTest';
+import RegexTest from '@/controllers/regex-test/RegexTest';
 import { escapeRegexSource } from '@/utils/regex';
 
 class ApplyRegexCodeLensProvider implements CodeLensProvider {
-  private regexMatchService: RegexMatchService;
+  private regexTests: RegexTest[];
 
   private _onDidChangeCodeLenses: EventEmitter<void> = new EventEmitter<void>();
   readonly onDidChangeCodeLenses: Event<void> = this._onDidChangeCodeLenses.event;
 
-  constructor(regexMatchService: RegexMatchService) {
-    this.regexMatchService = regexMatchService;
+  constructor() {
+    this.regexTests = [];
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    const regexTests = this.regexMatchService.getRegexTests();
-    const codeRegexList = regexTests.filter((regexTest) => regexTest.isCodeRegex());
+    const codeRegexList = this.regexTests.filter((regexTest) => regexTest.isCodeRegex());
 
     if (codeRegexList.length === 0) {
       return [];
@@ -87,6 +85,10 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
     );
 
     return !!codeRegexDocument?.getText().includes(codeRegex.pattern);
+  }
+
+  setRegexTests(regexTests: RegexTest[]): void {
+    this.regexTests = regexTests;
   }
 
   refresh(): void {

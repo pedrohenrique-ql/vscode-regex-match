@@ -1,6 +1,6 @@
+import RegexMatchFormatError from '@/exceptions/RegexMatchFormatError';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 
-import RegexMatchFormatError from '../../exceptions/RegexMatchFormatError';
 import RegexTest from './RegexTest';
 
 export const TEST_AREA_DELIMITER = '---';
