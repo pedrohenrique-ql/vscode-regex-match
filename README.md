@@ -90,6 +90,10 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
+## [v0.6.1]
+
+- Fixed the regex detector to detect regex in arrays.
+
 ## [v0.6.0]
 
 - Created a snippet to insert a regex test block into the regex test file.
@@ -101,11 +105,6 @@ The following settings are available to customize the extension:
 - Refactored services to implement disposables, improving resource management and extension stability.
 - Added configurable settings to customize the color highlighting of regex matches.
 - Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
-
-## [v0.4.2]
-
-- Fixed the regex detector to detect two or more regex in the same line.
-- Reduced the extension package size by removing unnecessary files.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 

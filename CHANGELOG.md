@@ -1,6 +1,10 @@
 # Change Log
 
-## [v0.6.0]
+## [v0.6.1]
+
+- Fixed the regex detector to detect regex in arrays.
+
+## [v0.6.0] - 09/03/2025
 
 - Created a snippet to insert a regex test block into the regex test file.
 - Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
