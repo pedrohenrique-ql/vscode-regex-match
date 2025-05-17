@@ -40,7 +40,7 @@ describe('Code Regex Detect', () => {
       `;
 
       const matches = getAllMatches(regexDetect!, code);
-      expect(matches).not.toBeNull();
+
       expect(matches).toHaveLength(1);
       expect(matches[0][0].trim()).toEqual('/hello/g');
     });
@@ -53,7 +53,7 @@ describe('Code Regex Detect', () => {
       `;
 
       const matches = getAllMatches(regexDetect!, code);
-      expect(matches).not.toBeNull();
+
       expect(matches).toHaveLength(1);
       expect(matches[0][0].trim()).toEqual('/hello/g');
     });
@@ -66,7 +66,7 @@ describe('Code Regex Detect', () => {
       `;
 
       const matches = getAllMatches(regexDetect!, code);
-      expect(matches).not.toBeNull();
+
       expect(matches).toHaveLength(1);
       expect(matches[0][0].trim()).toEqual('/hello/g');
     });
@@ -120,10 +120,25 @@ describe('Code Regex Detect', () => {
       const code = `.replace(/ ./g, '.').replace(/ ,/, ',')`;
 
       const matches = getAllMatches(regexDetect!, code);
-      expect(matches).not.toBeNull();
+
       expect(matches).toHaveLength(2);
       expect(matches[0][0].trim()).toEqual('/ ./g');
       expect(matches[1][0].trim()).toEqual('/ ,/');
+    });
+
+    it('should detect regex inside array', () => {
+      let code = 'const array = [/hello/g];';
+
+      let matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/hello/g');
+
+      code = 'const array = [/hello/g, /world/g];';
+
+      matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(2);
+      expect(matches[0][0].trim()).toEqual('/hello/g');
+      expect(matches[1][0].trim()).toEqual('/world/g');
     });
 
     it.each(['g', 'i', 'm', 'u', 'y', 's', 'v'])(`should detect regex with flag '%s'`, (flag) => {
@@ -132,7 +147,7 @@ describe('Code Regex Detect', () => {
       `;
 
       const matches = getAllMatches(regexDetect!, code);
-      expect(matches).not.toBeNull();
+
       expect(matches).toHaveLength(1);
       expect(matches[0][0].trim()).toEqual(`/hello/${flag}`);
     });
