@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { expect, beforeEach, describe, it } from 'vitest';
 
 import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
@@ -141,10 +142,22 @@ describe('Code Regex Detect', () => {
       expect(matches[1][0].trim()).toEqual('/world/g');
     });
 
+    it('should detect regex with "/" in the middle of the regex', () => {
+      let code = 'const regex = /(ab\\/)ab/g;';
+
+      let matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/(ab\\/)ab/g');
+
+      code = 'const regex = /[^/]/g';
+
+      matches = getAllMatches(regexDetect!, code);
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0].trim()).toEqual('/[^/]/g');
+    });
+
     it.each(['g', 'i', 'm', 'u', 'y', 's', 'v'])(`should detect regex with flag '%s'`, (flag) => {
-      const code = `
-        const regex = /hello/${flag};
-      `;
+      const code = `const regex = /hello/${flag};`;
 
       const matches = getAllMatches(regexDetect!, code);
 
