@@ -1,6 +1,6 @@
 # Change Log
 
-## [v0.6.1]
+## [v0.6.1] - 20/05/2025
 
 - Fixed the regex detector to detect regex in arrays.
 - Fixed regex detector to detect regex with slash in the middle of its text.
