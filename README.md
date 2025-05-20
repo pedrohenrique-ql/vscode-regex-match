@@ -93,6 +93,7 @@ The following settings are available to customize the extension:
 ## [v0.6.1]
 
 - Fixed the regex detector to detect regex in arrays.
+- Fixed regex detector to detect regex with slash in the middle of its text.
 
 ## [v0.6.0]
 
