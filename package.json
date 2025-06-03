@@ -50,7 +50,11 @@
         "extensions": [
           ".rgx"
         ],
-        "configuration": "./language-configuration.json"
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./resources/rgx-icon.svg",
+          "dark": "./resources/rgx-icon.svg"
+        }
       }
     ],
     "grammars": [
