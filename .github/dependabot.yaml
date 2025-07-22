@@ -11,8 +11,6 @@ updates:
     commit-message:
       prefix: chore
     target-branch: canary
-    reviewers:
-      - pedrohenrique-ql
     groups:
       npm:
         patterns:
