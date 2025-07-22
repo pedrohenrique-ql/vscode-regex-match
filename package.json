@@ -13,7 +13,7 @@
   },
   "publisher": "pedrohenrique-ql",
   "engines": {
-    "node": ">= 20.11.0 <21",
+    "node": ">= 20.19.0 <21",
     "vscode": "^1.96.0"
   },
   "license": "MIT",
