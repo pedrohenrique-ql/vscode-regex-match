@@ -37,10 +37,33 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
-    "onLanguage:plaintext",
     "regex-match.openRegexMatchWindow"
   ],
   "contributes": {
+    "languages": [
+      {
+        "id": "regex-match",
+        "aliases": [
+          "Regex Match",
+          "Regex"
+        ],
+        "extensions": [
+          ".rgx"
+        ],
+        "configuration": "./language-configuration.json",
+        "icon": {
+          "light": "./resources/rgx-icon.svg",
+          "dark": "./resources/rgx-icon.svg"
+        }
+      }
+    ],
+    "grammars": [
+      {
+        "language": "regex-match",
+        "scopeName": "source.rgx",
+        "path": "./syntaxes/regex-match.tmLanguage.json"
+      }
+    ],
     "commands": [
       {
         "command": "regex-match.openRegexMatchWindow",
@@ -53,7 +76,7 @@
     ],
     "snippets": [
       {
-        "language": "plaintext",
+        "language": "regex-match",
         "path": "./snippets/snippets.json",
         "name": "Regex Test Block"
       }
@@ -68,9 +91,9 @@
         "command": "editor.action.insertSnippet",
         "key": "ctrl+alt+g",
         "mac": "cmd+alt+g",
-        "when": "editorTextFocus && editorLangId == 'plaintext'",
+        "when": "editorTextFocus && editorLangId == 'regex-match'",
         "args": {
-          "langId": "plaintext",
+          "langId": "regex-match",
           "name": "Regex Test Block"
         }
       }
@@ -184,6 +207,8 @@
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.2.0"
   }
 }

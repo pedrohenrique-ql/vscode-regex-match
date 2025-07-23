@@ -2,7 +2,6 @@ import { TextEditorDecorationType } from 'vscode';
 
 export type DecorationKey =
   | 'match'
-  | 'delimiter'
   | 'firstGroup'
   | 'secondGroup'
   | 'thirdGroup'
@@ -14,7 +13,6 @@ export type DecorationMapping = { [type in DecorationKey]: TextEditorDecorationT
 
 export const DECORATION_KEYS = [
   'match',
-  'delimiter',
   'firstGroup',
   'secondGroup',
   'thirdGroup',
@@ -25,7 +23,6 @@ export const DECORATION_KEYS = [
 
 export const DEFAULT_DECORATION_COLORS: { [Decoration in DecorationKey]: string } = {
   match: '#FFA50080',
-  delimiter: '#BD93F9FF',
   firstGroup: '#518241',
   secondGroup: '#3164CACC',
   thirdGroup: '#6E25B7B2',
