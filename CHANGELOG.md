@@ -2,7 +2,7 @@
 
 ## [0.7.0] - In Progress
 
-- Created a new language for `.rgx` files, allowing the use of syntax highlighting.
+- Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
 
 ## [v0.6.1] - 20/05/2025
 
