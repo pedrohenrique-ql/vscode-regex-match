@@ -90,6 +90,11 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
+## [v0.6.1]
+
+- Fixed the regex detector to detect regex in arrays.
+- Fixed regex detector to detect regex with slash in the middle of its text.
+
 ## [v0.6.0]
 
 - Created a snippet to insert a regex test block into the regex test file.
@@ -102,11 +107,6 @@ The following settings are available to customize the extension:
 - Added configurable settings to customize the color highlighting of regex matches.
 - Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
 
-## [v0.4.2]
-
-- Fixed the regex detector to detect two or more regex in the same line.
-- Reduced the extension package size by removing unnecessary files.
-
 View the full [CHANGELOG](./CHANGELOG.md).
 
 ## 🛠️ Development
@@ -117,7 +117,7 @@ The following dependencies are required to run the project:
 
 | Dependency                                           | Version           |
 | ---------------------------------------------------- | ----------------- |
-| [Node.js](https://nodejs.org/)                       | >= 20.11.0 && <21 |
+| [Node.js](https://nodejs.org/)                       | >= 20.19.0 && <21 |
 | [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
 | [pnpm](https://pnpm.io/)                             | 8.15.3            |
 

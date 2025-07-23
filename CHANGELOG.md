@@ -1,6 +1,15 @@
 # Change Log
 
-## [v0.6.0]
+## [0.7.0] - In Progress
+
+- Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
+
+## [v0.6.1] - 20/05/2025
+
+- Fixed the regex detector to detect regex in arrays.
+- Fixed regex detector to detect regex with slash in the middle of its text.
+
+## [v0.6.0] - 09/03/2025
 
 - Created a snippet to insert a regex test block into the regex test file.
 - Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
