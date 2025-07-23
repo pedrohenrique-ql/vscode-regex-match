@@ -207,6 +207,8 @@
     "tsup": "^8.5.0",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.2.4"
+    "vitest": "^3.2.4",
+    "vscode-oniguruma": "^2.0.1",
+    "vscode-textmate": "^9.2.0"
   }
 }
