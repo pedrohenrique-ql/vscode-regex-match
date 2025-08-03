@@ -3,8 +3,8 @@ import { writeFile } from 'fs/promises';
 import path from 'path';
 import { Uri } from 'vscode';
 
-import { DEFAULT_FILE_CONTENT } from '@/services/regex-match/FileCreator';
-import { REGEX_TEST_FILE_PATH } from '@/services/regex-match/RegexMatchService';
+import { DEFAULT_FILE_CONTENT } from '@/controllers/regex-test/FileCreator';
+import { REGEX_TEST_FILE_PATH } from '@/controllers/regex-test/RegexTestController';
 
 export function wait(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -16,14 +16,14 @@ export async function writeDefaultTestFile() {
   await wait(100);
 }
 
-export function createTemporaryFile(content: string): Uri {
+export function createTemporaryFile(content: string, fileName?: string): Uri {
   const tmpDir = path.join(__dirname, 'tmp');
 
   if (!fs.existsSync(tmpDir)) {
     fs.mkdirSync(tmpDir);
   }
 
-  const tmpFilePath = path.join(tmpDir, 'test-file.txt');
+  const tmpFilePath = path.join(tmpDir, fileName ?? 'test-file.txt');
   fs.writeFileSync(tmpFilePath, content, { encoding: 'utf-8' });
 
   return Uri.file(tmpFilePath);

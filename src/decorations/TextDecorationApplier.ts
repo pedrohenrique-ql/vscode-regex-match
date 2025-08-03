@@ -9,7 +9,7 @@ import {
   workspace,
 } from 'vscode';
 
-import RegexTest, { MatchRange, MatchResult } from '@/services/regex-match/RegexTest';
+import RegexTest, { MatchRange, MatchResult } from '@/controllers/regex-test/RegexTest';
 
 import { DECORATION_KEYS, DecorationKey, DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
 

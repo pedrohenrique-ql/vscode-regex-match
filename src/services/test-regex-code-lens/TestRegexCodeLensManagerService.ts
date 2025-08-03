@@ -1,5 +1,7 @@
 import { CodeLensProvider, ConfigurationChangeEvent, Disposable, ExtensionContext, languages, workspace } from 'vscode';
 
+import { REGEX_MATCH_LANGUAGE_ID } from '@/extension';
+
 class TestRegexCodeLensManagerService implements Disposable {
   private codeLensProvider: CodeLensProvider;
 
@@ -25,7 +27,7 @@ class TestRegexCodeLensManagerService implements Disposable {
   }
 
   private updateCodeLensProvider() {
-    const isCodeLensEnabled = workspace.getConfiguration('regex-match').get<boolean>('codeLens.enabled');
+    const isCodeLensEnabled = workspace.getConfiguration(REGEX_MATCH_LANGUAGE_ID).get<boolean>('codeLens.enabled');
 
     if (isCodeLensEnabled && !this.codeLensDisposable) {
       this.codeLensDisposable = languages.registerCodeLensProvider(
