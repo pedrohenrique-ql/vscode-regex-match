@@ -16,14 +16,14 @@ export async function writeDefaultTestFile() {
   await wait(100);
 }
 
-export function createTemporaryFile(content: string): Uri {
+export function createTemporaryFile(content: string, fileName?: string): Uri {
   const tmpDir = path.join(__dirname, 'tmp');
 
   if (!fs.existsSync(tmpDir)) {
     fs.mkdirSync(tmpDir);
   }
 
-  const tmpFilePath = path.join(tmpDir, 'test-file.txt');
+  const tmpFilePath = path.join(tmpDir, fileName ?? 'test-file.txt');
   fs.writeFileSync(tmpFilePath, content, { encoding: 'utf-8' });
 
   return Uri.file(tmpFilePath);

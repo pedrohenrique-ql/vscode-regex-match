@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { after, beforeEach, describe, it } from 'mocha';
-import { Range, Selection, ViewColumn, commands, window } from 'vscode';
+import { Range, Selection, ViewColumn, commands, window, workspace } from 'vscode';
 
 import { DEFAULT_FILE_CONTENT } from '@/controllers/regex-test/FileCreator';
 import { REGEX_TEST_FILE_PATH } from '@/controllers/regex-test/RegexTestController';
@@ -9,7 +9,7 @@ import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 import snippets from '../../../snippets/snippets.json';
 import { createTemporaryFile, wait, writeDefaultTestFile } from './utils';
 
-describe('Regex Match Window', () => {
+describe('Regex Match file', () => {
   beforeEach(async () => {
     await writeDefaultTestFile();
     await commands.executeCommand('workbench.action.closeAllEditors');
@@ -19,20 +19,22 @@ describe('Regex Match Window', () => {
     await writeDefaultTestFile();
   });
 
-  it('should open the regex test window by command with correct content', async () => {
+  it('should open the default regex test file by command with correct content', async () => {
     await commands.executeCommand('regex-match.openRegexMatchWindow');
     const activeTextEditor = window.activeTextEditor;
 
-    assert.notStrictEqual(activeTextEditor, undefined);
+    assert.notEqual(activeTextEditor, undefined);
 
     assert.equal(activeTextEditor!.viewColumn, ViewColumn.Two);
     const realEndPath = activeTextEditor!.document.fileName.replace(/[/\\]/g, '');
     const expectedEndPath = REGEX_TEST_FILE_PATH.replace(/\//g, '');
     assert.ok(realEndPath.endsWith(expectedEndPath));
     assert.equal(activeTextEditor!.document.getText(), DEFAULT_FILE_CONTENT);
+
+    assert.equal(activeTextEditor!.document.languageId, 'regex-match');
   });
 
-  it('should open the regex test window by command with correct content if a code regex is provided', async () => {
+  it('should open the default regex test file by command with correct content if a code regex is provided', async () => {
     const documentUri = createTemporaryFile('Hello, world!');
 
     const pattern = /^\d{2}\w{3}/;
@@ -42,7 +44,7 @@ describe('Regex Match Window', () => {
 
     const activeTextEditor = window.activeTextEditor;
 
-    assert.notStrictEqual(activeTextEditor, undefined);
+    assert.notEqual(activeTextEditor, undefined);
     assert.equal(activeTextEditor!.viewColumn, ViewColumn.Two);
     const realEndPath = activeTextEditor!.document.fileName.replace(/[/\\]/g, '');
     const expectedEndPath = REGEX_TEST_FILE_PATH.replace(/\//g, '');
@@ -56,7 +58,7 @@ describe('Regex Match Window', () => {
     await commands.executeCommand('regex-match.openRegexMatchWindow');
     const activeTextEditor = window.activeTextEditor;
 
-    assert.notStrictEqual(activeTextEditor, undefined);
+    assert.notEqual(activeTextEditor, undefined);
 
     const lastLine = activeTextEditor!.document.lineCount - 1;
     const lastLineLength = activeTextEditor!.document.lineAt(lastLine).text.length;
@@ -71,5 +73,21 @@ describe('Regex Match Window', () => {
 
     const expectedContent = `${DEFAULT_FILE_CONTENT}\n${snippetBody}`;
     assert.equal(activeTextEditor!.document.getText(), expectedContent);
+  });
+
+  it('should create many regex test files by using .rgx extension', async () => {
+    for (let i = 1; i < 3; i++) {
+      const documentUri = createTemporaryFile(`Test content ${i}`, `test-file-${i}.rgx`);
+
+      const document = await workspace.openTextDocument(documentUri);
+      await window.showTextDocument(document);
+      await wait(100);
+
+      const activeTextEditor = window.activeTextEditor;
+      assert.notEqual(activeTextEditor, undefined);
+
+      assert.equal(activeTextEditor!.document.languageId, 'regex-match');
+      assert.equal(activeTextEditor!.document.fileName, documentUri.fsPath);
+    }
   });
 });
