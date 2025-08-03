@@ -1,25 +1,18 @@
-import { ExtensionContext, languages } from 'vscode';
+import { ExtensionContext } from 'vscode';
 
-import ApplyRegexCodeLensProvider from './providers/code-lenses/ApplyRegexCodeLensProvider';
-import TestRegexCodeLensProvider from './providers/code-lenses/TestRegexCodeLensProvider';
-import DiagnosticProvider from './providers/DiagnosticProvider';
-import RegexMatchService, { REGEX_TEST_FILE_PATH } from './services/regex-match/RegexMatchService';
-import TestRegexCodeLensManagerService from './services/test-regex-code-lens/TestRegexCodeLensManagerService';
+import RegexTestController from '@/controllers/regex-test/RegexTestController';
+import TestRegexCodeLensProvider from '@/providers/code-lenses/TestRegexCodeLensProvider';
+import DiagnosticProvider from '@/providers/DiagnosticProvider';
+import TestRegexCodeLensManagerService from '@/services/test-regex-code-lens/TestRegexCodeLensManagerService';
+
+export const REGEX_MATCH_LANGUAGE_ID = 'regex-match';
 
 export function activate(context: ExtensionContext) {
-  const diagnosticProvider = new DiagnosticProvider('regex-match');
-  const regexMatchService = new RegexMatchService(context, diagnosticProvider);
+  const diagnosticProvider = new DiagnosticProvider(REGEX_MATCH_LANGUAGE_ID);
+  const regexTestController = new RegexTestController(context.extensionPath, diagnosticProvider);
 
   const testRegexCodeLensProvider = new TestRegexCodeLensProvider();
   const testRegexCodeLensManagerService = new TestRegexCodeLensManagerService(context, testRegexCodeLensProvider);
 
-  const applyRegexCodeLensProvider = new ApplyRegexCodeLensProvider(regexMatchService);
-  const applyRegexDisposable = languages.registerCodeLensProvider(
-    { pattern: `${context.extensionPath}${REGEX_TEST_FILE_PATH}`, scheme: 'file' },
-    applyRegexCodeLensProvider,
-  );
-
-  regexMatchService.setApplyRegexCodeLensProvider(applyRegexCodeLensProvider);
-
-  context.subscriptions.push(regexMatchService, testRegexCodeLensManagerService, applyRegexDisposable);
+  context.subscriptions.push(regexTestController, testRegexCodeLensManagerService);
 }

@@ -1,10 +1,8 @@
 import {
   Diagnostic,
   Disposable,
-  ExtensionContext,
   Range,
   TextDocument,
-  TextDocumentChangeEvent,
   TextEditor,
   Uri,
   ViewColumn,
@@ -13,110 +11,98 @@ import {
   workspace,
 } from 'vscode';
 
+import FileParser from '@/controllers/regex-test/FileParser';
+import RegexTest from '@/controllers/regex-test/RegexTest';
+import TextDecorationApplier from '@/decorations/TextDecorationApplier';
+import RegexMatchFormatError from '@/exceptions/RegexMatchFormatError';
+import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 import ApplyRegexCodeLensProvider from '@/providers/code-lenses/ApplyRegexCodeLensProvider';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
+import DiagnosticProvider from '@/providers/DiagnosticProvider';
+import { disposeAll } from '@/utils/dispose';
 
-import TextDecorationApplier from '../../decorations/TextDecorationApplier';
-import RegexMatchFormatError from '../../exceptions/RegexMatchFormatError';
-import RegexSyntaxError from '../../exceptions/RegexSyntaxError';
-import DiagnosticProvider from '../../providers/DiagnosticProvider';
-import { disposeAll } from '../../utils/dipose';
-import FileCreator from './FileCreator';
-import FileParser from './FileParser';
-import RegexTest from './RegexTest';
-
-export const REGEX_TEST_FILE_PATH = '/regex-test-file/RegexMatch.rgx';
-
-class RegexMatchService implements Disposable {
-  private regexTestFileUri: Uri;
+class RegexTestFile implements Disposable {
+  private readonly fileUri: Uri;
+  private readonly isDefaultTestFile: boolean;
   private regexTests: RegexTest[] = [];
 
-  private diagnosticProvider: DiagnosticProvider;
+  private readonly diagnosticProvider: DiagnosticProvider;
   private textDecorationApplier: TextDecorationApplier;
-  private applyRegexCodeLensProvider: ApplyRegexCodeLensProvider | undefined;
+  private applyRegexCodeLensProvider?: ApplyRegexCodeLensProvider;
   private disposables: Disposable[] = [];
 
   private currentViewColumn: ViewColumn | undefined;
   private isEditorVisible = false;
 
-  private isOpeningWithCodeRegex = false;
+  constructor(
+    fileUri: Uri,
+    diagnosticProvider: DiagnosticProvider,
+    options: {
+      applyRegexCodeLensProvider?: ApplyRegexCodeLensProvider;
+      isDefaultTestFile?: boolean;
+      isOpeningWithCodeRegex?: boolean;
+    } = {},
+  ) {
+    const { isDefaultTestFile = false, isOpeningWithCodeRegex = false } = options;
 
-  constructor(context: ExtensionContext, diagnosticProvider: DiagnosticProvider) {
+    this.fileUri = fileUri;
+    this.isDefaultTestFile = isDefaultTestFile;
     this.diagnosticProvider = diagnosticProvider;
-    this.regexTestFileUri = Uri.file(`${context.extensionPath}${REGEX_TEST_FILE_PATH}`);
+    this.applyRegexCodeLensProvider = options.applyRegexCodeLensProvider;
+
     this.textDecorationApplier = new TextDecorationApplier();
 
-    const commands = this.registerCommands();
-    const disposables = this.registerDisposables();
-    this.disposables.push(...commands, ...disposables);
+    this.registerCommands();
+    this.registerDisposables();
 
-    this.checkRegexMatchEditorVisibility();
+    this.checkRegexMatchEditorVisibility({ isOpeningWithCodeRegex });
   }
 
   getRegexTests() {
     return this.regexTests;
   }
 
-  private checkRegexMatchEditorVisibility() {
-    const regexMatchEditor = window.visibleTextEditors.find(
-      (editor) => editor.document.uri.path === this.regexTestFileUri.path,
-    );
+  private checkRegexMatchEditorVisibility(options: { isOpeningWithCodeRegex?: boolean } = {}) {
+    const regexMatchEditor = window.visibleTextEditors.find((editor) => editor.document.uri.path === this.fileUri.path);
 
     this.currentViewColumn = regexMatchEditor?.viewColumn;
 
-    if (regexMatchEditor) {
+    if (regexMatchEditor && !options.isOpeningWithCodeRegex) {
       this.updateRegexTest(regexMatchEditor);
       this.isEditorVisible = true;
     }
   }
 
-  registerCommands(): Disposable[] {
-    const openRegexTextCommand = commands.registerCommand('regex-match.openRegexMatchWindow', (codeRegex?: CodeRegex) =>
-      this.openRegexTestWindow(codeRegex),
-    );
+  registerCommands() {
+    if (!this.isDefaultTestFile) {
+      return;
+    }
 
     const applyRegexToCodeCommand = commands.registerCommand(
       'regex-match.applyRegexToCode',
       (codeRegex: CodeRegex, updatedRegexSource?: string) => this.onApplyRegexToCode(codeRegex, updatedRegexSource),
     );
 
-    return [openRegexTextCommand, applyRegexToCodeCommand];
+    this.disposables.push(applyRegexToCodeCommand);
   }
 
-  registerDisposables(): Disposable[] {
-    const changeTextDocumentDisposable = workspace.onDidChangeTextDocument((event) => this.onChangeTextDocument(event));
-
+  registerDisposables() {
     const changeActiveTextEditorDisposable = window.onDidChangeVisibleTextEditors((editors) =>
       this.onChangeVisibleEditors(editors),
     );
 
     const changeColorHighlightingConfigurationDisposable = this.onChangeColorHighlightingConfiguration();
 
-    return [
-      changeTextDocumentDisposable,
-      changeActiveTextEditorDisposable,
-      changeColorHighlightingConfigurationDisposable,
-    ];
+    this.disposables.push(changeActiveTextEditorDisposable, changeColorHighlightingConfigurationDisposable);
   }
 
-  private async openRegexTestWindow(codeRegex?: CodeRegex) {
-    this.isOpeningWithCodeRegex = !!codeRegex;
+  updateRegexTest(textEditor: TextEditor, codeRegex?: CodeRegex) {
+    const regexTests = this.parseAndTestRegex(textEditor.document, codeRegex);
 
-    const document = await FileCreator.openRegexTestFile(this.regexTestFileUri, codeRegex?.pattern);
-
-    const activeEditor = window.activeTextEditor;
-    if (!(activeEditor && document === activeEditor.document)) {
-      return;
+    if (this.applyRegexCodeLensProvider) {
+      this.applyRegexCodeLensProvider.setRegexTests(regexTests ?? []);
     }
 
-    this.currentViewColumn = activeEditor.viewColumn;
-    this.isEditorVisible = true;
-
-    this.updateRegexTest(activeEditor, codeRegex);
-  }
-
-  private updateRegexTest(textEditor: TextEditor, codeRegex?: CodeRegex) {
-    const regexTests = this.parseAndTestRegex(textEditor.document, codeRegex);
     this.textDecorationApplier.applyDecorations(textEditor, regexTests);
   }
 
@@ -135,7 +121,7 @@ class RegexMatchService implements Disposable {
         diagnostics.push(diagnosticError);
       }
     } finally {
-      this.diagnosticProvider.updateDiagnostics(this.regexTestFileUri, diagnostics);
+      this.diagnosticProvider.updateDiagnostics(document.uri, diagnostics);
     }
   }
 
@@ -152,29 +138,14 @@ class RegexMatchService implements Disposable {
     return diagnosticError;
   }
 
-  private onChangeTextDocument(event: TextDocumentChangeEvent) {
-    const activeEditor = window.activeTextEditor;
-    const eventDocument = event.document;
-
-    if (
-      activeEditor &&
-      eventDocument.uri.path === this.regexTestFileUri.path &&
-      eventDocument === activeEditor.document &&
-      event.contentChanges.length > 0 &&
-      !this.isOpeningWithCodeRegex
-    ) {
-      this.updateRegexTest(activeEditor);
-    }
-
-    if (this.isOpeningWithCodeRegex) {
-      this.isOpeningWithCodeRegex = false;
-    }
+  handleTextDocumentChange(textEditor: TextEditor, codeRegex?: CodeRegex) {
+    this.updateRegexTest(textEditor, codeRegex);
   }
 
   private onChangeVisibleEditors(textEditors: readonly TextEditor[]) {
-    const regexMatchEditor = textEditors.find(
-      (editor) => editor.document.uri.toString() === this.regexTestFileUri.toString(),
-    );
+    const regexMatchEditor = textEditors.find((editor) => {
+      return editor.document.uri.toString() === this.fileUri.toString();
+    });
 
     if (!regexMatchEditor) {
       this.isEditorVisible = false;
@@ -195,10 +166,6 @@ class RegexMatchService implements Disposable {
 
       this.textDecorationApplier.applyPreviousDecorations(regexMatchEditor);
     }
-  }
-
-  setApplyRegexCodeLensProvider(applyRegexCodeLensProvider: ApplyRegexCodeLensProvider) {
-    this.applyRegexCodeLensProvider = applyRegexCodeLensProvider;
   }
 
   private async onApplyRegexToCode(codeRegex: CodeRegex, updatedRegexSource?: string) {
@@ -238,9 +205,7 @@ class RegexMatchService implements Disposable {
       if (event.affectsConfiguration('regex-match.colorHighlighting')) {
         const visibleEditors = window.visibleTextEditors;
 
-        const regexMatchEditor = visibleEditors.find(
-          (editor) => editor.document.uri.path === this.regexTestFileUri.path,
-        );
+        const regexMatchEditor = visibleEditors.find((editor) => editor.document.uri.path === this.fileUri.path);
 
         if (regexMatchEditor) {
           this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests, {
@@ -257,4 +222,4 @@ class RegexMatchService implements Disposable {
   }
 }
 
-export default RegexMatchService;
+export default RegexTestFile;

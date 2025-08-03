@@ -1,5 +1,10 @@
 # Change Log
 
+## [0.7.0] - 03/08/2025
+
+- Added support to create and test multiple regex test files.
+- Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
+
 ## [v0.6.1] - 20/05/2025
 
 - Fixed the regex detector to detect regex in arrays.

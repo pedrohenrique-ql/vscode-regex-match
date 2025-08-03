@@ -1,8 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import { Uri, Range } from 'vscode';
 
+import FileParser from '@/controllers/regex-test/FileParser';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
-import FileParser from '@/services/regex-match/FileParser';
 
 vi.mock('vscode', async () => {
   const { Uri, Range } = await import('@/tests/mocks/vscode');

@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
 
+import FileParser from '@/controllers/regex-test/FileParser';
 import RegexMatchFormatError, { DEFAULT_REGEX_MATCH_FORMAT_ERROR_MESSAGE } from '@/exceptions/RegexMatchFormatError';
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
-import FileParser from '@/services/regex-match/FileParser';
 
 describe('File Parser', () => {
   it('should parse file content correctly', () => {

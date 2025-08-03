@@ -90,6 +90,11 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
+## [0.7.0]
+
+- Added support to create and test multiple regex test files.
+- Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
+
 ## [v0.6.1]
 
 - Fixed the regex detector to detect regex in arrays.
@@ -117,7 +122,7 @@ The following dependencies are required to run the project:
 
 | Dependency                                           | Version           |
 | ---------------------------------------------------- | ----------------- |
-| [Node.js](https://nodejs.org/)                       | >= 20.11.0 && <21 |
+| [Node.js](https://nodejs.org/)                       | >= 20.19.0 && <21 |
 | [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
 | [pnpm](https://pnpm.io/)                             | 8.15.3            |
 
