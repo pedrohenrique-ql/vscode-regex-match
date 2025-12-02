@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import { expect, beforeEach, describe, it } from 'vitest';
 
 import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
