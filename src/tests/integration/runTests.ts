@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/strict-boolean-expressions */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-call */
 import { runTests } from '@vscode/test-electron';
 import * as fs from 'fs-extra';
 import * as path from 'path';
@@ -62,7 +58,6 @@ async function main() {
         .concat(['--user-data-dir', userDataDirectory]),
     });
   } catch (error) {
-    /* eslint-disable no-console */
     console.error('Failed to run tests');
     if (error instanceof Error) {
       console.error(`error message: ${error.message}`);
@@ -71,10 +66,9 @@ async function main() {
     } else {
       console.error(`No error object: ${JSON.stringify(error)}`);
     }
-    /* eslint-enable no-console */
+
     process.exit(1);
   }
 }
 
-// eslint-disable-next-line no-console
 main().catch((err) => console.error(err));

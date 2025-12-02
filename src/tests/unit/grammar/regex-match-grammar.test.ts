@@ -1,4 +1,3 @@
-/* eslint-disable no-useless-escape */
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as vscodeTextmate from 'vscode-textmate';
 
