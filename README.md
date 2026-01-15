@@ -154,5 +154,5 @@ pnpm test:vsc
 To run the unit tests, run the following command:
 
 ```
-pnpm test:vi
+pnpm test
 ```
