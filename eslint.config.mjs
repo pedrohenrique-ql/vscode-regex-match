@@ -396,7 +396,7 @@ export default defineConfig([
     },
   },
   {
-    files: ['**/*.test.ts*', '**/tests/**/utils/*.ts'],
+    files: ['**/*.test.ts*', '**/tests/**/utils/*.ts', '**/tests/**/mocks/*.ts'],
 
     rules: {
       '@typescript-eslint/no-non-null-assertion': 'off',

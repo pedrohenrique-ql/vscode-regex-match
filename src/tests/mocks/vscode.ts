@@ -11,10 +11,23 @@ export class Position {
 }
 
 export class Range {
+  start: Position;
+  end: Position;
+
   constructor(
-    public start: Position,
-    public end: Position,
-  ) {}
+    startLineOrStart: number | Position,
+    startCharacterOrEnd: number | Position,
+    endLine?: number,
+    endCharacter?: number,
+  ) {
+    if (typeof startLineOrStart === 'number') {
+      this.start = new Position(startLineOrStart, startCharacterOrEnd as number);
+      this.end = new Position(endLine!, endCharacter!);
+    } else {
+      this.start = startLineOrStart;
+      this.end = startCharacterOrEnd as Position;
+    }
+  }
 }
 
 export class EventEmitter<T> {
