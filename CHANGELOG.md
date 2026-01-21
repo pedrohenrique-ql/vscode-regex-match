@@ -2,7 +2,7 @@
 
 ## [v0.7.1]
 
-- Fixed an issue when there are duplicate regex test that became from code.
+- Fixed an issue when there are duplicate regex tests that came from code.
 
 ## [v0.7.0] - 03/08/2025
 
