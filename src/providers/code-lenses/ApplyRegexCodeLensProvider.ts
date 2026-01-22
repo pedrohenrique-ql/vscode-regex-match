@@ -23,53 +23,104 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
   }
 
   provideCodeLenses(document: TextDocument): ProviderResult<CodeLens[]> {
-    const codeRegexList = this.regexTests.filter((regexTest) => regexTest.isCodeRegex());
-
-    if (codeRegexList.length === 0) {
-      return [];
-    }
-
     const codeLenses: CodeLens[] = [];
-    const documentText = document.getText();
 
-    for (const regexTest of codeRegexList) {
-      const updatedRegex = regexTest.getMatchingRegex();
-      const codeRegExp = regexTest.getCodeRegExp();
+    for (let currentIndex = 0; currentIndex < this.regexTests.length; currentIndex++) {
+      const regexTest = this.regexTests[currentIndex];
 
-      if (!updatedRegex || !codeRegExp) {
+      if (!this.shouldProcessRegexTest(regexTest)) {
+        continue;
+      }
+
+      const matchRanges = this.findRegexMatchRanges(document, regexTest);
+      if (matchRanges.length === 0) {
+        continue;
+      }
+
+      if (!this.isCodeRegexInEditor(regexTest)) {
         continue;
       }
 
       const matchingRegexSource = regexTest.getMatchingRegexSource();
-      const codeRegexSource = `/${codeRegExp.source}/${codeRegExp.flags}`;
+      const targetRange = this.determineTargetRange(matchRanges, currentIndex, matchingRegexSource);
+      const command = {
+        title: 'Apply Regex to Code',
+        command: 'regex-match.applyRegexToCode',
+        arguments: [regexTest.getCodeRegex(), matchingRegexSource],
+      } satisfies CodeLens['command'];
 
-      const isRegexUpdated = codeRegexSource !== matchingRegexSource;
-
-      if (!isRegexUpdated) {
-        continue;
-      }
-
-      const updatedRegexSource = updatedRegex.source;
-      const escapedRegexString = escapeRegexSource(updatedRegexSource);
-      const searchRegex = new RegExp(escapedRegexString, 'g');
-      const match = searchRegex.exec(documentText);
-
-      if (match && this.isCodeRegexInEditor(regexTest)) {
-        const startPosition = document.positionAt(match.index);
-        const endPosition = document.positionAt(match.index + match[0].length);
-        const matchRange = new Range(startPosition, endPosition);
-
-        const command: CodeLens['command'] = {
-          title: 'Apply Regex to Code',
-          command: 'regex-match.applyRegexToCode',
-          arguments: [regexTest.getCodeRegex(), matchingRegexSource],
-        };
-
-        codeLenses.push(new CodeLens(matchRange, command));
-      }
+      codeLenses.push(new CodeLens(targetRange, command));
     }
 
     return codeLenses;
+  }
+
+  private shouldProcessRegexTest(regexTest: RegexTest): boolean {
+    if (!regexTest.isCodeRegex()) {
+      return false;
+    }
+
+    const updatedRegex = regexTest.getMatchingRegex();
+    const codeRegExp = regexTest.getCodeRegExp();
+
+    if (!updatedRegex || !codeRegExp) {
+      return false;
+    }
+
+    const matchingRegexSource = regexTest.getMatchingRegexSource();
+    const codeRegexSource = `/${codeRegExp.source}/${codeRegExp.flags}`;
+
+    return codeRegexSource !== matchingRegexSource;
+  }
+
+  private findRegexMatchRanges(document: TextDocument, regexTest: RegexTest): Range[] {
+    const updatedRegex = regexTest.getMatchingRegex();
+    if (!updatedRegex) {
+      return [];
+    }
+
+    const updatedRegexSource = updatedRegex.source;
+    const escapedRegexString = escapeRegexSource(updatedRegexSource);
+    const searchRegex = new RegExp(escapedRegexString, 'g');
+    const documentText = document.getText();
+
+    const matchRanges: Range[] = [];
+    let match: RegExpExecArray | null;
+
+    while ((match = searchRegex.exec(documentText)) !== null) {
+      const startPosition = document.positionAt(match.index);
+      const endPosition = document.positionAt(match.index + match[0].length);
+      matchRanges.push(new Range(startPosition, endPosition));
+    }
+
+    return matchRanges;
+  }
+
+  private determineTargetRange(matchRanges: Range[], currentIndex: number, matchingRegexSource: string): Range {
+    if (matchRanges.length === 1) {
+      return matchRanges[0];
+    }
+
+    const regexTestsWithSamePattern = this.getRegexTestsWithSamePattern(matchingRegexSource);
+    const positionInPattern = regexTestsWithSamePattern.indexOf(currentIndex);
+    const targetIndex = Math.min(positionInPattern, matchRanges.length - 1);
+
+    return matchRanges[targetIndex];
+  }
+
+  private getRegexTestsWithSamePattern(matchingRegexSource: string): number[] {
+    const indices: number[] = [];
+
+    for (let i = 0; i < this.regexTests.length; i++) {
+      const otherRegexTest = this.regexTests[i];
+      const otherMatchingRegexSource = otherRegexTest.getMatchingRegexSource();
+
+      if (otherMatchingRegexSource === matchingRegexSource) {
+        indices.push(i);
+      }
+    }
+
+    return indices;
   }
 
   private isCodeRegexInEditor(regexTest: RegexTest): boolean {

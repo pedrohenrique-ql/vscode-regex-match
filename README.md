@@ -90,7 +90,11 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
-## [0.7.0]
+## [v0.7.1]
+
+- Fixed an issue when there are duplicate regex tests that came from code.
+
+## [v0.7.0]
 
 - Added support to create and test multiple regex test files.
 - Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
@@ -105,12 +109,6 @@ The following settings are available to customize the extension:
 - Created a snippet to insert a regex test block into the regex test file.
 - Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
 - Fixed loss of highlights when opening regex test file when opening VSCode.
-
-### [v0.5.0]
-
-- Refactored services to implement disposables, improving resource management and extension stability.
-- Added configurable settings to customize the color highlighting of regex matches.
-- Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 
@@ -154,5 +152,5 @@ pnpm test:vsc
 To run the unit tests, run the following command:
 
 ```
-pnpm test:vi
+pnpm test
 ```

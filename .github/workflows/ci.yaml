@@ -60,7 +60,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: xvfb-run -a pnpm test:vsc
@@ -85,7 +85,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: pnpm test:vsc
@@ -110,7 +110,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: pnpm test:vsc
