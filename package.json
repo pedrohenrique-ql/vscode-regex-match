@@ -29,8 +29,8 @@
     "regexp",
     "test"
   ],
-  "icon": "./resources/icon.png",
-  "packageManager": "pnpm@8.15.5",
+  "icon": "./assets/icon.png",
+  "packageManager": "pnpm@10.30.0",
   "main": "./out/extension.js",
   "activationEvents": [
     "onLanguage:javascript",
@@ -52,8 +52,8 @@
         ],
         "configuration": "./language-configuration.json",
         "icon": {
-          "light": "./resources/rgx-icon.svg",
-          "dark": "./resources/rgx-icon.svg"
+          "light": "./assets/rgx-icon.svg",
+          "dark": "./assets/rgx-icon.svg"
         }
       }
     ],
