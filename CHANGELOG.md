@@ -1,6 +1,6 @@
 # Change Log
 
-## [v0.7.1]
+## [v0.7.1] - 21/02/2026
 
 - Fixed an issue when there are duplicate regex tests that came from code.
 
