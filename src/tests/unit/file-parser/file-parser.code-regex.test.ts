@@ -356,4 +356,38 @@ describe('File Parser - Code Regex', () => {
     expect(regexTests[2].isCodeRegex()).toBe(true);
     expect(regexTests[2].getCodeRegExp()).toStrictEqual(/ANOTHER-REGEX2/gm);
   });
+
+  it('should maintain code regex in the correct regex test when the regex is updated with the same pattern of others', () => {
+    const fileContent = '/[0-9]/gm\n---\n---\n/ANOTHER-REGEX/gm\n---\n---';
+
+    const codeRegex: CodeRegex = {
+      pattern: '/ANOTHER-REGEX/gm',
+      documentUri: Uri.file('./file-parser.test.ts'),
+      range: new Range(0, 0, 0, 0),
+    };
+
+    let regexTests = FileParser.parseFileContent(fileContent, [], codeRegex);
+    expect(regexTests).not.toBeNull();
+    expect(regexTests).toHaveLength(2);
+
+    expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+    expect(regexTests[0].isCodeRegex()).toBe(false);
+
+    expect(regexTests[1].getMatchingRegex()).toStrictEqual(/ANOTHER-REGEX/dgm);
+    expect(regexTests[1].isCodeRegex()).toBe(true);
+    expect(regexTests[1].getCodeRegExp()).toStrictEqual(/ANOTHER-REGEX/gm);
+
+    const updatedFileContent = '/[0-9]/gm\n---\n---\n/[0-9]/gm\n---\n---';
+
+    regexTests = FileParser.parseFileContent(updatedFileContent, regexTests);
+    expect(regexTests).not.toBeNull();
+    expect(regexTests).toHaveLength(2);
+
+    expect(regexTests[0].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+    expect(regexTests[0].isCodeRegex()).toBe(false);
+
+    expect(regexTests[1].getMatchingRegex()).toStrictEqual(/[0-9]/dgm);
+    expect(regexTests[1].isCodeRegex()).toBe(true);
+    expect(regexTests[1].getCodeRegExp()).toStrictEqual(/ANOTHER-REGEX/gm);
+  });
 });

@@ -1,6 +1,10 @@
 # Change Log
 
-## [0.7.0] - 03/08/2025
+## [v0.7.1] - 21/02/2026
+
+- Fixed an issue when there are duplicate regex tests that came from code.
+
+## [v0.7.0] - 03/08/2025
 
 - Added support to create and test multiple regex test files.
 - Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.

@@ -2,34 +2,31 @@ import { glob } from 'glob';
 import Mocha from 'mocha';
 import * as path from 'path';
 
-export function run(): Promise<void> {
+export async function run(): Promise<void> {
   const mocha = new Mocha({
     ui: 'tdd',
+    color: true,
+    timeout: 10000,
   });
 
   const testsRoot = path.resolve(__dirname, '..');
 
-  return new Promise((c, e) => {
-    void glob('**/**.test.js', { cwd: testsRoot }, (err: Error | null, files: string[]) => {
-      if (err) {
-        e(err);
-        return;
-      }
+  try {
+    const files = await glob('**/**.test.js', { cwd: testsRoot });
 
-      files.forEach((file: string) => mocha.addFile(path.resolve(testsRoot, file)));
+    files.forEach((file: string) => mocha.addFile(path.resolve(testsRoot, file)));
 
-      try {
-        mocha.run((failures) => {
-          if (failures > 0) {
-            e(new Error(`${failures} tests failed.`));
-          } else {
-            c();
-          }
-        });
-      } catch (_error) {
-        console.error(err);
-        e(err);
-      }
+    await new Promise<void>((resolve, reject) => {
+      mocha.run((failures) => {
+        if (failures > 0) {
+          reject(new Error(`${failures} tests failed.`));
+        } else {
+          resolve();
+        }
+      });
     });
-  });
+  } catch (error) {
+    console.error('Failed to find test files:', error);
+    throw error;
+  }
 }

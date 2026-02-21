@@ -23,7 +23,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Set up Regex Match
         uses: ./.github/actions/regex-match-setup
@@ -45,7 +45,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Regex Match
         uses: ./.github/actions/regex-match-setup
@@ -60,7 +60,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: xvfb-run -a pnpm test:vsc
@@ -73,7 +73,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Regex Match
         uses: ./.github/actions/regex-match-setup
@@ -85,7 +85,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: pnpm test:vsc
@@ -98,7 +98,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Setup Regex Match
         uses: ./.github/actions/regex-match-setup
@@ -110,7 +110,7 @@ jobs:
         run: pnpm run pre:test
 
       - name: Run unit tests
-        run: pnpm test:vi run
+        run: pnpm test run
 
       - name: Run integration tests
         run: pnpm test:vsc

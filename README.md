@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./resources/icon.png" align="center" width="100px" height="100px">
+  <img src="./assets/icon.png" align="center" width="100px" height="100px">
 </p>
 
 <h1 align="center">
@@ -25,7 +25,7 @@
 
 [Regex Match](https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match) is a Visual Studio Code extension that enables dynamically creating, testing and debugging regular expressions within a text file. It provides a simple and user-friendly interface, making the process of working with regular expressions effortless and efficient.
 
-Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights.
+Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights. Also, you can create `.rgx` files to save your regex tests.
 
 ![Regex Match Demo](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/demo.gif)
 
@@ -90,7 +90,11 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
-## [0.7.0]
+## [v0.7.1]
+
+- Fixed an issue when there are duplicate regex tests that came from code.
+
+## [v0.7.0]
 
 - Added support to create and test multiple regex test files.
 - Created a new language grammar for `.rgx` files, allowing the use of syntax highlighting.
@@ -106,12 +110,6 @@ The following settings are available to customize the extension:
 - Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
 - Fixed loss of highlights when opening regex test file when opening VSCode.
 
-### [v0.5.0]
-
-- Refactored services to implement disposables, improving resource management and extension stability.
-- Added configurable settings to customize the color highlighting of regex matches.
-- Added a new CodeLens to update the regex extracted from the code using the 'Test Regex' CodeLens with the regex edited in the extension file, replacing the original regex in its original location.
-
 View the full [CHANGELOG](./CHANGELOG.md).
 
 ## 🛠️ Development
@@ -124,7 +122,7 @@ The following dependencies are required to run the project:
 | ---------------------------------------------------- | ----------------- |
 | [Node.js](https://nodejs.org/)                       | >= 20.19.0 && <21 |
 | [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
-| [pnpm](https://pnpm.io/)                             | 8.15.3            |
+| [pnpm](https://pnpm.io/)                             | 10.30.0           |
 
 ### Usage
 
@@ -154,5 +152,5 @@ pnpm test:vsc
 To run the unit tests, run the following command:
 
 ```
-pnpm test:vi
+pnpm test
 ```
