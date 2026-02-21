@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="./resources/icon.png" align="center" width="100px" height="100px">
+  <img src="./assets/icon.png" align="center" width="100px" height="100px">
 </p>
 
 <h1 align="center">
@@ -25,9 +25,9 @@
 
 [Regex Match](https://marketplace.visualstudio.com/items?itemName=pedrohenrique-ql.regex-match) is a Visual Studio Code extension that enables dynamically creating, testing and debugging regular expressions within a text file. It provides a simple and user-friendly interface, making the process of working with regular expressions effortless and efficient.
 
-Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights.
+Press `Ctrl+Alt+X`/`Cmd+Alt+X` or use the command `Regex Match: Open Regex Match Window` to open the regex test window, where you can test your regular expressions with the help of highlights. Also, you can create `.rgx` files to save your regex tests.
 
-![Regex Match Demo](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/demo.gif)
+![Regex Match Demo](./assets/demo.gif)
 
 ## Table of Contents
 
@@ -53,25 +53,25 @@ test input line n
 ---
 ```
 
-![Testing Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/test-regex-feature.gif)
+![Testing Regular Expressions](./assets/test-regex-feature.gif)
 
 ### Test Regular Expressions from the Code Editor
 
 With VS Code's CodeLens functionality, Regex Match allows you to test the regular expressions directly from your code. By using the `Test Regex` CodeLens, you can send the regex from your code to the Regex Match extension for testing. Once edited, you can update the original regex in the code using the `Apply Regex to Code` CodeLens.
 
-![Test Regular Expressions from the Code Editor](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/code-lens-feature.gif)
+![Test Regular Expressions from the Code Editor](./assets/code-lens-feature.gif)
 
 ### Highlight of Capturing Groups
 
 Each group in a regular expression is highlighted in a different color, making it easy to distinguish and identify them. Color-coded regex capture groups enhance readability and simplify debugging.
 
-![Highlight of Capturing Groups](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/capturing-groups-feature.gif)
+![Highlight of Capturing Groups](./assets/capturing-groups-feature.gif)
 
 ### Test Multiple Regular Expressions
 
 You can test multiple regular expressions in the same file. Each regex test should follow the specified syntax, with its own test lines and capture groups. This feature allows you to test different regex patterns independently in the same file.
 
-![Test Multiple Regular Expressions](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/resources/multiple-regex-feature.gif)
+![Test Multiple Regular Expressions](./assets/multiple-regex-feature.gif)
 
 ## ⚙️ Extension Settings
 
@@ -122,7 +122,7 @@ The following dependencies are required to run the project:
 | ---------------------------------------------------- | ----------------- |
 | [Node.js](https://nodejs.org/)                       | >= 20.19.0 && <21 |
 | [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
-| [pnpm](https://pnpm.io/)                             | 8.15.3            |
+| [pnpm](https://pnpm.io/)                             | 10.30.0           |
 
 ### Usage
 
