@@ -60,7 +60,7 @@ class TextDecorationApplier implements Disposable {
   private getConfigurationColor(decorationKey: DecorationKey) {
     return workspace
       .getConfiguration('regex-match.colorHighlighting')
-      .get<string>(decorationKey, DEFAULT_DECORATION_COLORS[decorationKey]);
+      .get(decorationKey, DEFAULT_DECORATION_COLORS[decorationKey]);
   }
 
   applyDecorations(
