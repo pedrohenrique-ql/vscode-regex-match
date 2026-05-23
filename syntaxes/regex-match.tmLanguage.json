@@ -12,7 +12,7 @@
   "repository": {
     "regex-line": {
       "name": "meta.regex-line.rgx",
-      "match": "^/.*$",
+      "match": "^/.*/[dgimsuvy]*\\s*$",
       "captures": {
         "0": {
           "patterns": [{ "include": "#regexp" }]
@@ -33,7 +33,7 @@
       "patterns": [
         {
           "name": "text.test-content.rgx",
-          "match": "^(?!---\\s*$).*$"
+          "match": "^.*$"
         }
       ]
     },
