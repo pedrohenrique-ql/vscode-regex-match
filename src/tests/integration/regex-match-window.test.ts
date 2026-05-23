@@ -66,6 +66,7 @@ describe('Regex Match file', () => {
     activeTextEditor!.selection = new Selection(lastLine, lastLineLength, lastLine, lastLineLength);
 
     await commands.executeCommand('editor.action.insertLineAfter');
+    await wait(100);
     await commands.executeCommand('editor.action.insertSnippet', { name: 'Regex Test Block' });
     await wait(100);
 
