@@ -61,7 +61,13 @@ describe('Regex Match Grammar', () => {
     expectToken(tokens[2], {
       startIndex: 2,
       endIndex: 5,
-      scopes: ['source.rgx', 'meta.regex-line.rgx', 'string.regexp.rgx', 'constant.other.character-class.set.regexp'],
+      scopes: [
+        'source.rgx',
+        'meta.regex-line.rgx',
+        'string.regexp.rgx',
+        'constant.other.character-class.set.regexp',
+        'constant.other.character-class.range.regexp',
+      ],
     });
     expectToken(tokens[3], {
       startIndex: 5,
@@ -576,7 +582,13 @@ describe('Regex Match Grammar', () => {
     expectToken(allTokens[0].tokens[2], {
       startIndex: 2,
       endIndex: 5,
-      scopes: ['source.rgx', 'meta.regex-line.rgx', 'string.regexp.rgx', 'constant.other.character-class.set.regexp'],
+      scopes: [
+        'source.rgx',
+        'meta.regex-line.rgx',
+        'string.regexp.rgx',
+        'constant.other.character-class.set.regexp',
+        'constant.other.character-class.range.regexp',
+      ],
     });
     expectToken(allTokens[0].tokens[3], {
       startIndex: 5,
@@ -689,7 +701,13 @@ describe('Regex Match Grammar', () => {
     expectToken(allTokens[0].tokens[2], {
       startIndex: 2,
       endIndex: 5,
-      scopes: ['source.rgx', 'meta.regex-line.rgx', 'string.regexp.rgx', 'constant.other.character-class.set.regexp'],
+      scopes: [
+        'source.rgx',
+        'meta.regex-line.rgx',
+        'string.regexp.rgx',
+        'constant.other.character-class.set.regexp',
+        'constant.other.character-class.range.regexp',
+      ],
     });
     expectToken(allTokens[0].tokens[3], {
       startIndex: 5,
@@ -789,7 +807,13 @@ describe('Regex Match Grammar', () => {
     expectToken(allTokens[7].tokens[2], {
       startIndex: 2,
       endIndex: 5,
-      scopes: ['source.rgx', 'meta.regex-line.rgx', 'string.regexp.rgx', 'constant.other.character-class.set.regexp'],
+      scopes: [
+        'source.rgx',
+        'meta.regex-line.rgx',
+        'string.regexp.rgx',
+        'constant.other.character-class.set.regexp',
+        'constant.other.character-class.range.regexp',
+      ],
     });
     expectToken(allTokens[7].tokens[3], {
       startIndex: 5,
@@ -836,6 +860,16 @@ describe('Regex Match Grammar', () => {
       endIndex: 4,
       scopes: ['source.rgx', 'meta.test-block.rgx', 'punctuation.separator.test.end.rgx'],
     });
+  });
+
+  it('should tokenize character class ranges', () => {
+    const line = '/[a-zA-Z0-9]/';
+    const { tokens } = grammar.tokenizeLine(line, vscodeTextmate.INITIAL);
+
+    expectTokenWithScopes(tokens, [
+      'constant.other.character-class.set.regexp',
+      'constant.other.character-class.range.regexp',
+    ]);
   });
 
   it('should tokenize negated character class', () => {

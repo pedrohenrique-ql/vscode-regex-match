@@ -119,7 +119,13 @@
           "endCaptures": {
             "1": { "name": "punctuation.definition.character-class.regexp" }
           },
-          "patterns": [{ "include": "#regex-character-class" }]
+          "patterns": [
+            {
+              "name": "constant.other.character-class.range.regexp",
+              "match": "(?:\\\\.|[^\\\\\\]\\-])-(?:\\\\.|[^\\\\\\]\\-])"
+            },
+            { "include": "#regex-character-class" }
+          ]
         },
         { "include": "#regex-character-class" }
       ]
