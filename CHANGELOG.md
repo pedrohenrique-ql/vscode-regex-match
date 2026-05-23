@@ -1,5 +1,9 @@
 # Change Log
 
+## [v0.7.2]
+
+- Fixed the test-block end pattern that could never match, causing the rule to consume the entire file from the first regex line to EOF.
+
 ## [v0.7.1] - 21/02/2026
 
 - Fixed an issue when there are duplicate regex tests that came from code.
