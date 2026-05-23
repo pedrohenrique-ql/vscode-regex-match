@@ -957,6 +957,49 @@ describe('Regex Match Grammar', () => {
     expectNotTokenWithScopes(tokens, ['meta.regex-line.rgx']);
   });
 
+  it('should not consume content after a closed test block', () => {
+    const lines = ['/abc/', '---', 'foo', '---', 'trailing line', '/xyz/'];
+    let ruleStack = vscodeTextmate.INITIAL;
+    const allTokens: { line: string; tokens: vscodeTextmate.IToken[] }[] = [];
+    for (const line of lines) {
+      const res = grammar.tokenizeLine(line, ruleStack);
+      allTokens.push({ line, tokens: res.tokens });
+      ruleStack = res.ruleStack;
+    }
+
+    expectNotTokenWithScopes(allTokens[4].tokens, ['meta.test-block.rgx']);
+    expectToken(allTokens[4].tokens[0], {
+      startIndex: 0,
+      endIndex: 14,
+      scopes: ['source.rgx'],
+    });
+
+    expectTokenWithScopes(allTokens[5].tokens, ['meta.regex-line.rgx']);
+    expectNotTokenWithScopes(allTokens[5].tokens, ['meta.test-block.rgx']);
+  });
+
+  it('should keep an unclosed test block open until EOF', () => {
+    const lines = ['/abc/', '---', 'foo', 'bar'];
+    let ruleStack = vscodeTextmate.INITIAL;
+    const allTokens: { line: string; tokens: vscodeTextmate.IToken[] }[] = [];
+    for (const line of lines) {
+      const res = grammar.tokenizeLine(line, ruleStack);
+      allTokens.push({ line, tokens: res.tokens });
+      ruleStack = res.ruleStack;
+    }
+
+    expectToken(allTokens[2].tokens[0], {
+      startIndex: 0,
+      endIndex: 3,
+      scopes: ['source.rgx', 'meta.test-block.rgx', 'text.test-content.rgx'],
+    });
+    expectToken(allTokens[3].tokens[0], {
+      startIndex: 0,
+      endIndex: 3,
+      scopes: ['source.rgx', 'meta.test-block.rgx', 'text.test-content.rgx'],
+    });
+  });
+
   it('should not start test block for malformed delimiter', () => {
     const line = '---x';
     const { tokens } = grammar.tokenizeLine(line, vscodeTextmate.INITIAL);
