@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { after, beforeEach, describe, it } from 'mocha';
-import { Range, Selection, ViewColumn, commands, window, workspace } from 'vscode';
+import { Position, Range, Selection, ViewColumn, commands, window, workspace } from 'vscode';
 
 import { DEFAULT_FILE_CONTENT } from '@/controllers/regex-test/FileCreator';
 import { REGEX_TEST_FILE_PATH } from '@/controllers/regex-test/RegexTestController';
@@ -60,13 +60,15 @@ describe('Regex Match file', () => {
 
     assert.notEqual(activeTextEditor, undefined);
 
-    const lastLine = activeTextEditor!.document.lineCount - 1;
-    const lastLineLength = activeTextEditor!.document.lineAt(lastLine).text.length;
+    await activeTextEditor!.edit((editBuilder) => {
+      const lastLine = activeTextEditor!.document.lineCount - 1;
+      const lastLineLength = activeTextEditor!.document.lineAt(lastLine).text.length;
+      editBuilder.insert(new Position(lastLine, lastLineLength), '\n');
+    });
 
-    activeTextEditor!.selection = new Selection(lastLine, lastLineLength, lastLine, lastLineLength);
+    const newLastLine = activeTextEditor!.document.lineCount - 1;
+    activeTextEditor!.selection = new Selection(newLastLine, 0, newLastLine, 0);
 
-    await commands.executeCommand('editor.action.insertLineAfter');
-    await wait(100);
     await commands.executeCommand('editor.action.insertSnippet', { name: 'Regex Test Block' });
     await wait(100);
 
