@@ -3,59 +3,59 @@
   "scopeName": "source.rgx",
   "patterns": [
     {
-      "name": "meta.test-block.rgx",
-      "begin": "^(?=/)",
-      "end": "^---\\s*$\\n^---\\s*$",
-      "patterns": [
-        { "include": "#regexp" },
-        {
-          "name": "meta.test-declaration.rgx",
-          "begin": "^---\\s*$",
-          "end": "^---\\s*$",
-          "beginCaptures": {
-            "0": { "name": "punctuation.separator.test.begin.rgx" }
-          },
-          "endCaptures": {
-            "0": { "name": "punctuation.separator.test.end.rgx" }
-          },
-          "patterns": [
-            {
-              "name": "text.test-content.rgx",
-              "match": "^.*$"
-            }
-          ]
-        }
-      ]
+      "include": "#regex-line"
+    },
+    {
+      "include": "#test-block"
     }
   ],
   "repository": {
+    "regex-line": {
+      "name": "meta.regex-line.rgx",
+      "match": "^/.*/[dgimsuvy]*\\s*$",
+      "captures": {
+        "0": {
+          "patterns": [{ "include": "#regexp" }]
+        }
+      }
+    },
+
+    "test-block": {
+      "name": "meta.test-block.rgx",
+      "begin": "^---\\s*$",
+      "end": "^---\\s*$",
+      "beginCaptures": {
+        "0": { "name": "punctuation.separator.test.begin.rgx" }
+      },
+      "endCaptures": {
+        "0": { "name": "punctuation.separator.test.end.rgx" }
+      },
+      "patterns": [
+        {
+          "name": "text.test-content.rgx",
+          "match": "^.*$"
+        }
+      ]
+    },
+
     "regexp": {
       "patterns": [
         {
           "name": "string.regexp.rgx",
           "begin": "(/)",
           "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.begin.rgx"
-            }
+            "0": { "name": "punctuation.definition.string.begin.rgx" }
           },
           "end": "/([dgimsuvy]*)",
           "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.string.end.rgx"
-            },
-            "1": {
-              "name": "keyword.other.rgx"
-            }
+            "0": { "name": "punctuation.definition.string.end.rgx" },
+            "1": { "name": "keyword.other.rgx" }
           },
-          "patterns": [
-            {
-              "include": "#regex-body"
-            }
-          ]
+          "patterns": [{ "include": "#regex-body" }]
         }
       ]
     },
+
     "regex-body": {
       "patterns": [
         {
@@ -65,12 +65,8 @@
         {
           "match": "\\\\[1-9]\\d*|\\\\k<([a-zA-Z_$][\\w$]*)>",
           "captures": {
-            "0": {
-              "name": "keyword.other.back-reference.regexp"
-            },
-            "1": {
-              "name": "variable.other.regexp"
-            }
+            "0": { "name": "keyword.other.back-reference.regexp" },
+            "1": { "name": "variable.other.regexp" }
           }
         },
         {
@@ -94,82 +90,47 @@
           },
           "end": "(\\))",
           "endCaptures": {
-            "1": {
-              "name": "punctuation.definition.group.regexp"
-            }
+            "1": { "name": "punctuation.definition.group.regexp" }
           },
-          "patterns": [
-            {
-              "include": "#regex-body"
-            }
-          ]
+          "patterns": [{ "include": "#regex-body" }]
         },
         {
           "name": "meta.group.regexp",
           "begin": "\\((?:(\\?:)|(?:\\?<([a-zA-Z_$][\\w$]*)>))?",
           "beginCaptures": {
-            "0": {
-              "name": "punctuation.definition.group.regexp"
-            },
-            "1": {
-              "name": "punctuation.definition.group.no-capture.regexp"
-            },
-            "2": {
-              "name": "variable.other.regexp"
-            }
+            "0": { "name": "punctuation.definition.group.regexp" },
+            "1": { "name": "punctuation.definition.group.no-capture.regexp" },
+            "2": { "name": "variable.other.regexp" }
           },
           "end": "\\)",
           "endCaptures": {
-            "0": {
-              "name": "punctuation.definition.group.regexp"
-            }
+            "0": { "name": "punctuation.definition.group.regexp" }
           },
-          "patterns": [
-            {
-              "include": "#regex-body"
-            }
-          ]
+          "patterns": [{ "include": "#regex-body" }]
         },
         {
           "name": "constant.other.character-class.set.regexp",
           "begin": "(\\[)(\\^)?",
           "beginCaptures": {
-            "1": {
-              "name": "punctuation.definition.character-class.regexp"
-            },
-            "2": {
-              "name": "keyword.operator.negation.regexp"
-            }
+            "1": { "name": "punctuation.definition.character-class.regexp" },
+            "2": { "name": "keyword.operator.negation.regexp" }
           },
           "end": "(\\])",
           "endCaptures": {
-            "1": {
-              "name": "punctuation.definition.character-class.regexp"
-            }
+            "1": { "name": "punctuation.definition.character-class.regexp" }
           },
           "patterns": [
             {
               "name": "constant.other.character-class.range.regexp",
-              "match": "(?:.|(\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}))|(\\\\c[A-Z])|(\\\\.))\\-(?:[^\\]\\\\]|(\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}))|(\\\\c[A-Z])|(\\\\.))",
-              "captures": {
-                "1": { "name": "constant.character.numeric.regexp" },
-                "2": { "name": "constant.character.control.regexp" },
-                "3": { "name": "constant.character.escape.backslash.regexp" },
-                "4": { "name": "constant.character.numeric.regexp" },
-                "5": { "name": "constant.character.control.regexp" },
-                "6": { "name": "constant.character.escape.backslash.regexp" }
-              }
+              "match": "(?:\\\\.|[^\\\\\\]\\-])-(?:\\\\.|[^\\\\\\]\\-])"
             },
-            {
-              "include": "#regex-character-class"
-            }
+            { "include": "#regex-character-class" }
           ]
         },
-        {
-          "include": "#regex-character-class"
-        }
+        { "include": "#regex-character-class" }
       ]
     },
+
     "regex-character-class": {
       "patterns": [
         {
