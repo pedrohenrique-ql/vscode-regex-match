@@ -203,7 +203,7 @@
     "mocha": "^11.7.5",
     "prettier": "^3.6.2",
     "prettier-plugin-sh": "^0.18.0",
-    "tmp": "^0.2.3",
+    "tmp": "^0.2.6",
     "tsup": "^8.5.1",
     "typescript": "^5.8.3",
     "vite-tsconfig-paths": "^6.1.1",
