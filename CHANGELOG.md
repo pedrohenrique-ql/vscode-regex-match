@@ -1,6 +1,6 @@
 # Change Log
 
-## [v0.7.2]
+## [v0.7.2] - 10/06/2026
 
 - Fixed the test-block end pattern that could never match, causing the rule to consume the entire file from the first regex line to EOF.
 
