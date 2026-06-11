@@ -90,6 +90,10 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
+## [v0.7.2]
+
+- Fixed the test-block end pattern that could never match, causing the rule to consume the entire file from the first regex line to EOF.
+
 ## [v0.7.1]
 
 - Fixed an issue when there are duplicate regex tests that came from code.
@@ -120,7 +124,7 @@ The following dependencies are required to run the project:
 
 | Dependency                                           | Version           |
 | ---------------------------------------------------- | ----------------- |
-| [Node.js](https://nodejs.org/)                       | >= 20.19.0 && <21 |
+| [Node.js](https://nodejs.org/)                       | >=24.13.0 <25.0.0 |
 | [Visual Studio Code](https://code.visualstudio.com/) | ^1.96.0           |
 | [pnpm](https://pnpm.io/)                             | 10.30.0           |
 

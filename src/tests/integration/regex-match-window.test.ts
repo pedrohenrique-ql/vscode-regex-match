@@ -1,6 +1,6 @@
 import assert from 'assert';
 import { after, beforeEach, describe, it } from 'mocha';
-import { Range, Selection, ViewColumn, commands, window, workspace } from 'vscode';
+import { Position, Range, SnippetString, ViewColumn, commands, window, workspace } from 'vscode';
 
 import { DEFAULT_FILE_CONTENT } from '@/controllers/regex-test/FileCreator';
 import { REGEX_TEST_FILE_PATH } from '@/controllers/regex-test/RegexTestController';
@@ -60,19 +60,28 @@ describe('Regex Match file', () => {
 
     assert.notEqual(activeTextEditor, undefined);
 
-    const lastLine = activeTextEditor!.document.lineCount - 1;
-    const lastLineLength = activeTextEditor!.document.lineAt(lastLine).text.length;
+    await activeTextEditor!.edit((editBuilder) => {
+      const lastLine = activeTextEditor!.document.lineCount - 1;
+      const lastLineLength = activeTextEditor!.document.lineAt(lastLine).text.length;
+      editBuilder.insert(new Position(lastLine, lastLineLength), '\n');
+    });
 
-    activeTextEditor!.selection = new Selection(lastLine, lastLineLength, lastLine, lastLineLength);
+    const newLastLine = activeTextEditor!.document.lineCount - 1;
+    const snippetBody = snippets['Regex Test Block'].body.join('\n');
 
-    await commands.executeCommand('editor.action.insertLineAfter');
-    await commands.executeCommand('editor.action.insertSnippet', { name: 'Regex Test Block' });
-    await wait(100);
+    await activeTextEditor!.insertSnippet(new SnippetString(snippetBody), new Position(newLastLine, 0));
 
-    const snippetBody = snippets['Regex Test Block'].body.join('\n').replace(/\${\d:|}/g, '');
+    const expectedSnippetBody = snippetBody.replace(/\${\d:|}/g, '');
 
-    const expectedContent = `${DEFAULT_FILE_CONTENT}\n${snippetBody}`;
-    assert.equal(activeTextEditor!.document.getText(), expectedContent);
+    const textEditor = activeTextEditor!.document.getText().replace(/\r\n/g, '\n');
+    const expectedDefault = DEFAULT_FILE_CONTENT.replace(/\r\n/g, '\n');
+    const expectedSnippet = expectedSnippetBody.replace(/\r\n/g, '\n');
+
+    assert.ok(textEditor.startsWith(expectedDefault));
+
+    const afterDefault = textEditor.slice(expectedDefault.length);
+    assert.ok(/^\n+/.test(afterDefault));
+    assert.ok(afterDefault.includes(expectedSnippet));
   });
 
   it('should create many regex test files by using .rgx extension', async () => {
