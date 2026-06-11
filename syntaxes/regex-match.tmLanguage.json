@@ -122,7 +122,7 @@
           "patterns": [
             {
               "name": "constant.other.character-class.range.regexp",
-              "match": "(?:\\\\.|[^\\\\\\]\\-])-(?:\\\\.|[^\\\\\\]\\-])"
+              "match": "(?:\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|c[A-Z]|.)|[^\\\\\\]\\-])-(?:\\\\(?:[0-7]{3}|x[0-9A-Fa-f]{2}|u[0-9A-Fa-f]{4}|c[A-Z]|.)|[^\\\\\\]\\-])"
             },
             { "include": "#regex-character-class" }
           ]
