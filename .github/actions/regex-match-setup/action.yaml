@@ -5,12 +5,12 @@ runs:
   using: composite
   steps:
     - name: Install Node.js
-      uses: actions/setup-node@v4
+      uses: actions/setup-node@v6
       with:
         node-version: 24.13.0
 
     - name: Install pnpm
-      uses: pnpm/action-setup@v3
+      uses: pnpm/action-setup@v6
       with:
         version: 10.30.0
 
@@ -21,7 +21,7 @@ runs:
 
     - name: Restore pnpm cache
       id: pnpm-cache
-      uses: actions/cache@v4
+      uses: actions/cache@v5
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
         key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -33,7 +33,7 @@ runs:
       run: pnpm install --prefer-offline --frozen-lockfile
 
     - name: Save dependency cache
-      uses: actions/cache/save@v4
+      uses: actions/cache/save@v5
       if: ${{ steps.pnpm-cache.outputs.cache-hit != 'true' }}
       with:
         path: ${{ steps.pnpm-store.outputs.path }}
