@@ -218,6 +218,40 @@ describe('Regex Test', () => {
     expect(error!.line).toBe(6);
   });
 
+  it('should expose the syntax error via getError(), if the regex has an unknown flag', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]+a+/c',
+      regexLineIndex: 3,
+      testLines: ['123aaa'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const error = regexTest.getError();
+
+    expect(error).toBeInstanceOf(RegexSyntaxError);
+    expect(error!.message).toContain('Invalid flags');
+    expect(error!.line).toBe(3);
+    expect(regexTest.test()).toEqual([]);
+  });
+
+  it('should keep a literal forward slash in the pattern and parse trailing flags, if the pattern contains a slash', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/a\\/b/g',
+      regexLineIndex: 0,
+      testLines: ['xa/byy'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+
+    expect(regexTest.getError()).toBeUndefined();
+
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(1);
+    expect(matchResult[0].substring).toBe('a/b');
+  });
+
   it('should return an empty match array from test(), if the regex is invalid', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/(?/gm',
