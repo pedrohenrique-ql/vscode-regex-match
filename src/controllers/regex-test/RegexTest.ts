@@ -26,6 +26,7 @@ class RegexTest {
   private testString: string;
   private startTestIndex: number;
   private codeRegex?: CodeRegex;
+  private error?: RegexSyntaxError;
 
   constructor({ regexPattern, regexLineIndex, testLines, startTestIndex, codeRegex }: RegexTestProps) {
     this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
@@ -36,7 +37,7 @@ class RegexTest {
 
   test(): MatchResult[] {
     if (!this.matchingRegex) {
-      throw new Error('Regex not found');
+      return [];
     }
 
     const regexCopy = new RegExp(this.matchingRegex.source, this.matchingRegex.flags);
@@ -82,9 +83,13 @@ class RegexTest {
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new RegexSyntaxError(error.message, regexLineIndex);
+        this.error = new RegexSyntaxError(error.message, regexLineIndex);
       }
     }
+  }
+
+  getError(): RegexSyntaxError | undefined {
+    return this.error;
   }
 
   private processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
