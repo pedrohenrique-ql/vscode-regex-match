@@ -59,19 +59,18 @@ describe('File Parser', () => {
     expect(regexTests[0].getStartTestIndex()).toBe(15);
   });
 
-  it('should parse regex test with an error if the matching regex is invalid', () => {
+  it('should return the block with its syntax error captured when the only regex is invalid', () => {
     const fileContent = '/(?/gm\n---\nbb9abb\n---';
 
-    try {
-      FileParser.parseFileContent(fileContent, []);
-      expect.unreachable('Expected to throw an error');
-    } catch (error) {
-      expect(error).toBeInstanceOf(RegexSyntaxError);
+    const regexTests = FileParser.parseFileContent(fileContent, []);
+    expect(regexTests).toHaveLength(1);
 
-      const regexMatchFormatError = error as RegexSyntaxError;
-      expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-      expect(regexMatchFormatError.line).toBe(0);
-    }
+    const error = regexTests[0].getError();
+    expect(error).toBeInstanceOf(RegexSyntaxError);
+    expect(error!.message).toContain('Invalid regular expression');
+    expect(error!.line).toBe(0);
+
+    expect(regexTests[0].test()).toEqual([]);
   });
 
   it('should throw error if the file content does not contain the test area delimiter', () => {
@@ -150,19 +149,37 @@ describe('File Parser', () => {
       }
     });
 
-    it('should parse correctly if the second matching regex is invalid', () => {
-      const fileContent = '/[0-9]/gm\n---\nbb9abb\n---\n/[0-9](/gm\n---\n9\n---';
+    it('should keep the second block valid when the first block regex is invalid', () => {
+      const fileContent = '/[0-9](/gm\n---\nbb9abb\n---\n/[0-9]/gm\n---\n9\n---';
 
-      try {
-        FileParser.parseFileContent(fileContent, []);
-        expect.unreachable('Expected to throw an error');
-      } catch (error) {
-        expect(error).toBeInstanceOf(RegexSyntaxError);
+      const regexTests = FileParser.parseFileContent(fileContent, []);
+      expect(regexTests).toHaveLength(2);
 
-        const regexMatchFormatError = error as RegexSyntaxError;
-        expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-        expect(regexMatchFormatError.line).toBe(4);
-      }
+      const firstError = regexTests[0].getError();
+      expect(firstError).toBeInstanceOf(RegexSyntaxError);
+      expect(firstError!.line).toBe(0);
+      expect(regexTests[0].test()).toEqual([]);
+
+      expect(regexTests[1].getError()).toBeUndefined();
+      const secondMatches = regexTests[1].test();
+      expect(secondMatches).toHaveLength(1);
+      expect(secondMatches[0].substring).toBe('9');
+    });
+
+    it('should keep the first block valid when the second block regex is invalid', () => {
+      const fileContent = '/[0-9]/gm\n---\n9\n---\n/[0-9](/gm\n---\nbb9abb\n---';
+
+      const regexTests = FileParser.parseFileContent(fileContent, []);
+      expect(regexTests).toHaveLength(2);
+
+      expect(regexTests[0].getError()).toBeUndefined();
+      const firstMatches = regexTests[0].test();
+      expect(firstMatches).toHaveLength(1);
+      expect(firstMatches[0].substring).toBe('9');
+
+      const secondError = regexTests[1].getError();
+      expect(secondError).toBeInstanceOf(RegexSyntaxError);
+      expect(secondError!.line).toBe(4);
     });
 
     it('should parse multiple regex tests correctly', () => {
@@ -208,16 +225,15 @@ describe('File Parser', () => {
     it('should parse multiple regex tests correctly, if there is a regex with an error', () => {
       const fileContent = '/[0-9]/gm\n---\ntest1\ntest2\n---\n/[0-9](/gm\n---\n9\n---';
 
-      try {
-        FileParser.parseFileContent(fileContent, []);
-        expect.unreachable('Expected to throw an error');
-      } catch (error) {
-        expect(error).toBeInstanceOf(RegexSyntaxError);
+      const regexTests = FileParser.parseFileContent(fileContent, []);
+      expect(regexTests).toHaveLength(2);
 
-        const regexMatchFormatError = error as RegexSyntaxError;
-        expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-        expect(regexMatchFormatError.line).toBe(5);
-      }
+      expect(regexTests[0].getError()).toBeUndefined();
+
+      const secondError = regexTests[1].getError();
+      expect(secondError).toBeInstanceOf(RegexSyntaxError);
+      expect(secondError!.message).toContain('Invalid regular expression');
+      expect(secondError!.line).toBe(5);
     });
 
     it('should parse multiple regex tests correctly, if there are empty lines between tests', () => {
