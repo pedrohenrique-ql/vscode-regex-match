@@ -72,14 +72,12 @@ class RegexTest {
         const flagsGroup = matchGroups.groups?.flags;
 
         let flags = flagsGroup?.replace('/', '') ?? '';
-        let matchingRegex = new RegExp(pattern, flags);
 
         if (!flags.includes(REQUIRED_FLAG)) {
           flags += REQUIRED_FLAG;
         }
 
-        matchingRegex = new RegExp(pattern, flags);
-        return matchingRegex;
+        return new RegExp(pattern, flags);
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -121,15 +119,19 @@ class RegexTest {
     return this.matchingRegex;
   }
 
-  getMatchingRegexSource() {
+  getMatchingRegexSource(): string | undefined {
+    if (!this.matchingRegex) {
+      return undefined;
+    }
+
     const codeRegExp = this.getCodeRegExp();
     const hasIndicesFlag = codeRegExp?.hasIndices;
 
     const newRegexFlags = hasIndicesFlag
-      ? this.matchingRegex?.flags
-      : this.matchingRegex?.flags.replace(REQUIRED_FLAG, '');
+      ? this.matchingRegex.flags
+      : this.matchingRegex.flags.replace(REQUIRED_FLAG, '');
 
-    return `/${this.matchingRegex?.source}/${newRegexFlags}`;
+    return `/${this.matchingRegex.source}/${newRegexFlags}`;
   }
 
   getTestString() {
