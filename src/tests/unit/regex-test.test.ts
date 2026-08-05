@@ -202,7 +202,7 @@ describe('Regex Test', () => {
     expect(matchResult[0].groupRanges).toBeUndefined();
   });
 
-  it('should throw an error, if the regex is invalid', () => {
+  it('should expose the syntax error via getError(), if the regex is invalid', () => {
     const regexTestProps: RegexTestProps = {
       regexPattern: '/(?/gm',
       regexLineIndex: 6,
@@ -210,16 +210,70 @@ describe('Regex Test', () => {
       startTestIndex: 0,
     };
 
-    try {
-      new RegexTest(regexTestProps);
-      expect.unreachable('Expected to throw an error');
-    } catch (error) {
-      expect(error).toBeInstanceOf(RegexSyntaxError);
+    const regexTest = new RegexTest(regexTestProps);
+    const error = regexTest.getError();
 
-      const regexMatchFormatError = error as RegexSyntaxError;
-      expect(regexMatchFormatError.message).toContain('Invalid regular expression');
-      expect(regexMatchFormatError.line).toBe(regexTestProps.regexLineIndex);
-    }
+    expect(error).toBeInstanceOf(RegexSyntaxError);
+    expect(error!.message).toContain('Invalid regular expression');
+    expect(error!.line).toBe(6);
+  });
+
+  it('should expose the syntax error via getError(), if the regex has an unknown flag', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]+a+/c',
+      regexLineIndex: 3,
+      testLines: ['123aaa'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    const error = regexTest.getError();
+
+    expect(error).toBeInstanceOf(RegexSyntaxError);
+    expect(error!.message).toContain('Invalid flags');
+    expect(error!.line).toBe(3);
+    expect(regexTest.test()).toEqual([]);
+  });
+
+  it('should keep a literal forward slash in the pattern and parse trailing flags, if the pattern contains a slash', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/a\\/b/g',
+      regexLineIndex: 0,
+      testLines: ['xa/byy'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+
+    expect(regexTest.getError()).toBeUndefined();
+
+    const matchResult = regexTest.test();
+    expect(matchResult.length).toBe(1);
+    expect(matchResult[0].substring).toBe('a/b');
+  });
+
+  it('should return an empty match array from test(), if the regex is invalid', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/(?/gm',
+      regexLineIndex: 6,
+      testLines: ['9ab', '8a', '7A'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    expect(regexTest.test()).toEqual([]);
+  });
+
+  it('should return undefined from getError(), if the regex is valid', () => {
+    const regexTestProps: RegexTestProps = {
+      regexPattern: '/[0-9]a/g',
+      regexLineIndex: 0,
+      testLines: ['bbb9abbbb'],
+      startTestIndex: 0,
+    };
+
+    const regexTest = new RegexTest(regexTestProps);
+    expect(regexTest.getError()).toBeUndefined();
   });
 
   describe('Capturing Groups', () => {

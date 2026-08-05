@@ -26,6 +26,7 @@ class RegexTest {
   private testString: string;
   private startTestIndex: number;
   private codeRegex?: CodeRegex;
+  private error?: RegexSyntaxError;
 
   constructor({ regexPattern, regexLineIndex, testLines, startTestIndex, codeRegex }: RegexTestProps) {
     this.matchingRegex = this.transformStringToRegExp(regexPattern, regexLineIndex);
@@ -36,7 +37,7 @@ class RegexTest {
 
   test(): MatchResult[] {
     if (!this.matchingRegex) {
-      throw new Error('Regex not found');
+      return [];
     }
 
     const regexCopy = new RegExp(this.matchingRegex.source, this.matchingRegex.flags);
@@ -64,27 +65,29 @@ class RegexTest {
 
   private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
     try {
-      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
+      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[a-zA-Z]*)?$/);
 
       if (matchGroups) {
         const [, pattern] = matchGroups;
         const flagsGroup = matchGroups.groups?.flags;
 
         let flags = flagsGroup?.replace('/', '') ?? '';
-        let matchingRegex = new RegExp(pattern, flags);
 
         if (!flags.includes(REQUIRED_FLAG)) {
           flags += REQUIRED_FLAG;
         }
 
-        matchingRegex = new RegExp(pattern, flags);
-        return matchingRegex;
+        return new RegExp(pattern, flags);
       }
     } catch (error) {
       if (error instanceof SyntaxError) {
-        throw new RegexSyntaxError(error.message, regexLineIndex);
+        this.error = new RegexSyntaxError(error.message, regexLineIndex);
       }
     }
+  }
+
+  getError(): RegexSyntaxError | undefined {
+    return this.error;
   }
 
   private processMatch(match: RegExpExecArray, lineStartIndex: number): MatchResult {
@@ -116,15 +119,19 @@ class RegexTest {
     return this.matchingRegex;
   }
 
-  getMatchingRegexSource() {
+  getMatchingRegexSource(): string | undefined {
+    if (!this.matchingRegex) {
+      return undefined;
+    }
+
     const codeRegExp = this.getCodeRegExp();
     const hasIndicesFlag = codeRegExp?.hasIndices;
 
     const newRegexFlags = hasIndicesFlag
-      ? this.matchingRegex?.flags
-      : this.matchingRegex?.flags.replace(REQUIRED_FLAG, '');
+      ? this.matchingRegex.flags
+      : this.matchingRegex.flags.replace(REQUIRED_FLAG, '');
 
-    return `/${this.matchingRegex?.source}/${newRegexFlags}`;
+    return `/${this.matchingRegex.source}/${newRegexFlags}`;
   }
 
   getTestString() {
