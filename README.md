@@ -67,6 +67,10 @@ Each group in a regular expression is highlighted in a different color, making i
 
 ![Highlight of Capturing Groups](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/assets/capturing-groups-feature.gif)
 
+### Explanation of Regex Tokens on Hover
+
+Hover any character of the regex line in a Regex Match file to see what the token under the cursor does, along with the quantifier, group and character class that enclose it. Hovering a flag explains that flag and the other flags of the regex.
+
 ### Test Multiple Regular Expressions
 
 You can test multiple regular expressions in the same file. Each regex test should follow the specified syntax, with its own test lines and capture groups. This feature allows you to test different regex patterns independently in the same file.

@@ -37,6 +37,7 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
+    "onLanguage:regex-match",
     "regex-match.openRegexMatchWindow"
   ],
   "contributes": {
