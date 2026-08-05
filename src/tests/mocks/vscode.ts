@@ -30,6 +30,22 @@ export class Range {
   }
 }
 
+export class MarkdownString {
+  constructor(public value = '') {}
+
+  appendMarkdown(value: string) {
+    this.value += value;
+    return this;
+  }
+}
+
+export class Hover {
+  constructor(
+    public contents: MarkdownString,
+    public range?: Range,
+  ) {}
+}
+
 export class EventEmitter<T> {
   private listeners: ((e: T) => void)[] = [];
 
