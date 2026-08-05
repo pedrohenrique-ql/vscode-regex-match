@@ -175,6 +175,9 @@
     "pre:push": "concurrently --names style,lint,types 'pnpm style:check .' 'pnpm lint .' 'pnpm types:check'",
     "prepare": "husky"
   },
+  "dependencies": {
+    "@eslint-community/regexpp": "^4.12.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^21.2.0",
