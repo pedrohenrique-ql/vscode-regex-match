@@ -1,13 +1,7 @@
 import { TextEditorDecorationType } from 'vscode';
 
 export type DecorationKey =
-  | 'match'
-  | 'firstGroup'
-  | 'secondGroup'
-  | 'thirdGroup'
-  | 'fourthGroup'
-  | 'fifthGroup'
-  | 'sixthGroup';
+  'match' | 'firstGroup' | 'secondGroup' | 'thirdGroup' | 'fourthGroup' | 'fifthGroup' | 'sixthGroup';
 
 export type DecorationMapping = { [type in DecorationKey]: TextEditorDecorationType };
 
