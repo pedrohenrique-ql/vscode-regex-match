@@ -229,6 +229,9 @@
       "minimatch@^10.0.0": "^10.2.3",
       "picomatch@^2.0.0": "^2.3.2",
       "picomatch@^4.0.0": "^4.0.4"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }
