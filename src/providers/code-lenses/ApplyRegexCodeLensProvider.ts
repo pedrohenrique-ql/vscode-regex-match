@@ -42,6 +42,10 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
       }
 
       const matchingRegexSource = regexTest.getMatchingRegexSource();
+      if (!matchingRegexSource) {
+        continue;
+      }
+
       const targetRange = this.determineTargetRange(matchRanges, currentIndex, matchingRegexSource);
       const command = {
         title: 'Apply Regex to Code',

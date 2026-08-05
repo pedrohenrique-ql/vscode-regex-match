@@ -1,5 +1,9 @@
 # Change Log
 
+## [v0.8.0]
+
+- Scoped invalid regex errors to their own test block, keeping the other blocks highlighted instead of dropping every highlight in the file.
+
 ## [v0.7.2] - 10/06/2026
 
 - Fixed the test-block end pattern that could never match, causing the rule to consume the entire file from the first regex line to EOF.
