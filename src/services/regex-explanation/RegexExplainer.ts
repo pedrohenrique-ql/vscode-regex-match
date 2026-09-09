@@ -1,9 +1,17 @@
 import { RegExpParser, RegExpSyntaxError, visitRegExpAST, type AST } from '@eslint-community/regexpp';
 
+import { splitRegexLine } from '@/utils/regex';
+
 export interface RegexExplanation {
   token: string;
   description: string;
   range: [number, number];
+}
+
+interface ParsedRegexLine {
+  pattern: AST.Pattern;
+  flagsRaw: string;
+  flagsStart: number;
 }
 
 const CONTROL_CHARACTER_NAMES: Record<number, string> = {
@@ -49,33 +57,45 @@ const EXPLAINABLE_ANCESTOR_TYPES = [
   'ExpressionCharacterClass',
 ];
 
+// A `|` inside these nodes is part of their own syntax instead of a pattern alternation.
+const NON_ALTERNATION_TYPES = ['Character', 'ClassStringDisjunction'];
+
+export function toInlineCode(value: string): string {
+  const backtickRuns = value.match(/`+/g) ?? [];
+  const longestBacktickRun = backtickRuns.reduce((longest, run) => Math.max(longest, run.length), 0);
+
+  const fence = '`'.repeat(longestBacktickRun + 1);
+  const padding = value.startsWith('`') || value.endsWith('`') ? ' ' : '';
+
+  return `${fence}${padding}${value}${padding}${fence}`;
+}
+
 class RegexExplainer {
   private static parser = new RegExpParser();
+  private static nodesByRoot = new WeakMap<AST.Node, AST.Node[]>();
 
   static explainAt(lineText: string, characterIndex: number): RegexExplanation[] {
-    const ast = this.parseLine(lineText);
-    if (!ast) {
+    const parsedLine = this.parseRegexLine(lineText);
+    if (!parsedLine) {
       return [];
     }
 
-    if (ast.type === 'RegExpLiteral') {
-      if (characterIndex >= ast.flags.start && characterIndex < ast.flags.end) {
-        return this.explainFlags(ast.flags, characterIndex);
-      }
+    const { pattern, flagsRaw, flagsStart } = parsedLine;
 
-      if (characterIndex === 0 || characterIndex === ast.pattern.end) {
-        return [];
-      }
+    if (characterIndex >= flagsStart && characterIndex < flagsStart + flagsRaw.length) {
+      return this.explainFlags(flagsRaw, flagsStart, characterIndex);
     }
 
-    const innermostNode = this.findInnermostNode(ast, characterIndex);
+    if (characterIndex < pattern.start || characterIndex >= pattern.end) {
+      return [];
+    }
+
+    const innermostNode = this.findInnermostNode(pattern, characterIndex);
     if (!innermostNode) {
       return [];
     }
 
-    const flags = ast.type === 'RegExpLiteral' ? ast.flags.raw : '';
-
-    if (lineText[characterIndex] === '|' && innermostNode.type !== 'Character') {
+    if (lineText[characterIndex] === '|' && !NON_ALTERNATION_TYPES.includes(innermostNode.type)) {
       const alternation: RegexExplanation = {
         token: '|',
         description: 'alternation — matches either the expression before or after the `|`',
@@ -86,25 +106,24 @@ class RegexExplainer {
         this.isExplainable(node),
       );
 
-      return [alternation, ...enclosingNodes.map((node) => this.describeNode(node, flags))];
+      return [alternation, ...enclosingNodes.map((node) => this.describeNode(node, flagsRaw))];
     }
 
     const explainableAncestors = this.ancestorsOf(innermostNode).filter((node) => this.isExplainable(node));
 
-    return [innermostNode, ...explainableAncestors].map((node) => this.describeNode(node, flags));
+    return [innermostNode, ...explainableAncestors].map((node) => this.describeNode(node, flagsRaw));
   }
 
-  private static parseLine(lineText: string): AST.RegExpLiteral | AST.Pattern | undefined {
-    try {
-      return this.parser.parseLiteral(lineText);
-    } catch (error) {
-      if (!(error instanceof RegExpSyntaxError)) {
-        throw error;
-      }
-    }
+  private static parseRegexLine(lineText: string): ParsedRegexLine | undefined {
+    const { pattern: patternSource, patternStart, flags, flagsStart } = splitRegexLine(lineText);
 
     try {
-      return this.parser.parsePattern(lineText);
+      const pattern = this.parser.parsePattern(lineText, patternStart, patternStart + patternSource.length, {
+        unicode: flags.includes('u'),
+        unicodeSets: flags.includes('v'),
+      });
+
+      return { pattern, flagsRaw: flags, flagsStart };
     } catch (error) {
       if (!(error instanceof RegExpSyntaxError)) {
         throw error;
@@ -115,6 +134,11 @@ class RegexExplainer {
   }
 
   private static collectNodes(root: AST.Node): AST.Node[] {
+    const cachedNodes = this.nodesByRoot.get(root);
+    if (cachedNodes) {
+      return cachedNodes;
+    }
+
     const nodes: AST.Node[] = [];
     function collect(node: AST.Node): void {
       nodes.push(node);
@@ -134,13 +158,12 @@ class RegexExplainer {
       onClassSubtractionEnter: collect,
       onExpressionCharacterClassEnter: collect,
       onGroupEnter: collect,
-      onModifierFlagsEnter: collect,
-      onModifiersEnter: collect,
       onPatternEnter: collect,
       onQuantifierEnter: collect,
-      onRegExpLiteralEnter: collect,
       onStringAlternativeEnter: collect,
     });
+
+    this.nodesByRoot.set(root, nodes);
 
     return nodes;
   }
@@ -200,7 +223,11 @@ class RegexExplainer {
       return min === 1 ? 'one or more times' : `${min} or more times`;
     }
 
-    return min === max ? `exactly ${min} times` : `between ${min} and ${max} times`;
+    if (min === max) {
+      return min === 1 ? 'exactly one time' : `exactly ${min} times`;
+    }
+
+    return `between ${min} and ${max} times`;
   }
 
   private static describeQuantifier(node: AST.Quantifier): string {
@@ -220,8 +247,8 @@ class RegexExplainer {
     if (node.kind === 'property') {
       const property = node.value === null ? node.key : `${node.key}=${node.value}`;
       return node.negate
-        ? `matches any character that does not have the Unicode property \`${property}\``
-        : `matches any character with the Unicode property \`${property}\``;
+        ? `matches any character that does not have the Unicode property ${toInlineCode(property)}`
+        : `matches any character with the Unicode property ${toInlineCode(property)}`;
     }
 
     const descriptions = ESCAPE_CHARACTER_SET_DESCRIPTIONS[node.kind];
@@ -244,12 +271,33 @@ class RegexExplainer {
     return `asserts position at the ${node.kind} of the string (or line with the \`m\` flag)`;
   }
 
+  private static describeGroup(node: AST.Group): string {
+    const modifiers = node.modifiers;
+    if (!modifiers) {
+      return 'non-capturing group';
+    }
+
+    const changes: string[] = [];
+
+    if (modifiers.add.raw !== '') {
+      changes.push(`enables ${toInlineCode(modifiers.add.raw)}`);
+    }
+
+    if (modifiers.remove && modifiers.remove.raw !== '') {
+      changes.push(`disables ${toInlineCode(modifiers.remove.raw)}`);
+    }
+
+    return changes.length > 0
+      ? `non-capturing group that ${changes.join(' and ')} for the tokens inside it`
+      : 'non-capturing group';
+  }
+
   private static describeNonQuantifierNode(node: AST.Node, flags: string): string {
     if (node.type === 'Character') {
       const controlCharacterName = CONTROL_CHARACTER_NAMES[node.value];
       return controlCharacterName
         ? `matches a ${controlCharacterName} character`
-        : `matches the character \`${node.raw}\` literally`;
+        : `matches the character ${toInlineCode(node.raw)} literally`;
     }
 
     if (node.type === 'CharacterSet') {
@@ -262,19 +310,29 @@ class RegexExplainer {
         : 'matches a single character present in the list';
     }
 
+    if (node.type === 'ExpressionCharacterClass') {
+      return node.negate
+        ? 'matches a single character not matched by the class expression'
+        : 'matches a single character matched by the class expression';
+    }
+
+    if (node.type === 'ClassStringDisjunction') {
+      return 'matches any one of the strings of the disjunction';
+    }
+
     if (node.type === 'CharacterClassRange') {
-      return `matches a single character in the range \`${node.min.raw}\` to \`${node.max.raw}\``;
+      return `matches a single character in the range ${toInlineCode(node.min.raw)} to ${toInlineCode(node.max.raw)}`;
     }
 
     if (node.type === 'CapturingGroup') {
       const index = this.capturingGroupIndex(node);
       return node.name === null
         ? `capturing group ${index}`
-        : `named capturing group \`${node.name}\` (group ${index})`;
+        : `named capturing group ${toInlineCode(node.name)} (group ${index})`;
     }
 
     if (node.type === 'Group') {
-      return 'non-capturing group';
+      return this.describeGroup(node);
     }
 
     if (node.type === 'Assertion') {
@@ -284,10 +342,10 @@ class RegexExplainer {
     if (node.type === 'Backreference') {
       return typeof node.ref === 'number'
         ? `matches the same text most recently matched by group ${node.ref}`
-        : `matches the same text most recently matched by the named group \`${node.ref}\``;
+        : `matches the same text most recently matched by the named group ${toInlineCode(node.ref)}`;
     }
 
-    return `matches \`${node.raw}\` (${this.splitTypeName(node.type)})`;
+    return `matches ${toInlineCode(node.raw)} (${this.splitTypeName(node.type)})`;
   }
 
   private static describeNode(node: AST.Node, flags: string): RegexExplanation {
@@ -302,16 +360,19 @@ class RegexExplainer {
     return { token: node.raw, description: this.describeNonQuantifierNode(node, flags), range: [node.start, node.end] };
   }
 
-  private static explainFlags(flags: AST.Flags, characterIndex: number): RegexExplanation[] {
-    const explanations = [...flags.raw].map<RegexExplanation>((flag, index) => ({
-      token: flag,
-      description: FLAG_DESCRIPTIONS[flag],
-      range: [flags.start + index, flags.start + index + 1],
-    }));
+  private static explainFlags(flagsRaw: string, flagsStart: number, characterIndex: number): RegexExplanation[] {
+    const explanations = [...flagsRaw].flatMap<RegexExplanation>((flag, index) => {
+      const description = FLAG_DESCRIPTIONS[flag];
 
-    const hoveredIndex = characterIndex - flags.start;
+      return description ? [{ token: flag, description, range: [flagsStart + index, flagsStart + index + 1] }] : [];
+    });
 
-    return [explanations[hoveredIndex], ...explanations.filter((_explanation, index) => index !== hoveredIndex)];
+    const hoveredExplanation = explanations.find(({ range }) => range[0] === characterIndex);
+    if (!hoveredExplanation) {
+      return [];
+    }
+
+    return [hoveredExplanation, ...explanations.filter((explanation) => explanation !== hoveredExplanation)];
   }
 }
 

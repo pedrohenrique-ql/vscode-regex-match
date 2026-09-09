@@ -1,7 +1,7 @@
 import { Hover, HoverProvider, MarkdownString, Position, Range, TextDocument } from 'vscode';
 
 import { TEST_AREA_DELIMITER } from '@/controllers/regex-test/FileParser';
-import RegexExplainer from '@/services/regex-explanation/RegexExplainer';
+import RegexExplainer, { toInlineCode } from '@/services/regex-explanation/RegexExplainer';
 
 class RegexHoverProvider implements HoverProvider {
   provideHover(document: TextDocument, position: Position): Hover | undefined {
@@ -17,7 +17,7 @@ class RegexHoverProvider implements HoverProvider {
     }
 
     const markdown = new MarkdownString(
-      explanations.map(({ token, description }) => `\`${token}\` — ${description}`).join('\n\n'),
+      explanations.map(({ token, description }) => `${toInlineCode(token)} — ${description}`).join('\n\n'),
     );
 
     const [start, end] = explanations[0].range;
@@ -26,20 +26,35 @@ class RegexHoverProvider implements HoverProvider {
   }
 
   private isRegexLine(document: TextDocument, line: number): boolean {
-    const lineText = document.lineAt(line).text;
+    let isInTestStringArea = false;
+    let regexLineIndex: number | undefined;
 
-    if (lineText === '' || lineText === TEST_AREA_DELIMITER) {
-      return false;
-    }
+    for (let currentLine = 0; currentLine < document.lineCount; currentLine++) {
+      const currentLineText = document.lineAt(currentLine).text;
 
-    let delimiterCount = 0;
-    for (let i = 0; i < line; i++) {
-      if (document.lineAt(i).text === TEST_AREA_DELIMITER) {
-        delimiterCount++;
+      if (currentLineText === TEST_AREA_DELIMITER) {
+        isInTestStringArea = !isInTestStringArea;
+
+        if (isInTestStringArea) {
+          if (regexLineIndex === line) {
+            return true;
+          }
+
+          if (currentLine > line) {
+            return false;
+          }
+        }
+
+        regexLineIndex = undefined;
+        continue;
+      }
+
+      if (!isInTestStringArea && currentLineText !== '') {
+        regexLineIndex = currentLine;
       }
     }
 
-    return delimiterCount % 2 === 0;
+    return regexLineIndex === line;
   }
 }
 
