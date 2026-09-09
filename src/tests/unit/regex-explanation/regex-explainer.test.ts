@@ -228,4 +228,49 @@ describe('Regex Explainer', () => {
   it('should return an empty array for a character index outside the line', () => {
     expect(RegexExplainer.explainAt('/a/g', 99)).toEqual([]);
   });
+
+  it('should not explain the delimiters or the flags as pattern characters when the literal is malformed', () => {
+    expect(RegexExplainer.explainAt('/a/x', 3)).toEqual([]);
+    expect(RegexExplainer.explainAt('/abc', 0)).toEqual([]);
+    expect(RegexExplainer.explainAt('/abc/gi ', 0)).toEqual([]);
+  });
+
+  it('should widen the code span fence for tokens that contain backticks', () => {
+    expect(RegexExplainer.explainAt('/`a`/g', 1)[0].description).toBe('matches the character `` ` `` literally');
+    expect(RegexExplainer.explainAt('/[`-~]/g', 2)[1].token).toBe('[`-~]');
+  });
+
+  it('should explain the modifiers of a non-capturing group', () => {
+    const added = RegexExplainer.explainAt('/(?i:abc)/g', 3);
+
+    expect(added).toHaveLength(1);
+    expect(added[0].token).toBe('(?i:abc)');
+    expect(added[0].description).toBe('non-capturing group that enables `i` for the tokens inside it');
+
+    expect(RegexExplainer.explainAt('/(?-i:abc)/i', 7)[1].description).toBe(
+      'non-capturing group that disables `i` for the tokens inside it',
+    );
+    expect(RegexExplainer.explainAt('/(?:abc)/g', 5)[1].description).toBe('non-capturing group');
+  });
+
+  it('should explain a negated expression character class', () => {
+    expect(RegexExplainer.explainAt('/[^[a-z]--[aeiou]]/v', 4).at(-1)?.description).toBe(
+      'matches a single character not matched by the class expression',
+    );
+    expect(RegexExplainer.explainAt('/[[a-z]--[aeiou]]/v', 3).at(-1)?.description).toBe(
+      'matches a single character matched by the class expression',
+    );
+  });
+
+  it('should explain a quantifier of exactly one time in the singular', () => {
+    expect(RegexExplainer.explainAt('/a{1}/g', 3)[0].description).toContain('exactly one time,');
+    expect(RegexExplainer.explainAt('/a{3}/g', 3)[0].description).toContain('exactly 3 times,');
+  });
+
+  it('should not explain a string disjunction separator as an alternation', () => {
+    const explanations = RegexExplainer.explainAt('/[\\q{ab|cd}]/v', 7);
+
+    expect(explanations[0].token).toBe('\\q{ab|cd}');
+    expect(explanations[0].description).toBe('matches any one of the strings of the disjunction');
+  });
 });

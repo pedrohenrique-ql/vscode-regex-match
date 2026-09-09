@@ -92,4 +92,19 @@ describe('Regex Hover Provider', () => {
   it('should not provide a hover when the regex is invalid', () => {
     expect(hover('/a(/', 0, 1)).toBeUndefined();
   });
+
+  it('should not provide a hover for a line that the file parser discards', () => {
+    const fileContent = '/a+/g\n---\naaa\n---\nsome notes\n/b+/g\n---\nbbb\n---';
+
+    expect(hover(fileContent, 4, 2)).toBeUndefined();
+    expect(hover(fileContent, 5, 1)).toBeDefined();
+  });
+
+  it('should keep the hover on a regex line whose test area is not typed yet', () => {
+    expect(hover('/a+/g\n---\naaa\n---\n/b+/g', 4, 1)).toBeDefined();
+  });
+
+  it('should widen the code span fence for a token that contains a backtick', () => {
+    expect(hoverText(hover('/`a`/g', 0, 1))).toContain('`` ` ``');
+  });
 });
