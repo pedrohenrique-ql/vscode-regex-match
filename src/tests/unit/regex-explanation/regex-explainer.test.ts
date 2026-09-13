@@ -267,6 +267,39 @@ describe('Regex Explainer', () => {
     expect(RegexExplainer.explainAt('/a{3}/g', 3)[0].description).toContain('exactly 3 times,');
   });
 
+  it('should explain the dot with the s flag scoped by a modifier group', () => {
+    expect(RegexExplainer.explainAt('/(?s:.)/', 5)[0].description).toBe(
+      'matches any character, including line terminators (`s` flag)',
+    );
+    expect(RegexExplainer.explainAt('/(?-s:.)/s', 6)[0].description).toBe(
+      'matches any character except line terminators',
+    );
+  });
+
+  it('should omit the ASCII equivalence of a word character set under the u and i flags', () => {
+    expect(RegexExplainer.explainAt('/\\w/iu', 1)[0].description).toBe('matches any word character');
+    expect(RegexExplainer.explainAt('/(?i:\\w)/u', 5)[0].description).toBe('matches any word character');
+    expect(RegexExplainer.explainAt('/\\w/u', 1)[0].description).toBe(
+      'matches any word character (equivalent to `[a-zA-Z0-9_]`)',
+    );
+  });
+
+  it('should explain an escaped character by the character that it matches', () => {
+    expect(RegexExplainer.explainAt('/\\x41/', 1)[0].description).toBe('matches the character `A` (U+0041)');
+    expect(RegexExplainer.explainAt('/\\u0041/', 1)[0].description).toBe('matches the character `A` (U+0041)');
+    expect(RegexExplainer.explainAt('/\\cA/', 1)[0].description).toBe('matches the control character U+0001');
+    expect(RegexExplainer.explainAt('/\\./', 1)[0].description).toBe('matches the character `.` literally');
+  });
+
+  it('should return an empty array for invalid flags', () => {
+    expect(RegexExplainer.explainAt('/a/x', 1)).toEqual([]);
+    expect(RegexExplainer.explainAt('/a/gg', 1)).toEqual([]);
+  });
+
+  it('should return an empty array for a pattern with an unmatched leading delimiter', () => {
+    expect(RegexExplainer.explainAt('/abc', 2)).toEqual([]);
+  });
+
   it('should not explain a string disjunction separator as an alternation', () => {
     const explanations = RegexExplainer.explainAt('/[\\q{ab|cd}]/v', 7);
 

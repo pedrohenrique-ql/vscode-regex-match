@@ -38,6 +38,17 @@ const ESCAPE_CHARACTER_SET_DESCRIPTIONS = {
   },
 };
 
+const UNICODE_CASE_INSENSITIVE_WORD_DESCRIPTIONS = {
+  positive: 'matches any word character',
+  negative: 'matches any character that is not a word character',
+};
+
+const MODIFIER_FLAG_CHARACTERS = {
+  ignoreCase: 'i',
+  multiline: 'm',
+  dotAll: 's',
+};
+
 const FLAG_DESCRIPTIONS: Record<string, string> = {
   d: 'generates indices for substring matches',
   g: 'global — finds all matches instead of stopping at the first',
@@ -115,9 +126,15 @@ class RegexExplainer {
   }
 
   private static parseRegexLine(lineText: string): ParsedRegexLine | undefined {
-    const { pattern: patternSource, patternStart, flags, flagsStart } = splitRegexLine(lineText);
+    const { pattern: patternSource, patternStart, flags, flagsStart, hasValidDelimiters } = splitRegexLine(lineText);
+
+    if (!hasValidDelimiters) {
+      return undefined;
+    }
 
     try {
+      this.parser.parseFlags(flags);
+
       const pattern = this.parser.parsePattern(lineText, patternStart, patternStart + patternSource.length, {
         unicode: flags.includes('u'),
         unicodeSets: flags.includes('v'),
@@ -210,6 +227,25 @@ class RegexExplainer {
     return capturingGroups.indexOf(node) + 1;
   }
 
+  private static effectiveFlag(node: AST.Node, flag: 'ignoreCase' | 'multiline' | 'dotAll', flags: string): boolean {
+    for (const ancestor of this.ancestorsOf(node)) {
+      const modifiers = ancestor.type === 'Group' ? ancestor.modifiers : undefined;
+      if (!modifiers) {
+        continue;
+      }
+
+      if (modifiers.add[flag]) {
+        return true;
+      }
+
+      if (modifiers.remove?.[flag]) {
+        return false;
+      }
+    }
+
+    return flags.includes(MODIFIER_FLAG_CHARACTERS[flag]);
+  }
+
   private static describeQuantifierTimes(min: number, max: number): string {
     if (min === 0 && max === 1) {
       return 'between zero and one time';
@@ -239,7 +275,7 @@ class RegexExplainer {
 
   private static describeCharacterSet(node: AST.CharacterSet, flags: string): string {
     if (node.kind === 'any') {
-      return flags.includes('s')
+      return this.effectiveFlag(node, 'dotAll', flags)
         ? 'matches any character, including line terminators (`s` flag)'
         : 'matches any character except line terminators';
     }
@@ -251,7 +287,14 @@ class RegexExplainer {
         : `matches any character with the Unicode property ${toInlineCode(property)}`;
     }
 
-    const descriptions = ESCAPE_CHARACTER_SET_DESCRIPTIONS[node.kind];
+    const isUnicodeCaseInsensitive =
+      (flags.includes('u') || flags.includes('v')) && this.effectiveFlag(node, 'ignoreCase', flags);
+
+    const descriptions =
+      node.kind === 'word' && isUnicodeCaseInsensitive
+        ? UNICODE_CASE_INSENSITIVE_WORD_DESCRIPTIONS
+        : ESCAPE_CHARACTER_SET_DESCRIPTIONS[node.kind];
+
     return node.negate ? descriptions.negative : descriptions.positive;
   }
 
@@ -292,12 +335,30 @@ class RegexExplainer {
       : 'non-capturing group';
   }
 
+  private static describeCharacter(node: AST.Character): string {
+    const controlCharacterName = CONTROL_CHARACTER_NAMES[node.value];
+    if (controlCharacterName) {
+      return `matches a ${controlCharacterName} character`;
+    }
+
+    const character = String.fromCodePoint(node.value);
+
+    // `a` and identity escapes such as `\.` are spelled as the character they match.
+    if (node.raw === character || node.raw === `\\${character}`) {
+      return `matches the character ${toInlineCode(character)} literally`;
+    }
+
+    const codePoint = `U+${node.value.toString(16).toUpperCase().padStart(4, '0')}`;
+
+    // `\x41`, `\u0041`, `\cA` and the like are spelled as an escape, so the decoded character is shown instead.
+    return node.value < 0x20 || node.value === 0x7f
+      ? `matches the control character ${codePoint}`
+      : `matches the character ${toInlineCode(character)} (${codePoint})`;
+  }
+
   private static describeNonQuantifierNode(node: AST.Node, flags: string): string {
     if (node.type === 'Character') {
-      const controlCharacterName = CONTROL_CHARACTER_NAMES[node.value];
-      return controlCharacterName
-        ? `matches a ${controlCharacterName} character`
-        : `matches the character ${toInlineCode(node.raw)} literally`;
+      return this.describeCharacter(node);
     }
 
     if (node.type === 'CharacterSet') {

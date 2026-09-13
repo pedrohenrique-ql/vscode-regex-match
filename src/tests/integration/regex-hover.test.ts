@@ -15,7 +15,8 @@ describe('Regex hover', () => {
   }
 
   function hoverText(hover: Hover): string {
-    return hover.contents.map((content) => (content as MarkdownString).value).join('\n\n');
+    const contents = Array.isArray(hover.contents) ? hover.contents : [hover.contents];
+    return contents.map((content) => (content as MarkdownString).value).join('\n\n');
   }
 
   before(async () => {
