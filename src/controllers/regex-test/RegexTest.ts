@@ -1,5 +1,6 @@
 import RegexSyntaxError from '@/exceptions/RegexSyntaxError';
 import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
+import { splitRegexLine } from '@/utils/regex';
 
 export const REQUIRED_FLAG = 'd';
 
@@ -65,20 +66,9 @@ class RegexTest {
 
   private transformStringToRegExp(regexPattern: string, regexLineIndex: number): RegExp | undefined {
     try {
-      const matchGroups = regexPattern.match(/^\/?(.*?)(?<flags>\/[a-zA-Z]*)?$/);
+      const { pattern, flags } = splitRegexLine(regexPattern);
 
-      if (matchGroups) {
-        const [, pattern] = matchGroups;
-        const flagsGroup = matchGroups.groups?.flags;
-
-        let flags = flagsGroup?.replace('/', '') ?? '';
-
-        if (!flags.includes(REQUIRED_FLAG)) {
-          flags += REQUIRED_FLAG;
-        }
-
-        return new RegExp(pattern, flags);
-      }
+      return new RegExp(pattern, flags.includes(REQUIRED_FLAG) ? flags : flags + REQUIRED_FLAG);
     } catch (error) {
       if (error instanceof SyntaxError) {
         this.error = new RegexSyntaxError(error.message, regexLineIndex);
@@ -159,17 +149,14 @@ class RegexTest {
       return;
     }
 
-    const codeRegexPattern = this.codeRegex.pattern;
-    const matchGroups = codeRegexPattern.match(/^\/?(.*?)(?<flags>\/[gimuysvd]*)?$/);
+    const { pattern, flags } = splitRegexLine(this.codeRegex.pattern);
 
-    if (matchGroups) {
-      const [, pattern] = matchGroups;
-      const flagsGroup = matchGroups.groups?.flags;
-
-      const flags = flagsGroup?.replace('/', '') ?? '';
-      const codeRegex = new RegExp(pattern, flags);
-
-      return codeRegex;
+    try {
+      return new RegExp(pattern, flags);
+    } catch (error) {
+      if (!(error instanceof SyntaxError)) {
+        throw error;
+      }
     }
   }
 
