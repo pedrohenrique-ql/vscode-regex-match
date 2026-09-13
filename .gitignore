@@ -15,3 +15,6 @@
 
 # VSCode
 *.vsix
+
+# Temporary files
+/tmp

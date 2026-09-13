@@ -37,6 +37,7 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
+    "onLanguage:regex-match",
     "regex-match.openRegexMatchWindow"
   ],
   "contributes": {
@@ -174,6 +175,9 @@
     "pre:commit": "lint-staged",
     "pre:push": "concurrently --names style,lint,types 'pnpm style:check .' 'pnpm lint .' 'pnpm types:check'",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "@eslint-community/regexpp": "^4.12.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.2.2",

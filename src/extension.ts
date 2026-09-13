@@ -1,8 +1,9 @@
-import { ExtensionContext } from 'vscode';
+import { ExtensionContext, languages } from 'vscode';
 
 import RegexTestController from '@/controllers/regex-test/RegexTestController';
 import TestRegexCodeLensProvider from '@/providers/code-lenses/TestRegexCodeLensProvider';
 import DiagnosticProvider from '@/providers/DiagnosticProvider';
+import RegexHoverProvider from '@/providers/RegexHoverProvider';
 import TestRegexCodeLensManagerService from '@/services/test-regex-code-lens/TestRegexCodeLensManagerService';
 
 export const REGEX_MATCH_LANGUAGE_ID = 'regex-match';
@@ -14,5 +15,7 @@ export function activate(context: ExtensionContext) {
   const testRegexCodeLensProvider = new TestRegexCodeLensProvider();
   const testRegexCodeLensManagerService = new TestRegexCodeLensManagerService(context, testRegexCodeLensProvider);
 
-  context.subscriptions.push(regexTestController, testRegexCodeLensManagerService);
+  const regexHoverProvider = languages.registerHoverProvider(REGEX_MATCH_LANGUAGE_ID, new RegexHoverProvider());
+
+  context.subscriptions.push(regexTestController, testRegexCodeLensManagerService, regexHoverProvider);
 }
