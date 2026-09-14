@@ -4,6 +4,7 @@
 
 - Added a hover on the regex line that explains each token and flag.
 - Scoped invalid regex errors to their own test block, keeping the other blocks highlighted instead of dropping every highlight in the file.
+- Replaced the `firstGroup` to `sixthGroup` color settings with a single `regex-match.colorHighlighting.groups` list, allowing any number of capturing group colors.
 
 ## [v0.7.2] - 10/06/2026
 
