@@ -114,11 +114,22 @@ export const workspace = {
       /* empty */
     },
   }),
+  onDidChangeConfiguration: () => ({
+    dispose: () => {
+      /* empty */
+    },
+  }),
 };
 
 let decorationTypeCount = 0;
 
 export const window = {
+  visibleTextEditors: [] as unknown[],
+  onDidChangeVisibleTextEditors: () => ({
+    dispose: () => {
+      /* empty */
+    },
+  }),
   createTextEditorDecorationType: (options: { backgroundColor?: string }) => ({
     key: `decoration-${decorationTypeCount++}`,
     options,
