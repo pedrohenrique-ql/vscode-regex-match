@@ -1,26 +1,11 @@
 import { TextEditorDecorationType } from 'vscode';
 
-export type DecorationKey =
-  'match' | 'firstGroup' | 'secondGroup' | 'thirdGroup' | 'fourthGroup' | 'fifthGroup' | 'sixthGroup';
+export interface DecorationMapping {
+  match: TextEditorDecorationType;
+  groups: TextEditorDecorationType[];
+}
 
-export type DecorationMapping = { [type in DecorationKey]: TextEditorDecorationType };
-
-export const DECORATION_KEYS = [
-  'match',
-  'firstGroup',
-  'secondGroup',
-  'thirdGroup',
-  'fourthGroup',
-  'fifthGroup',
-  'sixthGroup',
-] as const;
-
-export const DEFAULT_DECORATION_COLORS: { [Decoration in DecorationKey]: string } = {
+export const DEFAULT_DECORATION_COLORS = {
   match: '#FFA50080',
-  firstGroup: '#518241',
-  secondGroup: '#3164CACC',
-  thirdGroup: '#6E25B7B2',
-  fourthGroup: '#D339DF99',
-  fifthGroup: '#006B6BCC',
-  sixthGroup: '#B82F2F99',
+  groups: ['#07925C99', '#3164CACC', '#6E25B7B2', '#D339DF99', '#006B6BCC', '#B82F2F99'],
 };
