@@ -1,3 +1,15 @@
+export class Disposable {
+  constructor(private callOnDispose: () => void) {}
+
+  static from(...disposables: { dispose: () => void }[]) {
+    return new Disposable(() => disposables.forEach((disposable) => disposable.dispose()));
+  }
+
+  dispose() {
+    this.callOnDispose();
+  }
+}
+
 export const Uri = {
   file: (path: string) => ({ fsPath: path, toString: () => `file://${path}` }),
   parse: (uri: string) => ({ fsPath: uri, toString: () => uri }),
@@ -100,6 +112,30 @@ export const workspace = {
   onDidChangeTextDocument: () => ({
     dispose: () => {
       /* empty */
+    },
+  }),
+  onDidChangeConfiguration: () => ({
+    dispose: () => {
+      /* empty */
+    },
+  }),
+};
+
+let decorationTypeCount = 0;
+
+export const window = {
+  visibleTextEditors: [] as unknown[],
+  onDidChangeVisibleTextEditors: () => ({
+    dispose: () => {
+      /* empty */
+    },
+  }),
+  createTextEditorDecorationType: (options: { backgroundColor?: string }) => ({
+    key: `decoration-${decorationTypeCount++}`,
+    options,
+    isDisposed: false,
+    dispose() {
+      this.isDisposed = true;
     },
   }),
 };
