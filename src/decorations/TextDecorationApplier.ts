@@ -14,19 +14,24 @@ import RegexTest, { MatchRange, MatchResult } from '@/controllers/regex-test/Reg
 import { DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
 
 class TextDecorationApplier implements Disposable {
-  private decorationSettings: DecorationMapping = {} as DecorationMapping;
+  private decorationSettings: DecorationMapping;
   private configurationChangeDisposable: Disposable = Disposable.from();
 
   private previousDecorations: Map<TextEditorDecorationType, Range[]> = new Map<TextEditorDecorationType, Range[]>();
 
   constructor() {
-    this.updateDecorationSettings();
+    this.decorationSettings = this.createDecorations();
   }
 
   private updateDecorationSettings() {
+    this.disposeDecorations();
+    this.decorationSettings = this.createDecorations();
+  }
+
+  private createDecorations(): DecorationMapping {
     const { match, groups } = this.loadColorSettings();
 
-    this.decorationSettings = {
+    return {
       match: this.createTextDecorationType({ backgroundColor: match }),
       groups: groups.map((color) => this.createTextDecorationType({ backgroundColor: color })),
     };
@@ -44,6 +49,13 @@ class TextDecorationApplier implements Disposable {
 
   private createTextDecorationType(options: DecorationRenderOptions) {
     return window.createTextEditorDecorationType(options);
+  }
+
+  private disposeDecorations() {
+    this.decorationSettings.match.dispose();
+    this.decorationSettings.groups.forEach((groupDecoration) => groupDecoration.dispose());
+
+    this.previousDecorations.clear();
   }
 
   applyDecorations(
@@ -160,6 +172,7 @@ class TextDecorationApplier implements Disposable {
   }
 
   dispose() {
+    this.disposeDecorations();
     this.configurationChangeDisposable.dispose();
   }
 }
