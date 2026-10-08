@@ -211,15 +211,13 @@ class RegexTestFile implements Disposable {
   private onChangeColorHighlightingConfiguration() {
     return workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration('regex-match.colorHighlighting')) {
-        const regexMatchEditors = window.visibleTextEditors.filter(
-          (editor) => editor.document.uri.path === this.fileUri.path,
-        );
+        this.textDecorationApplier.updateDecorationSettings();
 
-        regexMatchEditors.forEach((regexMatchEditor, index) => {
-          this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests, {
-            isToUpdateDecorations: index === 0,
+        window.visibleTextEditors
+          .filter((editor) => editor.document.uri.path === this.fileUri.path)
+          .forEach((regexMatchEditor) => {
+            this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests);
           });
-        });
       }
     });
   }

@@ -142,7 +142,7 @@ describe('Color Highlighting', () => {
       const { match, groups } = getDecorationTypes(applier);
 
       stubColorSettings({ match: '#444444', groups: ['#555555'] });
-      applier.applyDecorations(createTextEditor(), [], { isToUpdateDecorations: true });
+      applier.updateDecorationSettings();
 
       expect([match, ...groups].map((decorationType) => decorationType.isDisposed)).toEqual([true, true, true]);
 
@@ -168,7 +168,10 @@ describe('Color Highlighting', () => {
   });
 
   describe('Configuration Change', () => {
-    function changeColorHighlightingConfiguration(settings: Record<string, unknown>) {
+    function changeColorHighlightingConfiguration(
+      settings: Record<string, unknown>,
+      visibleEditorIds = ['first', 'second'],
+    ) {
       let onChangeConfiguration: ((event: ConfigurationChangeEvent) => void) | undefined;
 
       vi.spyOn(workspace, 'onDidChangeConfiguration').mockImplementation((listener) => {
@@ -176,18 +179,21 @@ describe('Color Highlighting', () => {
         return { dispose: () => undefined };
       });
 
-      Object.assign(window, { visibleTextEditors: [createTextEditor('first'), createTextEditor('second')] });
+      Object.assign(window, { visibleTextEditors: visibleEditorIds.map(createTextEditor) });
 
       const diagnosticProvider = { updateDiagnostics: () => undefined } as unknown as DiagnosticProvider;
-      new RegexTestFile(Uri.file(FILE_PATH), diagnosticProvider);
+      const regexTestFile = new RegexTestFile(Uri.file(FILE_PATH), diagnosticProvider);
 
       appliedDecorations = [];
       stubColorSettings(settings);
 
       onChangeConfiguration?.({ affectsConfiguration: () => true });
+
+      return regexTestFile;
     }
 
     beforeEach(() => {
+      Object.assign(window, { visibleTextEditors: [] });
       stubColorSettings({ match: '#111111', groups: ['#222222', '#333333'] });
     });
 
@@ -206,6 +212,17 @@ describe('Color Highlighting', () => {
       }
 
       expect(getDecorationTypesOf('first')).toEqual(getDecorationTypesOf('second'));
+    });
+
+    it('should update the colors when the file is not visible in any editor', () => {
+      const regexTestFile = changeColorHighlightingConfiguration({ match: '#111111', groups: ['#444444'] }, []);
+
+      const reopenedEditor = createTextEditor('reopened');
+      regexTestFile.updateRegexTest(reopenedEditor);
+
+      expect(getColors(getPaintedDecorations('reopened').map(({ decorationType }) => decorationType))).toContain(
+        '#444444',
+      );
     });
 
     it('should apply the updated colors to every visible editor of the file', () => {

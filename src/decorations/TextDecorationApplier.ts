@@ -23,7 +23,7 @@ class TextDecorationApplier implements Disposable {
     this.decorationSettings = this.createDecorations();
   }
 
-  private updateDecorationSettings() {
+  updateDecorationSettings() {
     this.disposeDecorations();
     this.decorationSettings = this.createDecorations();
   }
@@ -59,16 +59,8 @@ class TextDecorationApplier implements Disposable {
     this.previousDecorations.clear();
   }
 
-  applyDecorations(
-    textEditor: TextEditor,
-    regexTests?: RegexTest[],
-    options: { isToUpdateDecorations: boolean } = { isToUpdateDecorations: false },
-  ) {
+  applyDecorations(textEditor: TextEditor, regexTests?: RegexTest[]) {
     this.clearDecorations(textEditor);
-
-    if (options.isToUpdateDecorations) {
-      this.updateDecorationSettings();
-    }
 
     const capturingGroupDecorations = this.decorationSettings.groups;
 
