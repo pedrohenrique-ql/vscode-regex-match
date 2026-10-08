@@ -11,7 +11,7 @@ import {
 
 import RegexTest, { MatchRange, MatchResult } from '@/controllers/regex-test/RegexTest';
 
-import { DecorationMapping, DEFAULT_DECORATION_COLORS } from './utils';
+import { DecorationMapping, DEFAULT_DECORATION_COLORS, MAX_GROUP_COLORS } from './utils';
 
 class TextDecorationApplier implements Disposable {
   private decorationSettings: DecorationMapping;
@@ -40,10 +40,11 @@ class TextDecorationApplier implements Disposable {
   private loadColorSettings() {
     const configuration = workspace.getConfiguration('regex-match.colorHighlighting');
     const groups = configuration.get<string[]>('groups', DEFAULT_DECORATION_COLORS.groups);
+    const isGroupListValid = Array.isArray(groups) && groups.length > 0;
 
     return {
       match: configuration.get('match', DEFAULT_DECORATION_COLORS.match),
-      groups: groups.length > 0 ? groups : DEFAULT_DECORATION_COLORS.groups,
+      groups: (isGroupListValid ? groups : DEFAULT_DECORATION_COLORS.groups).slice(0, MAX_GROUP_COLORS),
     };
   }
 

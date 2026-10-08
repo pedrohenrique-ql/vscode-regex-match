@@ -13,7 +13,7 @@ import {
 
 import RegexTestFile from '@/controllers/regex-test/RegexTestFile';
 import TextDecorationApplier from '@/decorations/TextDecorationApplier';
-import { DEFAULT_DECORATION_COLORS } from '@/decorations/utils';
+import { DEFAULT_DECORATION_COLORS, MAX_GROUP_COLORS } from '@/decorations/utils';
 import DiagnosticProvider from '@/providers/DiagnosticProvider';
 import { createRegexTest } from '@/tests/factories/RegexTestFactory';
 
@@ -100,6 +100,23 @@ describe('Color Highlighting', () => {
       const { groups } = getDecorationTypes(new TextDecorationApplier());
 
       expect(getColors(groups)).toEqual(DEFAULT_DECORATION_COLORS.groups);
+    });
+
+    it('should fall back to the default group colors when the group color list is not an array', () => {
+      stubColorSettings({ match: '#111111', groups: '#222222' });
+
+      const { groups } = getDecorationTypes(new TextDecorationApplier());
+
+      expect(getColors(groups)).toEqual(DEFAULT_DECORATION_COLORS.groups);
+    });
+
+    it('should cap the group color list', () => {
+      const colors = Array.from({ length: MAX_GROUP_COLORS + 10 }, (_, index) => `#${index}`);
+      stubColorSettings({ match: '#111111', groups: colors });
+
+      const { groups } = getDecorationTypes(new TextDecorationApplier());
+
+      expect(getColors(groups)).toEqual(colors.slice(0, MAX_GROUP_COLORS));
     });
 
     it('should cycle the group colors when a match has more groups than colors', () => {
