@@ -81,16 +81,11 @@ You can test multiple regular expressions in the same file. Each regex test shou
 
 The following settings are available to customize the extension:
 
-| Setting Type                                | Default Value | Description                                                                  |
-| ------------------------------------------- | ------------- | ---------------------------------------------------------------------------- |
-| `regex-match.codeLens.enabled`              | `true`        | Enable the code lens that allows you to test the regex from the code editor. |
-| `regex-match.colorHighlighting.match`       | `#FFA50080`   | Color used to highlight the matches.                                         |
-| `regex-match.colorHighlighting.firstGroup`  | `#07925C99`   | Color used to highlight the first group.                                     |
-| `regex-match.colorHighlighting.secondGroup` | `#3164CACC`   | Color used to highlight the second group.                                    |
-| `regex-match.colorHighlighting.thirdGroup`  | `#6E25B7B2`   | Color used to highlight the third group.                                     |
-| `regex-match.colorHighlighting.fourthGroup` | `#D339DF99`   | Color used to highlight the fourth group.                                    |
-| `regex-match.colorHighlighting.fifthGroup`  | `#006B6BCC`   | Color used to highlight the fifth group.                                     |
-| `regex-match.colorHighlighting.sixthGroup`  | `#B82F2F99`   | Color used to highlight the sixth group.                                     |
+| Setting Type                           | Default Value                                                                    | Description                                                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `regex-match.codeLens.enabled`         | `true`                                                                           | Enable the code lens that allows you to test the regex from the code editor.                                         |
+| `regex-match.colorHighlighting.match`  | `#FFA50080`                                                                      | Color used to highlight the matches.                                                                                 |
+| `regex-match.colorHighlighting.groups` | `["#07925C99", "#3164CACC", "#6E25B7B2", "#D339DF99", "#006B6BCC", "#B82F2F99"]` | Colors used to highlight the capturing groups, applied in order and cycled when a match has more groups than colors. |
 
 ## 📝 Release Notes
 
