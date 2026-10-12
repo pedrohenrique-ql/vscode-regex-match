@@ -91,6 +91,13 @@ The following settings are available to customize the extension:
 
 ## 📝 Release Notes
 
+## [v0.8.0] - 12/10/2026
+
+- Added a hover on the regex line that explains each token and flag.
+- Scoped invalid regex errors to their own test block, keeping the other blocks highlighted instead of dropping every highlight in the file.
+- Replaced the `firstGroup` to `sixthGroup` color settings with a single `regex-match.colorHighlighting.groups` list, allowing any number of capturing group colors.
+- Fixed the decoration types leaking on every color setting change, since the previous ones were never disposed.
+
 ## [v0.7.2]
 
 - Fixed the test-block end pattern that could never match, causing the rule to consume the entire file from the first regex line to EOF.
@@ -108,12 +115,6 @@ The following settings are available to customize the extension:
 
 - Fixed the regex detector to detect regex in arrays.
 - Fixed regex detector to detect regex with slash in the middle of its text.
-
-## [v0.6.0]
-
-- Created a snippet to insert a regex test block into the regex test file.
-- Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
-- Fixed loss of highlights when opening regex test file when opening VSCode.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 

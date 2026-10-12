@@ -1,6 +1,6 @@
-# Change Log
+# Changelog
 
-## [v0.8.0]
+## [v0.8.0] - 12/10/2026
 
 - Added a hover on the regex line that explains each token and flag.
 - Scoped invalid regex errors to their own test block, keeping the other blocks highlighted instead of dropping every highlight in the file.
