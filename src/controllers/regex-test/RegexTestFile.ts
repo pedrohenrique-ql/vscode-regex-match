@@ -21,6 +21,8 @@ import { CodeRegex } from '@/providers/code-lenses/TestRegexCodeLensProvider';
 import DiagnosticProvider from '@/providers/DiagnosticProvider';
 import { disposeAll } from '@/utils/dispose';
 
+export const DOCUMENT_CHANGE_DEBOUNCE_MS = 150;
+
 class RegexTestFile implements Disposable {
   private readonly fileUri: Uri;
   private readonly isDefaultTestFile: boolean;
@@ -33,6 +35,10 @@ class RegexTestFile implements Disposable {
 
   private currentViewColumn: ViewColumn | undefined;
   private isEditorVisible = false;
+
+  private pendingChangeTimeout?: ReturnType<typeof setTimeout>;
+  private pendingChangeEditor?: TextEditor;
+  private pendingCodeRegex?: CodeRegex;
 
   constructor(
     fileUri: Uri,
@@ -147,7 +153,21 @@ class RegexTestFile implements Disposable {
   }
 
   handleTextDocumentChange(textEditor: TextEditor, codeRegex?: CodeRegex) {
-    this.updateRegexTest(textEditor, codeRegex);
+    this.pendingChangeEditor = textEditor;
+    this.pendingCodeRegex = codeRegex ?? this.pendingCodeRegex;
+
+    clearTimeout(this.pendingChangeTimeout);
+
+    this.pendingChangeTimeout = setTimeout(() => {
+      const editor = this.pendingChangeEditor ?? textEditor;
+      const pendingCodeRegex = this.pendingCodeRegex;
+
+      this.pendingChangeTimeout = undefined;
+      this.pendingChangeEditor = undefined;
+      this.pendingCodeRegex = undefined;
+
+      this.updateRegexTest(editor, pendingCodeRegex);
+    }, DOCUMENT_CHANGE_DEBOUNCE_MS);
   }
 
   private onChangeVisibleEditors(textEditors: readonly TextEditor[]) {
@@ -223,6 +243,11 @@ class RegexTestFile implements Disposable {
   }
 
   dispose() {
+    clearTimeout(this.pendingChangeTimeout);
+    this.pendingChangeTimeout = undefined;
+    this.pendingChangeEditor = undefined;
+    this.pendingCodeRegex = undefined;
+
     this.textDecorationApplier.dispose();
     disposeAll(this.disposables);
   }
