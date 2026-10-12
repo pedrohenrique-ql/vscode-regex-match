@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import {
   ConfigurationChangeEvent,
+  DecorationRangeBehavior,
   Position,
   Range,
   TextEditor,
@@ -23,7 +24,7 @@ const FILE_PATH = '/regex-match/RegexMatch.rgx';
 const FILE_CONTENT = '/(a+)(b+)/gm\n---\naabb\n---';
 
 interface MockedDecorationType extends TextEditorDecorationType {
-  options: { backgroundColor?: string };
+  options: { backgroundColor?: string; rangeBehavior?: DecorationRangeBehavior };
   isDisposed: boolean;
 }
 
@@ -133,6 +134,16 @@ describe('Color Highlighting', () => {
 
       expect(getColors(groupDecorations.map(({ decorationType }) => decorationType))).toEqual(['#222222', '#333333']);
       expect(groupDecorations.map(({ ranges }) => ranges.length)).toEqual([2, 1]);
+    });
+
+    it('should not grow the decorations when text is typed at their edges', () => {
+      stubColorSettings({});
+
+      const { match, groups } = getDecorationTypes(new TextDecorationApplier());
+
+      for (const decorationType of [match, ...groups]) {
+        expect(decorationType.options.rangeBehavior).toBe(DecorationRangeBehavior.ClosedClosed);
+      }
     });
 
     it('should dispose the previous decoration types when the color settings are updated', () => {

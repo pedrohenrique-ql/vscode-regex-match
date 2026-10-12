@@ -10,6 +10,13 @@ export class Disposable {
   }
 }
 
+export const DecorationRangeBehavior = {
+  OpenOpen: 0,
+  ClosedClosed: 1,
+  OpenClosed: 2,
+  ClosedOpen: 3,
+};
+
 export const Uri = {
   file: (path: string) => ({ fsPath: path, toString: () => `file://${path}` }),
   parse: (uri: string) => ({ fsPath: uri, toString: () => uri }),
@@ -130,7 +137,7 @@ export const window = {
       /* empty */
     },
   }),
-  createTextEditorDecorationType: (options: { backgroundColor?: string }) => ({
+  createTextEditorDecorationType: (options: { backgroundColor?: string; rangeBehavior?: number }) => ({
     key: `decoration-${decorationTypeCount++}`,
     options,
     isDisposed: false,
