@@ -1,4 +1,5 @@
 import {
+  DecorationRangeBehavior,
   DecorationRenderOptions,
   Disposable,
   Range,
@@ -49,7 +50,7 @@ class TextDecorationApplier implements Disposable {
   }
 
   private createTextDecorationType(options: DecorationRenderOptions) {
-    return window.createTextEditorDecorationType(options);
+    return window.createTextEditorDecorationType({ ...options, rangeBehavior: DecorationRangeBehavior.ClosedClosed });
   }
 
   private disposeDecorations() {
