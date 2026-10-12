@@ -2,7 +2,7 @@
   "name": "regex-match",
   "displayName": "Regex Match",
   "description": "Create, test and debug regular expressions in Visual Studio Code",
-  "version": "0.7.2",
+  "version": "0.8.0",
   "author": {
     "name": "Pedro Henrique Queiroz Lúcio",
     "email": "pedrohenriqueql.dev@gmail.com"
@@ -37,6 +37,7 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
+    "onLanguage:regex-match",
     "regex-match.openRegexMatchWindow"
   ],
   "contributes": {
@@ -117,41 +118,69 @@
               "format": "color-hex",
               "description": "Color used to highlight the matches."
             },
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "format": "color-hex"
+              },
+              "default": [
+                "#07925C99",
+                "#3164CACC",
+                "#6E25B7B2",
+                "#D339DF99",
+                "#006B6BCC",
+                "#B82F2F99"
+              ],
+              "description": "Colors used to highlight the capturing groups, applied in order and cycled when a match has more groups than colors."
+            },
             "firstGroup": {
               "type": "string",
               "default": "#07925C99",
               "format": "color-hex",
-              "description": "Color used to highlight the first group."
+              "description": "Color used to highlight the first group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             },
             "secondGroup": {
               "type": "string",
               "default": "#3164CACC",
               "format": "color-hex",
-              "description": "Color used to highlight the second group."
+              "description": "Color used to highlight the second group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             },
             "thirdGroup": {
               "type": "string",
               "default": "#6E25B7B2",
               "format": "color-hex",
-              "description": "Color used to highlight the third group."
+              "description": "Color used to highlight the third group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             },
             "fourthGroup": {
               "type": "string",
               "default": "#D339DF99",
               "format": "color-hex",
-              "description": "Color used to highlight the fourth group."
+              "description": "Color used to highlight the fourth group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             },
             "fifthGroup": {
               "type": "string",
               "default": "#006B6BCC",
               "format": "color-hex",
-              "description": "Color used to highlight the fifth group."
+              "description": "Color used to highlight the fifth group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             },
             "sixthGroup": {
               "type": "string",
               "default": "#B82F2F99",
               "format": "color-hex",
-              "description": "Color used to highlight the sixth group."
+              "description": "Color used to highlight the sixth group.",
+              "deprecationMessage": "Deprecated: use regex-match.colorHighlighting.groups instead.",
+              "markdownDeprecationMessage": "**Deprecated**: this setting is ignored. Use `#regex-match.colorHighlighting.groups#` instead."
             }
           }
         }
@@ -175,39 +204,42 @@
     "pre:push": "concurrently --names style,lint,types 'pnpm style:check .' 'pnpm lint .' 'pnpm types:check'",
     "prepare": "husky"
   },
+  "dependencies": {
+    "@eslint-community/regexpp": "^4.12.2"
+  },
   "devDependencies": {
-    "@commitlint/cli": "^21.0.2",
-    "@commitlint/config-conventional": "^21.0.2",
-    "@eslint/compat": "^2.1.0",
+    "@commitlint/cli": "^21.2.3",
+    "@commitlint/config-conventional": "^21.2.3",
+    "@eslint/compat": "^2.1.1",
     "@types/fs-extra": "^11.0.4",
     "@types/mocha": "^10.0.10",
-    "@types/node": "^25.9.3",
+    "@types/node": "^26.6.4",
     "@types/tmp": "^0.2.6",
     "@types/vscode": "^1.96.0",
-    "@typescript-eslint/eslint-plugin": "^8.61.0",
-    "@typescript-eslint/parser": "^8.61.0",
-    "@vscode/test-cli": "^0.0.12",
-    "@vscode/test-electron": "^3.0.0",
-    "@vscode/vsce": "^3.9.2",
-    "concurrently": "^10.0.3",
-    "eslint": "^9.39.4",
+    "@typescript-eslint/eslint-plugin": "^8.71.1",
+    "@typescript-eslint/parser": "^8.71.1",
+    "@vscode/test-cli": "^0.0.15",
+    "@vscode/test-electron": "^3.1.0",
+    "@vscode/vsce": "^4.0.0",
+    "concurrently": "^10.0.5",
+    "eslint": "^9.39.5",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.5",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-import-helpers": "^2.0.2",
     "eslint-plugin-prettier": "^5.5.6",
-    "fs-extra": "^11.3.5",
+    "fs-extra": "^11.4.1",
     "glob": "^13.0.6",
     "husky": "^9.1.7",
-    "lint-staged": "^17.0.7",
-    "mocha": "^11.7.6",
-    "prettier": "^3.8.4",
-    "prettier-plugin-sh": "^0.18.1",
+    "lint-staged": "^17.6.0",
+    "mocha": "^11.8.0",
+    "prettier": "^3.9.9",
+    "prettier-plugin-sh": "^0.20.2",
     "tmp": "^0.2.7",
     "tsup": "^8.5.1",
     "typescript": "^6.0.3",
     "vite-tsconfig-paths": "^6.1.1",
-    "vitest": "^4.1.8",
+    "vitest": "^5.0.3",
     "vscode-oniguruma": "^2.0.1",
     "vscode-textmate": "^9.2.0"
   },
@@ -215,19 +247,29 @@
     "overrides": {
       "jws": "^3.2.3",
       "qs": "^6.14.1",
+      "esbuild": "^0.28.1",
       "glob@10.4.5": "^10.5.0",
       "js-yaml": "^4.1.1",
       "lodash": "^4.18.1",
       "vite": "^7.3.5",
       "rollup": "^4.59.0",
       "flatted": "^3.4.2",
-      "serialize-javascript": "^7.0.5",
-      "undici": "^7.24.0",
+      "serialize-javascript": "^7.1.2",
+      "undici": "^7.29.0",
+      "form-data": "^4.0.6",
+      "linkify-it": "^5.0.2",
       "minimatch@^3.0.0": "^3.1.3",
       "minimatch@^9.0.0": "^9.0.7",
       "minimatch@^10.0.0": "^10.2.3",
       "picomatch@^2.0.0": "^2.3.2",
-      "picomatch@^4.0.0": "^4.0.4"
-    }
+      "picomatch@^4.0.0": "^4.0.4",
+      "brace-expansion@^1.0.0": "^1.1.21",
+      "brace-expansion@^2.0.0": "^2.1.7",
+      "brace-expansion@^5.0.0": "^5.0.12",
+      "shell-quote": "^1.11.0"
+    },
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
   }
 }

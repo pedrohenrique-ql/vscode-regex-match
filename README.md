@@ -67,6 +67,12 @@ Each group in a regular expression is highlighted in a different color, making i
 
 ![Highlight of Capturing Groups](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/assets/capturing-groups-feature.gif)
 
+### Explanation of Regex Tokens on Hover
+
+Hover any character of the regex line in a Regex Match file to see what the token under the cursor does, along with the quantifier, group and character class that enclose it. Hovering a flag explains that flag and the other flags of the regex.
+
+![Regex Hover](https://raw.githubusercontent.com/pedrohenrique-ql/vscode-regex-match/main/assets/hover.gif)
+
 ### Test Multiple Regular Expressions
 
 You can test multiple regular expressions in the same file. Each regex test should follow the specified syntax, with its own test lines and capture groups. This feature allows you to test different regex patterns independently in the same file.
@@ -77,18 +83,20 @@ You can test multiple regular expressions in the same file. Each regex test shou
 
 The following settings are available to customize the extension:
 
-| Setting Type                                | Default Value | Description                                                                  |
-| ------------------------------------------- | ------------- | ---------------------------------------------------------------------------- |
-| `regex-match.codeLens.enabled`              | `true`        | Enable the code lens that allows you to test the regex from the code editor. |
-| `regex-match.colorHighlighting.match`       | `#FFA50080`   | Color used to highlight the matches.                                         |
-| `regex-match.colorHighlighting.firstGroup`  | `#07925C99`   | Color used to highlight the first group.                                     |
-| `regex-match.colorHighlighting.secondGroup` | `#3164CACC`   | Color used to highlight the second group.                                    |
-| `regex-match.colorHighlighting.thirdGroup`  | `#6E25B7B2`   | Color used to highlight the third group.                                     |
-| `regex-match.colorHighlighting.fourthGroup` | `#D339DF99`   | Color used to highlight the fourth group.                                    |
-| `regex-match.colorHighlighting.fifthGroup`  | `#006B6BCC`   | Color used to highlight the fifth group.                                     |
-| `regex-match.colorHighlighting.sixthGroup`  | `#B82F2F99`   | Color used to highlight the sixth group.                                     |
+| Setting Type                           | Default Value                                                                    | Description                                                                                                          |
+| -------------------------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `regex-match.codeLens.enabled`         | `true`                                                                           | Enable the code lens that allows you to test the regex from the code editor.                                         |
+| `regex-match.colorHighlighting.match`  | `#FFA50080`                                                                      | Color used to highlight the matches.                                                                                 |
+| `regex-match.colorHighlighting.groups` | `["#07925C99", "#3164CACC", "#6E25B7B2", "#D339DF99", "#006B6BCC", "#B82F2F99"]` | Colors used to highlight the capturing groups, applied in order and cycled when a match has more groups than colors. |
 
 ## 📝 Release Notes
+
+## [v0.8.0] - 12/10/2026
+
+- Added a hover on the regex line that explains each token and flag.
+- Scoped invalid regex errors to their own test block, keeping the other blocks highlighted instead of dropping every highlight in the file.
+- Replaced the `firstGroup` to `sixthGroup` color settings with a single `regex-match.colorHighlighting.groups` list, allowing any number of capturing group colors.
+- Fixed the decoration types leaking on every color setting change, since the previous ones were never disposed.
 
 ## [v0.7.2]
 
@@ -107,12 +115,6 @@ The following settings are available to customize the extension:
 
 - Fixed the regex detector to detect regex in arrays.
 - Fixed regex detector to detect regex with slash in the middle of its text.
-
-## [v0.6.0]
-
-- Created a snippet to insert a regex test block into the regex test file.
-- Allowed to test many regex that came from the code in the regex test file by adding them below the existing ones.
-- Fixed loss of highlights when opening regex test file when opening VSCode.
 
 View the full [CHANGELOG](./CHANGELOG.md).
 

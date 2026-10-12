@@ -114,6 +114,14 @@ class RegexTestFile implements Disposable {
       const parsedRegexTests = FileParser.parseFileContent(fileContent, this.regexTests, codeRegex);
       this.regexTests = parsedRegexTests;
 
+      for (const regexTest of parsedRegexTests) {
+        const error = regexTest.getError();
+
+        if (error) {
+          diagnostics.push(this.createLineDiagnostic(document, error.line, error.message));
+        }
+      }
+
       return parsedRegexTests;
     } catch (error) {
       if (error instanceof Error) {
@@ -126,16 +134,16 @@ class RegexTestFile implements Disposable {
   }
 
   private handleError(error: Error, document: TextDocument): Diagnostic {
-    let documentErrorLine = document.lineAt(0).text;
-    let errorRange = new Range(0, 0, 0, documentErrorLine.length);
+    const errorLine = error instanceof RegexMatchFormatError || error instanceof RegexSyntaxError ? error.line : 0;
 
-    if (error instanceof RegexMatchFormatError || error instanceof RegexSyntaxError) {
-      documentErrorLine = document.lineAt(error.line).text;
-      errorRange = new Range(error.line, 0, error.line, documentErrorLine.length);
-    }
+    return this.createLineDiagnostic(document, errorLine, error.message);
+  }
 
-    const diagnosticError = this.diagnosticProvider.createErrorDiagnostic(errorRange, error.message);
-    return diagnosticError;
+  private createLineDiagnostic(document: TextDocument, line: number, message: string): Diagnostic {
+    const lineText = document.lineAt(line).text;
+    const range = new Range(line, 0, line, lineText.length);
+
+    return this.diagnosticProvider.createErrorDiagnostic(range, message);
   }
 
   handleTextDocumentChange(textEditor: TextEditor, codeRegex?: CodeRegex) {
@@ -203,15 +211,13 @@ class RegexTestFile implements Disposable {
   private onChangeColorHighlightingConfiguration() {
     return workspace.onDidChangeConfiguration((event) => {
       if (event.affectsConfiguration('regex-match.colorHighlighting')) {
-        const visibleEditors = window.visibleTextEditors;
+        this.textDecorationApplier.updateDecorationSettings();
 
-        const regexMatchEditor = visibleEditors.find((editor) => editor.document.uri.path === this.fileUri.path);
-
-        if (regexMatchEditor) {
-          this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests, {
-            isToUpdateDecorations: true,
+        window.visibleTextEditors
+          .filter((editor) => editor.document.uri.path === this.fileUri.path)
+          .forEach((regexMatchEditor) => {
+            this.textDecorationApplier.applyDecorations(regexMatchEditor, this.regexTests);
           });
-        }
       }
     });
   }

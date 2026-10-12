@@ -92,9 +92,10 @@ class FileParser {
           continue;
         }
 
-        const regexTestWithSameMatchingRegexIndex = newRegexTests.findIndex(
-          (regexTest) => regexTest.getMatchingRegexSource() === currentRegexTest.getMatchingRegexSource(),
-        );
+        const currentMatchingRegexSource = currentRegexTest.getMatchingRegexSource();
+        const regexTestWithSameMatchingRegexIndex = currentMatchingRegexSource
+          ? newRegexTests.findIndex((regexTest) => regexTest.getMatchingRegexSource() === currentMatchingRegexSource)
+          : -1;
 
         if (regexTestWithSameMatchingRegexIndex !== -1) {
           newRegexTests[regexTestWithSameMatchingRegexIndex].setCodeRegex(currentRegexTest.getCodeRegex());
@@ -121,9 +122,10 @@ class FileParser {
           continue;
         }
 
-        const currentRegexTest = currentRegexTests.find(
-          (regexTest) => regexTest.getMatchingRegexSource() === newRegexTest.getMatchingRegexSource(),
-        );
+        const newMatchingRegexSource = newRegexTest.getMatchingRegexSource();
+        const currentRegexTest = newMatchingRegexSource
+          ? currentRegexTests.find((regexTest) => regexTest.getMatchingRegexSource() === newMatchingRegexSource)
+          : undefined;
 
         if (currentRegexTest) {
           newRegexTest.setCodeRegex(currentRegexTest.getCodeRegex());

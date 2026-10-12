@@ -14,6 +14,7 @@ vitest.config.mjs
 .prettierrc
 .eslintrc
 .eslintignore
+eslint.config.mjs
 .eslintcache
 .gitignore
 .vscode-test.mjs
@@ -24,3 +25,6 @@ tsup.config.ts
 
 ## TS files
 src/**
+
+# Assets served from GitHub in the README
+assets/*.gif
