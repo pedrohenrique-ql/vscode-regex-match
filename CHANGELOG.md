@@ -1,5 +1,10 @@
 # Change Log
 
+## [v0.8.1]
+
+- Fixed the test file being re-parsed on every keystroke.
+- Fixed the match highlights growing while typing at their edges.
+
 ## [v0.8.0]
 
 - Added a hover on the regex line that explains each token and flag.
