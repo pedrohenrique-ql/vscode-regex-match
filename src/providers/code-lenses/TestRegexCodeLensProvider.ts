@@ -1,6 +1,6 @@
 import { CodeLens, CodeLensProvider, Command, ProviderResult, Range, TextDocument, Uri } from 'vscode';
 
-import { getRegexDetect } from './utils';
+import { getRegexDetect, normalizePythonRegexPattern } from './utils';
 
 export interface CodeRegex {
   pattern: string;
@@ -25,7 +25,11 @@ class TestRegexCodeLensProvider implements CodeLensProvider {
       const endPosition = document.positionAt(matches.index + matches[0].length);
       const range = new Range(startPosition, endPosition);
 
-      const pattern = matches[0].trim();
+      const isPython = document.languageId === 'python';
+      const isRawPythonString = isPython && /[rR]["']$/.test(textCode.slice(0, matches.index));
+      const pattern = isPython
+        ? normalizePythonRegexPattern(matches[0], isRawPythonString)
+        : matches[0].trim();
       const codeRegex: CodeRegex = { pattern, range, documentUri: document.uri };
 
       const command: Command = {
