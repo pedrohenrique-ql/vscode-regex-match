@@ -37,6 +37,7 @@
     "onLanguage:javascriptreact",
     "onLanguage:typescript",
     "onLanguage:typescriptreact",
+    "onLanguage:python",
     "onLanguage:regex-match",
     "regex-match.openRegexMatchWindow"
   ],

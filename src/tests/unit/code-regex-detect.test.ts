@@ -1,6 +1,15 @@
-import { expect, beforeEach, describe, it } from 'vitest';
+import { expect, beforeEach, describe, it, vi } from 'vitest';
+import { CodeLens, Position, TextDocument, Uri } from 'vscode';
 
-import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
+import TestRegexCodeLensProvider from '@/providers/code-lenses/TestRegexCodeLensProvider';
+import {
+  JAVASCRIPT_REGEX_DETECT,
+  PYTHON_REGEX_DETECT,
+  getRegexDetect,
+  normalizePythonRegexPattern,
+} from '@/providers/code-lenses/utils';
+
+vi.mock('vscode', () => vi.importActual('@/tests/mocks/vscode'));
 
 describe('Code Regex Detect', () => {
   function getAllMatches(regex: RegExp, text: string): RegExpExecArray[] {
@@ -163,5 +172,83 @@ describe('Code Regex Detect', () => {
       expect(matches).toHaveLength(1);
       expect(matches[0][0].trim()).toEqual(`/hello/${flag}`);
     });
+  });
+
+  it('should get regex detect for Python', () => {
+    const regexDetect = getRegexDetect('python');
+    expect(regexDetect).toBeDefined();
+    expect(regexDetect).toEqual(PYTHON_REGEX_DETECT);
+  });
+
+  describe('Python', () => {
+    const regexDetect = getRegexDetect('python');
+
+    beforeEach(() => {
+      regexDetect!.lastIndex = 0;
+    });
+
+    it.each(['compile', 'match', 'search', 'fullmatch', 'findall', 'finditer', 'sub', 'subn', 'split'])(
+      'should detect the pattern argument of re.%s',
+      (functionName) => {
+        const code = 're.' + functionName + '(r"\\d+", value)';
+        const matches = getAllMatches(regexDetect!, code);
+
+        expect(matches.map((match) => match[0])).toEqual(['\\d+']);
+      },
+    );
+
+    it('should detect patterns from raw and regular strings on the same line', () => {
+      const code = 're.compile(r"\\d+"); re.search("\\\\w+", value)';
+      const matches = getAllMatches(regexDetect!, code);
+
+      expect(matches.map((match) => match[0])).toEqual(['\\d+', '\\\\w+']);
+    });
+
+    it('should detect single- and double-quoted patterns', () => {
+      const code = 're.compile(r\'first\'); re.match(r"second", value)';
+      const matches = getAllMatches(regexDetect!, code);
+
+      expect(matches.map((match) => match[0])).toEqual(['first', 'second']);
+    });
+
+    it('should not detect patterns in Python comments', () => {
+      const code = '# re.compile(r"ignored")\nre.compile(r"kept")';
+      const matches = getAllMatches(regexDetect!, code);
+
+      expect(matches.map((match) => match[0])).toEqual(['kept']);
+    });
+
+    it('should handle escaped quotes and backslashes in raw strings', () => {
+      const code = 're.compile(r"quote: \\" and slash \\\\d")';
+      const matches = getAllMatches(regexDetect!, code);
+
+      expect(matches).toHaveLength(1);
+      expect(matches[0][0]).toBe('quote: \\" and slash \\\\d');
+    });
+
+    it('should normalize regular Python string escapes but preserve raw strings', () => {
+      expect(normalizePythonRegexPattern('\\\\d+', false)).toBe('\\d+');
+      expect(normalizePythonRegexPattern('\\b', false)).toBe('\\x08');
+      expect(normalizePythonRegexPattern('\\d+', true)).toBe('\\d+');
+    });
+  });
+});
+
+describe('Python Test Regex CodeLens', () => {
+  it.each([
+    ['raw', 're.compile(r"\\d+")'],
+    ['regular', 're.compile("\\\\d+")'],
+  ])('should pass the normalized pattern from a %s string', (_kind, code) => {
+    const document = {
+      languageId: 'python',
+      getText: () => code,
+      positionAt: (index: number) => new Position(0, index),
+      uri: Uri.file('/example.py'),
+    } as unknown as TextDocument;
+
+    const codeLenses = new TestRegexCodeLensProvider().provideCodeLenses(document) as CodeLens[];
+
+    expect(codeLenses).toHaveLength(1);
+    expect(codeLenses[0].command?.arguments?.[0]).toMatchObject({ pattern: '\\d+' });
   });
 });
