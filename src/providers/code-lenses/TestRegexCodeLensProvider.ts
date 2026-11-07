@@ -27,9 +27,7 @@ class TestRegexCodeLensProvider implements CodeLensProvider {
 
       const isPython = document.languageId === 'python';
       const isRawPythonString = isPython && /[rR]["']$/.test(textCode.slice(0, matches.index));
-      const pattern = isPython
-        ? normalizePythonRegexPattern(matches[0], isRawPythonString)
-        : matches[0].trim();
+      const pattern = isPython ? normalizePythonRegexPattern(matches[0], isRawPythonString) : matches[0].trim();
       const codeRegex: CodeRegex = { pattern, range, documentUri: document.uri };
 
       const command: Command = {
