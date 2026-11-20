@@ -1,8 +1,7 @@
 import { expect, beforeEach, describe, it } from 'vitest';
-
 import { JAVASCRIPT_REGEX_DETECT, getRegexDetect } from '@/providers/code-lenses/utils';
 
-describe('Code Regex Detect', () => {
+describe('Code Regex Detect (JavaScript)', () => {
   function getAllMatches(regex: RegExp, text: string): RegExpExecArray[] {
     if (!regex.global) {
       throw new Error("A expressão regular deve ter a flag global 'g' para capturar todas as correspondências.");
@@ -164,4 +163,5 @@ describe('Code Regex Detect', () => {
       expect(matches[0][0].trim()).toEqual(`/hello/${flag}`);
     });
   });
+
 });

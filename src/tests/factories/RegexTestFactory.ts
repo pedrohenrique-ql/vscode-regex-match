@@ -5,6 +5,7 @@ import RegexTest, { RegexTestProps } from '@/controllers/regex-test/RegexTest';
 export interface CreateRegexTestOptions extends Partial<RegexTestProps> {
   codeRegexPattern?: string;
   codeRegexUri?: string;
+  codeRegexLanguageId?: string;
 }
 
 export function createRegexTest(options: CreateRegexTestOptions = {}): RegexTest {
@@ -16,6 +17,7 @@ export function createRegexTest(options: CreateRegexTestOptions = {}): RegexTest
     isCodeRegex = false,
     codeRegexPattern = '/hello/gm',
     codeRegexUri = 'test://code',
+    codeRegexLanguageId,
   } = options;
 
   const codeRegex = isCodeRegex
@@ -23,6 +25,7 @@ export function createRegexTest(options: CreateRegexTestOptions = {}): RegexTest
         pattern: codeRegexPattern,
         range: new Range(new Position(0, 0), new Position(0, codeRegexPattern.length)),
         documentUri: Uri.parse(codeRegexUri),
+        languageId: codeRegexLanguageId,
       }
     : undefined;
 

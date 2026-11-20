@@ -68,6 +68,13 @@ describe('Apply Regex to Code - Code Lens', () => {
     expect(result).toEqual([]);
   });
 
+  it('should not create an Apply CodeLens for Python regexes', () => {
+    const regexTest = createRegexTest({ isCodeRegex: true, codeRegexLanguageId: 'python' });
+    setupDocumentText('test');
+    provider.setRegexTests([regexTest]);
+    expect(provider.provideCodeLenses(mockDocument)).toEqual([]);
+  });
+
   it('should create code lens for single match', () => {
     const documentText = 'test';
     const regexTest = createRegexTest({
