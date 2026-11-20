@@ -60,7 +60,7 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
   }
 
   private shouldProcessRegexTest(regexTest: RegexTest): boolean {
-    if (!regexTest.isCodeRegex()) {
+    if (!regexTest.isCodeRegex() || regexTest.getCodeRegex()?.languageId === 'python') {
       return false;
     }
 
