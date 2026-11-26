@@ -11,6 +11,7 @@ import {
 
 import RegexTest from '@/controllers/regex-test/RegexTest';
 import { escapeRegexSource } from '@/utils/regex';
+import { getRegexLanguage } from './languages';
 
 class ApplyRegexCodeLensProvider implements CodeLensProvider {
   private regexTests: RegexTest[];
@@ -27,24 +28,13 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
 
     for (let currentIndex = 0; currentIndex < this.regexTests.length; currentIndex++) {
       const regexTest = this.regexTests[currentIndex];
-
-      if (!this.shouldProcessRegexTest(regexTest)) {
-        continue;
-      }
+      if (!this.shouldProcessRegexTest(regexTest)) continue;
 
       const matchRanges = this.findRegexMatchRanges(document, regexTest);
-      if (matchRanges.length === 0) {
-        continue;
-      }
-
-      if (!this.isCodeRegexInEditor(regexTest)) {
-        continue;
-      }
+      if (matchRanges.length === 0 || !this.isCodeRegexInEditor(regexTest)) continue;
 
       const matchingRegexSource = regexTest.getMatchingRegexSource();
-      if (!matchingRegexSource) {
-        continue;
-      }
+      if (!matchingRegexSource) continue;
 
       const targetRange = this.determineTargetRange(matchRanges, currentIndex, matchingRegexSource);
       const command = {
@@ -60,34 +50,26 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
   }
 
   private shouldProcessRegexTest(regexTest: RegexTest): boolean {
-    if (!regexTest.isCodeRegex()) {
-      return false;
-    }
+    const codeRegex = regexTest.getCodeRegex();
+    const languageId = codeRegex?.languageId ?? 'javascript';
+    if (!regexTest.isCodeRegex() || !getRegexLanguage(languageId)?.canApply) return false;
 
     const updatedRegex = regexTest.getMatchingRegex();
     const codeRegExp = regexTest.getCodeRegExp();
-
-    if (!updatedRegex || !codeRegExp) {
-      return false;
-    }
+    if (!updatedRegex || !codeRegExp) return false;
 
     const matchingRegexSource = regexTest.getMatchingRegexSource();
     const codeRegexSource = `/${codeRegExp.source}/${codeRegExp.flags}`;
-
     return codeRegexSource !== matchingRegexSource;
   }
 
   private findRegexMatchRanges(document: TextDocument, regexTest: RegexTest): Range[] {
     const updatedRegex = regexTest.getMatchingRegex();
-    if (!updatedRegex) {
-      return [];
-    }
+    if (!updatedRegex) return [];
 
-    const updatedRegexSource = updatedRegex.source;
-    const escapedRegexString = escapeRegexSource(updatedRegexSource);
+    const escapedRegexString = escapeRegexSource(updatedRegex.source);
     const searchRegex = new RegExp(escapedRegexString, 'g');
     const documentText = document.getText();
-
     const matchRanges: Range[] = [];
     let match: RegExpExecArray | null;
 
@@ -101,44 +83,30 @@ class ApplyRegexCodeLensProvider implements CodeLensProvider {
   }
 
   private determineTargetRange(matchRanges: Range[], currentIndex: number, matchingRegexSource: string): Range {
-    if (matchRanges.length === 1) {
-      return matchRanges[0];
-    }
+    if (matchRanges.length === 1) return matchRanges[0];
 
     const regexTestsWithSamePattern = this.getRegexTestsWithSamePattern(matchingRegexSource);
     const positionInPattern = regexTestsWithSamePattern.indexOf(currentIndex);
     const targetIndex = Math.min(positionInPattern, matchRanges.length - 1);
-
     return matchRanges[targetIndex];
   }
 
   private getRegexTestsWithSamePattern(matchingRegexSource: string): number[] {
     const indices: number[] = [];
-
     for (let i = 0; i < this.regexTests.length; i++) {
-      const otherRegexTest = this.regexTests[i];
-      const otherMatchingRegexSource = otherRegexTest.getMatchingRegexSource();
-
-      if (otherMatchingRegexSource === matchingRegexSource) {
-        indices.push(i);
-      }
+      if (this.regexTests[i].getMatchingRegexSource() === matchingRegexSource) indices.push(i);
     }
-
     return indices;
   }
 
   private isCodeRegexInEditor(regexTest: RegexTest): boolean {
     const codeRegex = regexTest.getCodeRegex();
     const codeRegexDocumentUri = codeRegex?.documentUri;
-
-    if (!codeRegexDocumentUri) {
-      return false;
-    }
+    if (!codeRegexDocumentUri) return false;
 
     const codeRegexDocument = workspace.textDocuments.find(
       (document) => document.uri.toString() === codeRegexDocumentUri.toString(),
     );
-
     return !!codeRegexDocument?.getText().includes(codeRegex.pattern);
   }
 
